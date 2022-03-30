@@ -1,0 +1,99 @@
+// Stock Market Simulation Project Database Proposal
+
+// Users collection
+{
+    "_id": "507f1f77bcf86cd799439011", /* ObjectId user_id*/
+
+    "firstName": "Daniel",
+    "lastName": "Dae Kim",
+
+    "email": "danielKim4815162342@gmail.com",
+    "username": "Jin Soo Kwon",
+
+    "hashed-password": "$5$MnfsQ4iN$ZMTppKN16y/tIsUYs/obHlhdP.Os80yXhTurpBMUbA5",
+
+    "email-updates": "weekly", /* none, hourly, daily, weekly, monthly */
+
+    "stock-market-settings": {
+        "_id": "507f1f77bcf86cd799439011",
+        "user_id": "507f1f77bcf86cd799439011", /* Each stock-market-settings configuration must correspond to a user_id */
+
+        "initial_deposit": 15000,
+
+        "automated-deposit-freq": "weekly", /* none, daily, weekly, monthly */
+        "automated-deposit-amount": 50, /* min: 0 */
+
+        "minimum_account_balance": 5000, /* min: 0 */
+
+        "insufficient-funds-option": 1 /*  '1' = buy as many shares as you can afford. '0' = do not buy any shares at all */
+    },
+        
+    "stock-portfolio": {
+        "_id": "507f1f77bcf86cd799439011",
+        "user_id": "507f1f77bcf86cd799439011", /* Each stock-portfolio must correspond to a user_id */
+        "stock-market-settings_id": "507f1f77bcf86cd799439011", /* Each stock-portfolio must have a stock-market-settings subdoc */
+
+        "current_balance": 19000,
+        "stocks": ["GOOG", "TSLA", "AAPL", "AMZN"],
+
+        "deposit-history": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of deposit-history_id's */
+
+        "automated-purchases": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of automated-purchase id's */
+        "automated-sells": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of automated-sells id's */
+
+        "transaction-log": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"] /* Array of transaction_id's */
+    },
+    
+    "portfolio_value_history": [15000, 16000, 15000, 18000, 19000] /* tracks portfolio value over time -- updated daily */
+
+}
+
+// deposit-history
+{
+    "_id": "507f1f77bcf86cd799439011",
+
+    "stock-portfolio_id": "507f1f77bcf86cd799439011", /* Each deposit must correspond to a stock-portfolio subdoc */
+
+    "deposit-amount": 400,
+    "manual": true, /* false=automated deposite, true=manual */
+    "deposit-date": "<YYYY-mm-dd>" /* store as new Date Object */
+}
+
+// automated-purchases
+{
+    // Purchase up to 10 shares of google (GOOG) stock if the share-price reaches $2500 per share.
+    "_id": "507f1f77bcf86cd799439011",
+
+    "stock-portfolio_id": "507f1f77bcf86cd799439011", /* Each automated-purchase request must correspond to a stock-portfolio subdoc */
+
+    "stock-symbol": "GOOG",
+    "quantity": 10,
+    "purchase-threshold": 2500, /* must be < current stock price */
+    "priority": 1 /* In the array of automated-purchases for a user, every priority must be unique */
+}
+
+// automated-sells
+{
+    // Sell 5 shares of google (GOOG) stock if the share-price falls reaches $2500 per share.
+    "_id": "507f1f77bcf86cd799439011",
+
+    "stock-market-info_id": "507f1f77bcf86cd799439011", /* Each automated-sell request must correspond to a stock-portfolio subdoc */
+
+    "Stock-symbol": "GOOG",
+    "quantity": 5,
+    "sell-threshold": 2700, /* must be > current stock price */
+}
+
+
+// Transactions
+{
+    "_id": "507f1f77bcf86cd799439011",
+
+    "stock-portfolio_id": "507f1f77bcf86cd799439011", /* Each transaction must correspond to a stock-portfolio subdoc */
+
+    "trade-type": "purchase", /* "purchase" or "sell" */
+    "stock-traded": "GOOG",
+    "quantity-traded": 5,
+    "total-transaction-amount": 9000 /* positive number */,
+    "date-of-trade": "<YYYY-mm-dd>" /* store as new Date Object */
+}
