@@ -84,7 +84,7 @@
     // Sell 5 shares of google (GOOG) stock if the share-price falls reaches $2500 per share.
     "_id": "507f1f77bcf86cd799439011",
 
-    "stockPortfolio_id": "507f1f77bcf86cd799439011", /* Each automated-sell request must correspond to a stock portfolio */
+    "stockPortfolio_id": "507f1f77bcf86cd799439011", /* Each automated-sell request must correspond to a stock portfolio document */
 
     "Stock-symbol": "GOOG",
     "quantity": 5,
