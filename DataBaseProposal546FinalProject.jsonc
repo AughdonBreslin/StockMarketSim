@@ -59,7 +59,7 @@
 {
     "_id": "507f1f77bcf86cd799439011",
 
-    "stockPortfolio_id": "507f1f77bcf86cd799439011", /* Each deposit must correspond to a stock-portfolio subdoc */
+    "stockPortfolio_id": "507f1f77bcf86cd799439011", /* Each deposit must correspond to a stock-portfolio document */
 
     "deposit-amount": 400,
     "manual": true, /* false=automated deposite, true=manual */
@@ -71,7 +71,7 @@
     // Purchase up to 10 shares of google (GOOG) stock if the share-price reaches $2500 per share.
     "_id": "507f1f77bcf86cd799439011",
 
-    "stockPortfolio_id": "507f1f77bcf86cd799439011", /* Each automated-purchase request must correspond to a stock-portfolio subdoc */
+    "stockPortfolio_id": "507f1f77bcf86cd799439011", /* Each automated-purchase request must correspond to a stock-portfolio document */
 
     "stock-symbol": "GOOG",
     "quantity": 10,
@@ -96,7 +96,7 @@
 {
     "_id": "507f1f77bcf86cd799439011",
 
-    "stockPortfolio_id": "507f1f77bcf86cd799439011", /* Each transaction must correspond to a stock-portfolio subdoc */
+    "stockPortfolio_id": "507f1f77bcf86cd799439011", /* Each transaction must correspond to a stock-portfolio document */
 
     "trade-type": "purchase", /* "purchase" or "sell" */
     "stock-traded": "GOOG",
