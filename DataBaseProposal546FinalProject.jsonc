@@ -15,21 +15,6 @@
     "email-updates": "weekly" /* none, hourly, daily, weekly, monthly */
 }
 
-// stockMarketSettings 
-{
-    "_id": "507f1f77bcf86cd799439011",
-    "user_id": "507f1f77bcf86cd799439011", /* Each stock-market-settings configuration must correspond to a user_id */
-
-    "initial_deposit": 15000,
-
-    "automated-deposit-freq": "weekly", /* none, daily, weekly, monthly */
-    "automated-deposit-amount": 50, /* min: 0 */
-
-    "minimum-account-balance": 5000, /* min: 0 */
-
-    "insufficient-funds-option": false /*  'true' = buy as many shares as you can afford. 'false' = do not buy any shares at all */
-}
-    
 // stockPortfolio 
 {
     "_id": "507f1f77bcf86cd799439011",
@@ -49,8 +34,21 @@
 
     "transactionLog": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of transaction_id's */
 
-    "portfolio-value-history": [15000, 16000, 15000, 18000, 19000] /* tracks portfolio value over time -- updated daily */
+    "portfolio-value-history": [15000, 16000, 15000, 18000, 19000], /* tracks portfolio value over time -- updated daily */
 
+    "stockMarketSettings": /* Store the settings as a subdocument */
+                        {
+                            "_id": "507f1f77bcf86cd799439011",
+
+                            "initial_deposit": 15000,
+
+                            "automated-deposit-freq": "weekly", /* none, daily, weekly, monthly */
+                            "automated-deposit-amount": 50, /* min: 0 */
+
+                            "minimum-account-balance": 5000, /* min: 0 */
+
+                            "insufficient-funds-option": false /*  'true' = buy as many shares as you can afford. 'false' = do not buy any shares at all */
+                        }
 }
 
 
