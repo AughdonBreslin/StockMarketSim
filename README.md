@@ -1,4 +1,4 @@
-# StockMarketSim
+# MyMarketSim
 CS546 Final Project
 ## Members:
 
