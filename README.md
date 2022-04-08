@@ -5,7 +5,7 @@ CS546 Final Project
 Ella Crabtree, Aughdon Breslin, Christian Bautista, Ankit Patel
 
 
-## Project Name: Stock Market Sim
+## Project Name: MyMarketSim
 
 
 ## Brief Description:
