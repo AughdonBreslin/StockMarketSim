@@ -32,6 +32,7 @@ Individual components:
 
 
 Dependencies we'll need:
+    axios
     express
     handlebars or express-handlebars
     xss
