@@ -1,0 +1,43 @@
+List of all components of the project:
+
+Frontend
+    - HTML
+    - HTML handlebars
+    - CSS / bootstrap?
+
+Backend
+    - server stuff
+        - routing
+        - middleware
+    - database stuff
+        - get user data
+
+API calls (to get real-time stock-related data)
+
+
+
+Individual components:
+- seed file to populate a few users in the Database. Can do this during testing phase. [required to do]
+
+- input validation scripts:
+    - one for client-side (check user inputs)
+    - one for server-side (check user inputs)
+    - one for Database
+
+- login/signup system (similar to lab 10)
+
+- handlebars templates
+    - one for viewing Individual stock data
+    - one for the graphs
+
+
+Dependencies we'll need:
+    express
+    handlebars or express-handlebars
+    xss
+    mongod
+    email-validator (very easy package used to validate emails)
+    bcrypt & bcryptjs
+
+
+
