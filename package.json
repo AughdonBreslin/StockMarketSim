@@ -1,0 +1,27 @@
+{
+  "name": "my_market_sim_cs546_final_project",
+  "version": "1.0.0",
+  "description": "Application for the CS546 final project. Stock Market Simulator.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AughdonBreslin/StockMarketSim.git"
+  },
+  "author": "Ankit Patel, Aughdon Breslin, Ella Crabtree, Christian Bautista",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AughdonBreslin/StockMarketSim/issues"
+  },
+  "homepage": "https://github.com/AughdonBreslin/StockMarketSim#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "bcryptjs": "^2.4.3",
+    "email-validator": "^2.0.4",
+    "express": "^4.17.3",
+    "mongod": "^2.0.0",
+    "xss": "^1.0.11"
+  }
+}
