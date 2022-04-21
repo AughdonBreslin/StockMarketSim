@@ -9,9 +9,11 @@ const constructorMethod = (app) => {
     // Home Page
     app.get('/', (req, res) => {
         if(req.session.username) {
-            res.render('homePages/home.handlebars', {title: 'My Market Simulator', loggedIn: true, username: req.session.username});
+            res.render('homePages/home.handlebars',
+                {title: 'My Market Simulator', loggedIn: true, username: req.session.username});
         } else {
-            res.render('account/login.handlebars', {title: 'Login', loggedIn: false});
+            res.render('account/login.handlebars',
+                {title: 'Login', loggedIn: false});
         }
     });
 

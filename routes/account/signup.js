@@ -6,7 +6,8 @@ const userData = data.users;
 
 // GET /signup
 router.get('/', async (req, res) => {
-    res.render('account/signup.handlebars', {title: 'Signup', error: ''});
+    res.render('account/signup.handlebars',
+      {title: 'Signup', error: ''});
 });
 
 // POST /signup

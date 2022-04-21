@@ -6,7 +6,8 @@ const userData = data.users;
 
 // GET /login
 router.get('/', async (req, res) => {
-    res.render('account/login.handlebars', {title: 'Login', error: ''});
+    res.render('account/login.handlebars',
+      {title: 'Login', error: ''});
 });
 
 // POST /login

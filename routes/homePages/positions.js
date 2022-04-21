@@ -7,9 +7,11 @@ const userData = data.users;
 // GET /positions
 router.get('/', (req, res) => {
     if(req.session.username) {
-        res.render('homePages/positions.handlebars', {title: 'Positions', loggedIn: true, user: 'TODO'});
+        res.render('homePages/positions.handlebars',
+            {title: 'Positions', loggedIn: true, user: 'TODO'});
     } else {
-        res.render('account/login.handlebars', {title: 'Login', loggedIn: false, error: 'Please login first.'});
+        res.render('account/login.handlebars',
+            {title: 'Login', loggedIn: false, error: 'Please login first.'});
     }
 });
 

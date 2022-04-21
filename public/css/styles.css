@@ -1,0 +1,74 @@
+:root {
+    --animation-time: 2s;
+}
+
+/* The annoying one */
+/* * {
+    position: relative;
+    animation: colorRotate  var(--animation-time) linear 0s infinite;
+} */
+
+/* Dangerous addition */
+@keyframes colorRotate {
+    from {
+      /* background-color: #FF0000; */
+      color:#8B00FF;
+      left:0px;
+      top:0px;
+      border-color: #8B00FF;
+    }
+    14% {
+      /* background-color: #FF7F00; */
+      color:#2E2B5F;
+      left:1px;
+      top:3px;
+      border-color: #2E2B5F;
+    }
+    28% {
+      /* background-color: #FFFF00; */
+      color: #0000FF;
+      left:3px;
+      top:5px;
+      border-color: #0000FF;
+    }
+    43% {
+      /* background-color: #00FF00; */
+      color: #00FF00;
+      left:5px;
+      top:7px;
+      border-color: #00FF00;
+    }
+    57% {
+      /* background-color: #0000FF; */
+      color: #FFFF00;
+      left:7px;
+      top:5px;
+      border-color: #FFFF00;
+    }
+    72% {
+      /* background-color: #2E2B5F; */
+      color: #FF7F00;
+      left:5px;
+      top:3px;
+      border-color: #FF7F00;
+    }
+    86% {
+      /* background-color: #8B00FF; */
+      color: #FF0000;
+      left:3px;
+      top:1px;
+      border-color: #FF0000;
+    }
+    100% {
+      /* background-color: #FF0000; */
+      color:#8B00FF;
+      left:0px;
+      top:0px;
+      border-color: #8B00FF;
+    }
+}
+
+/* Peaceful stuff */
+body {
+    background-color: gray;
+}
