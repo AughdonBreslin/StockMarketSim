@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const validation = require('../validation');
-const data = require('../data');
+const validation = require('../../validation');
+const data = require('../../data');
 const userData = data.users;
 
 // GET /login

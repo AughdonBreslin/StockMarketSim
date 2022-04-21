@@ -1,13 +1,17 @@
-const signupRoutes = require('./signup');
-const loginRoutes = require('./login');
+const signupRoutes = require('./account/signup');
+const loginRoutes = require('./account/login');
+
+const activityRoutes = require('./homePages/activity');
+const positionsRoutes = require('./homePages/positions');
+const tradeRoutes = require('./homePages/trade');
 
 const constructorMethod = (app) => {
     // Home Page
     app.get('/', (req, res) => {
         if(req.session.username) {
-            res.render('homePages/home.handlebars', {title: 'My Market Simulator', username: req.session.username});
+            res.render('homePages/home.handlebars', {title: 'My Market Simulator', loggedIn: true, username: req.session.username});
         } else {
-            res.render('account/login.handlebars', {title: 'Login', error:'Please login first.'});
+            res.render('account/login.handlebars', {title: 'Login', loggedIn: false});
         }
     });
 
@@ -15,14 +19,11 @@ const constructorMethod = (app) => {
     app.use('/signup', signupRoutes);
     app.use('/login', loginRoutes);
 
-    // Trade Page
-    app.get('/', (req, res) => {
-        if(req.session.username) {
-            res.render('homePages/trade.handlebars', {title: 'Trade', user: 'TODO'});
-        } else {
-            res.render('account/login.handlebars', {title: 'Login', error: 'Please login first.'});
-        }
-    });    // View Portfolio Page
+    // Main Pages
+    app.use('/activity', activityRoutes);
+    // app.use('/home', homeRoutes);
+    app.use('/positions', positionsRoutes);
+    app.use('/trade', tradeRoutes); // ha
 
     // etc
 
