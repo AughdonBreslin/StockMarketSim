@@ -39,7 +39,7 @@ const checkWithinBounds = function checkWithinBounds(num, lower, upper) {
 const checkWebsite = function checkWebsite(website) {
   if (website.indexOf('http://www.') != 0) throw `Error: Website ${website} must begin with 'http://www.'.`;
   if (website.indexOf('.com') == -1
-      || website.substr(website.indexOf('.com')+4) != "") throw `Error: Website ${website} must end in with '.com'.`;
+      || website.substr(website.indexOf('.com')+4) != '') throw `Error: Website ${website} must end in with '.com'.`;
   if (website.length < 20) throw `Error: There must be at least 5 characters in between 'http://www.' and '.com'.`
 };
 

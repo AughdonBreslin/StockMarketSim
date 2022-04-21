@@ -31,7 +31,7 @@ Individual components:
     - one for the graphs
 
 
-Dependencies we'll need:
+Dependencies we"ll need:
     axios
     express
     handlebars or express-handlebars

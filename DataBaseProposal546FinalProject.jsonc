@@ -27,12 +27,12 @@
         {"GOOG": 10}, {"TSLA": 5}, {"AAPL": 6}, {"AMZN": 100}
     ],
 
-    "depositHistory": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of deposit-history_id's */
+    "depositHistory": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of deposit-history_id"s */
 
-    "automatedPurchases": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of automated-purchase id's */
-    "automatedSells": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of automated-sells id's */
+    "automatedPurchases": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of automated-purchase id"s */
+    "automatedSells": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of automated-sells id"s */
 
-    "transactionLog": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of transaction_id's */
+    "transactionLog": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of transaction_id"s */
 
     "portfolio-value-history": [15000, 16000, 15000, 18000, 19000], /* tracks portfolio value over time -- updated daily */
 
@@ -47,7 +47,7 @@
 
                             "minimum-account-balance": 5000, /* min: 0 */
 
-                            "insufficient-funds-option": false /*  'true' = buy as many shares as you can afford. 'false' = do not buy any shares at all */
+                            "insufficient-funds-option": false /*  "true" = buy as many shares as you can afford. "false" = do not buy any shares at all */
                         }
 }
 

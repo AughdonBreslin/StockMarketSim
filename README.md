@@ -22,7 +22,7 @@ The purpose of this project is to simulate pulling from real-time datasets and t
 
 
 
-* Frontpage displays daily/weekly updates on your portfolio performance (eg: Hey ___, your portfolio increased by 1% today")
+* Frontpage displays daily/weekly updates on your portfolio performance (eg: Hey ___, your portfolio increased by 1% today')
 * Graphs
     * Show the overall portfolio value over time
     * Show individual stock values over time

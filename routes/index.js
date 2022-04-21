@@ -5,9 +5,9 @@ const constructorMethod = (app) => {
     // Home Page
     app.get('/', (req, res) => {
         if(req.session.username) {
-            res.render('homePages/home.handlebars', {title: 'My Market Simulator'});
+            res.render('homePages/home.handlebars', {title: 'My Market Simulator', username: req.session.username});
         } else {
-            res.render('account/login.handlebars', {title: "Login"});
+            res.render('account/login.handlebars', {title: 'Login', error:'Please login first.'});
         }
     });
 
@@ -16,8 +16,13 @@ const constructorMethod = (app) => {
     app.use('/login', loginRoutes);
 
     // Trade Page
-
-    // View Portfolio Page
+    app.get('/', (req, res) => {
+        if(req.session.username) {
+            res.render('homePages/trade.handlebars', {title: 'Trade', user: 'TODO'});
+        } else {
+            res.render('account/login.handlebars', {title: 'Login', error: 'Please login first.'});
+        }
+    });    // View Portfolio Page
 
     // etc
 

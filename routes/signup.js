@@ -6,7 +6,7 @@ const userData = data.users;
 
 // GET /signup
 router.get('/', async (req, res) => {
-    res.render('account/signup.handlebars', {title: "Signup", error: ""});
+    res.render('account/signup.handlebars', {title: 'Signup', error: ''});
 });
 
 // POST /signup
@@ -23,13 +23,13 @@ router.post('/', async (req, res) => {
       status = await userData.createUser(username,password);
     } catch (e) {
       //  Render the sign-up screen once again, and this time showing an error message (along with an HTTP 400 status code) to the user explaining what they had entered incorrectly.
-      return res.status(400).render('account/signup.handlebars', {title: "Signup", error: e});
+      return res.status(400).render('account/signup.handlebars', {title: 'Signup', error: e});
     }
     try {
       if(!status || !status.userInserted) throw `Error: Could not add new user.`;
       return res.redirect('/login');
     } catch (e) {
-      return res.status(500).json({error: "Internal Server Error"});
+      return res.status(500).json({error: 'Internal Server Error'});
     }
 });
 

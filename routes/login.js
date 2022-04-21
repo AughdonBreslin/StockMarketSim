@@ -6,7 +6,7 @@ const userData = data.users;
 
 // GET /login
 router.get('/', async (req, res) => {
-    res.render('account/login.handlebars', {title: "Login", error: ""});
+    res.render('account/login.handlebars', {title: 'Login', error: ''});
 });
 
 // POST /login
@@ -25,12 +25,12 @@ router.post('/', async (req, res) => {
       req.session.username = userInfo.username;
     } catch (e) {
       //  Render the login screen once again, and this time showing an error message (along with an HTTP 400 status code) to the user explaining what they had entered incorrectly.
-      return res.status(400).render('account/login.handlebars', {title: "Login", error: e});
+      return res.status(400).render('account/login.handlebars', {title: 'Login', error: e});
     }
     try {
       return res.redirect('/');
     } catch (e) {
-      return res.status(500).json({error: "Internal Server Error"});
+      return res.status(500).json({error: 'Internal Server Error'});
     }
 });
 

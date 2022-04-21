@@ -7,7 +7,7 @@ const data = require('../data/');
 
 async function main() {
 
-    console.log("Seeding...");
+    console.log('Seeding...');
     const db = await dbConnection.dbConnection();
     await db.dropDatabase();
 
@@ -18,11 +18,11 @@ async function main() {
     // Create band 1
     // try {
     //     band1 = await bands.create(
-    //         "Band A",
-    //         ["genre A", "genre B"],
-    //         "http://www.band1website.com",
-    //         "recordLabel",
-    //         ["Member A", "Member B", "Member C"],
+    //         'Band A',
+    //         ['genre A', 'genre B'],
+    //         'http://www.band1website.com',
+    //         'recordLabel',
+    //         ['Member A', 'Member B', 'Member C'],
     //         2018
     //     );
     //     band1_id = band1._id.toString();
