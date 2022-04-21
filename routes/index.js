@@ -1,3 +1,5 @@
+const signupRoutes = require('./signup');
+const loginRoutes = require('./login');
 
 const constructorMethod = (app) => {
     // Home Page
@@ -10,12 +12,9 @@ const constructorMethod = (app) => {
     });
 
     // Login and Signup Page
-    app.get('/login', (req, res) => {
-        res.render('account/login.handlebars', {title: "Login"});
-    })
-    app.get('/signup', (req, res) => {
-        res.render('account/signup.handlebars', {title: "Sign Up"});
-    })
+    app.use('/signup', signupRoutes);
+    app.use('/login', loginRoutes);
+
     // Trade Page
 
     // View Portfolio Page

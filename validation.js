@@ -84,7 +84,7 @@ const checkId = function checkId(id, varName) {
   return id;
 };
 
-const checkStringAdv = function checkStringAdv(strVal, length, varName, alphanumeric=false, spacesOk=true) {
+const checkString = function checkString(strVal, length, varName, alphanumeric=false, spacesOk=true) {
   if (!strVal) throw `Error: You must supply a ${varName}!`;
   if (typeof strVal !== 'string') throw `Error: ${varName} must be a string!`;
   strVal = strVal.trim();
@@ -102,7 +102,7 @@ module.exports = {
   checkId,
   checkInt,
   checkWithinBounds,
-  checkStringAdv,
+  checkString,
   checkNumOfArgs,
   checkIsProper,
   checkArray,
