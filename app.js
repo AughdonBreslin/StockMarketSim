@@ -53,10 +53,27 @@ app.use(
   })
 );
 
+// User is logged in and trying to access login/signup pages
+app.use('/signup', (req, res, next) => {
+  if (req.session.username) {
+    return res.redirect('/');
+  } else {
+    req.method = 'POST';
+    next();
+  }
+});
+app.use('/login', (req, res, next) => {
+  if (req.session.username) {
+    return res.redirect('/');
+  } else {
+    req.method = 'POST';
+    next();
+  }
+});
 
-
-
-
+/*************************
+ ***      Booting      ***
+ *************************/
 configRoutes(app);
 
 app.listen(3000, () => {
