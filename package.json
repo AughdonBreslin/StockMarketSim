@@ -2,9 +2,10 @@
   "name": "my_market_sim_cs546_final_project",
   "version": "1.0.0",
   "description": "Application for the CS546 final project. Stock Market Simulator.",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,8 @@
     "bcryptjs": "^2.4.3",
     "email-validator": "^2.0.4",
     "express": "^4.17.3",
+    "express-handlebars": "^6.0.5",
+    "express-session": "^1.17.2",
     "mongod": "^2.0.0",
     "xss": "^1.0.11"
   }
