@@ -12,8 +12,7 @@ const constructorMethod = (app) => {
             res.render('homePages/home.handlebars',
                 {title: 'My Market Simulator', loggedIn: true, username: req.session.username});
         } else {
-            res.render('account/login.handlebars',
-                {title: 'Login', loggedIn: false});
+            res.redirect('/login')
         }
     });
 
@@ -23,7 +22,6 @@ const constructorMethod = (app) => {
 
     // Main Pages
     app.use('/activity', activityRoutes);
-    // app.use('/home', homeRoutes);
     app.use('/positions', positionsRoutes);
     app.use('/trade', tradeRoutes); // ha
 

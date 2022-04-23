@@ -1,3 +1,65 @@
+body {
+  font-family: sans-serif;
+  background-color: gray;
+  color: white;
+}
+
+nav {
+  background-color: green;
+  position: sticky;
+  height: 40px;
+  display: flex;
+  align-items:center;
+  box-shadow: 0 1px 1px 0 black;
+}
+nav a {
+  display: block;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+nav a:hover {
+  background-color:#009000;
+}
+
+footer {
+	text-decoration: none;
+  position: absolute;
+  bottom: 0;
+  width: 95%;
+  padding: 4px 4px;
+  border-top: 1px groove white;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 :root {
     --animation-time: 2s;
 }
@@ -66,9 +128,4 @@
       top:0px;
       border-color: #8B00FF;
     }
-}
-
-/* Peaceful stuff */
-body {
-    background-color: gray;
 }

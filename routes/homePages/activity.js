@@ -10,8 +10,7 @@ router.get('/', (req, res) => {
         res.render('homePages/activity.handlebars',
             {title: 'Activity', loggedIn: true, user: 'TODO'});
     } else {
-        res.render('account/login.handlebars',
-            {title: 'Login', loggedIn: false, error: 'Please login first.'});
+        res.redirect('/login');
     }
 });
 
