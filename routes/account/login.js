@@ -14,6 +14,8 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     const userInfo = req.body;
     let status = {authenticated: false};
+    let error = '';
+
     // Check that username and password are supplied in the req.body
     try {
       validation.checkIsProper(userInfo.username, 'string', 'Username');
@@ -26,7 +28,8 @@ router.post('/', async (req, res) => {
       req.session.username = userInfo.username;
     } catch (e) {
       //  Render the login screen once again, and this time showing an error message (along with an HTTP 400 status code) to the user explaining what they had entered incorrectly.
-      return res.status(400).render('account/login.handlebars', {title: 'Login', error: e});
+      error = e;
+      return res.status(400).render('account/login.handlebars', {title: 'Login', error: error});
     }
     try {
       return res.redirect('/');

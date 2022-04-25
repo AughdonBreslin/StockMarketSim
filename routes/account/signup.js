@@ -14,6 +14,8 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     const userInfo = req.body;
     let status = {userInserted: false};
+    let error = '';
+
     // Check that username and password are supplied in the req.body
     try {
       validation.checkIsProper(userInfo.username, 'string', 'Username');
@@ -23,8 +25,9 @@ router.post('/', async (req, res) => {
       const {username,password} = userInfo;
       status = await userData.createUser(username,password);
     } catch (e) {
+      error = e;
       //  Render the sign-up screen once again, and this time showing an error message (along with an HTTP 400 status code) to the user explaining what they had entered incorrectly.
-      return res.status(400).render('account/signup.handlebars', {title: 'Signup', error: e});
+      return res.status(400).render('account/signup.handlebars', {title: 'Signup', error: error});
     }
     try {
       if(!status || !status.userInserted) throw `Error: Could not add new user.`;

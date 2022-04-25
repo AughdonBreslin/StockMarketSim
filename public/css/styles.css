@@ -23,6 +23,7 @@ nav a:hover {
 }
 
 a.idkuser {
+
   text-decoration: none;
   color: white;
 }
@@ -39,7 +40,8 @@ input, button {
   color: black;
 }
 
-.userInfo[data-error]::after {
+/* For forms that have non-empty errors, output error after */
+.userInfo[data-error]:not([data-error=""])::after {
   background-color: #fffafa;
   content: attr(data-error);
 
@@ -53,7 +55,6 @@ input, button {
   color: #c92423;
   padding: 2px;
 }
-
 
 footer {
 	text-decoration: none;
