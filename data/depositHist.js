@@ -76,6 +76,8 @@ const addDepositRecord = async function(stockPortfolio_id, dep_amnt, man_or_aut,
 }
 
 module.exports = {
-    getDepositsOfUser, getDeposit, addDepositRecord
+    getDepositsOfUser,
+    getDeposit,
+    addDepositRecord
 }
 
