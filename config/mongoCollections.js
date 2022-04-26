@@ -19,5 +19,6 @@ const getCollectionFn = (collection) => {
 module.exports = {
     users: getCollectionFn('users'),
     deposits: getCollectionFn('deposits'),
-    stockSettings: getCollectionFn('stockMarketSettings')
+    stockSettings: getCollectionFn('stockMarketSettings'),
+    stockPortfolio: getCollectionFn('stockPortfolio')
 };
