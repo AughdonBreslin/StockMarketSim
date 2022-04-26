@@ -36,6 +36,34 @@ const checkWithinBounds = function checkWithinBounds(num, lower, upper) {
   if(num < lower || num > upper) throw `Error: ${numName} must be within [${lower}, ${upper}].`;
 }
 
+const checkMoneyAmt = function checkinteger(num, numName, negatives) {
+
+    if (arguments.length != 3) throw `There are not enough arguments for this function!`
+
+    if (typeof num !== 'number' && typeof num !== 'string') throw `Error: ${numName} not of type number or string!`
+
+    let newNum = num.toString();
+    if (newNum.trim().length === 0) throw `Error: ${varName} cannot be empty or just spaces!`
+
+    newNum = newNum.trim();
+
+    if (newNum.charAt(0) == '$') {
+      newNum = newNum.substring(1);
+    } else if (newNum.charAt(newNum.length - 1) == '$') {
+      newNum = newNum.substring(0, num.trim().length - 1);
+    }
+
+    if (newNum.includes('.') && newNum.split('.')[1].length > 2) throw `Error: ${numName} cannot have 3 point precision!`;
+
+    newNum = Number(newNum);
+
+    if (isNaN(newNum)) throw `Error: ${numName} is an invalid number!`;
+
+    if (!negatives && newNum < 0) throw `Error: ${numName} cannot be a negative amount!`;
+
+    return newNum;
+}
+
 const checkWebsite = function checkWebsite(website) {
   if (website.indexOf('http://www.') != 0) throw `Error: Website ${website} must begin with 'http://www.'.`;
   if (website.indexOf('.com') == -1
@@ -72,7 +100,23 @@ const trimArray = function trimArray(array) {
   return array;
 };
 
+const checkEmail = function checkEmail(email, varName) {
 
+  if (!email) throw `Error: You must provide a ${varName}`;
+  if (typeof email !== 'string') throw `Error: ${varName} must be a string!`;
+  let newEmail = email.trim();
+  if (newEmail.length === 0) throw `Error: ${varName} cannot be an empty string or just spaces`;
+
+  const amp = newEmail.indexOf('@');
+
+  if (amp === -1) throw `Error: ${varName} does not have an @`;
+  if (newEmail.substring(0, amp).includes('@')) throw `Error: ${varName} has an extra @`;
+
+  const emailDomain = newEmail.substring(amp);
+  
+  const emailValidator = require("email-validator");
+  if (!emailValidator.validate(newEmail)) throw `Error: ${varName} not a valid email address!`; 
+};
 
 const checkId = function checkId(id, varName) {
   if (!id) throw `Error: You must provide a ${varName}`;
@@ -111,5 +155,7 @@ module.exports = {
   trimArray,
   checkRating,
   checkRelease,
-  checkTracks
+  checkTracks,
+  checkEmail,
+  checkMoneyAmt
 };
