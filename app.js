@@ -71,6 +71,11 @@ app.use('/login', (req, res, next) => {
   }
 });
 
+app.use('/logout', (req, res, next) => {
+  req.method = 'GET';
+  next();
+})
+
 /*************************
  ***      Booting      ***
  *************************/
