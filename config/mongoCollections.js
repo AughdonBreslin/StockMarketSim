@@ -18,5 +18,8 @@ const getCollectionFn = (collection) => {
 /* Now, you can list your collections here: */
 module.exports = {
     users: getCollectionFn('users'),
-    deposits: getCollectionFn('deposits')
+    deposits: getCollectionFn('deposits'),
+    autoBuy: getCollectionFn('autoBuy'),
+    autoSell: getCollectionFn('autoSell'),
+    transactions: getCollectionFn('transactions')
 };
