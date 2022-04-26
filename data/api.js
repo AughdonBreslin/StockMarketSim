@@ -64,3 +64,8 @@ async function pval(stocks) {
     console.log(total) // debugging purposes only
     return total
 }
+
+module.exports = {
+    price,
+    pval
+}
