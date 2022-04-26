@@ -142,6 +142,13 @@ const checkString = function checkString(strVal, length, varName, alphanumeric=f
     throw `Error: ${varName} must be alphanumeric.`;
   return strVal;
 };
+
+const checkBoolean = function checkBoolean(val, varName) {
+  if (val == null || val == undefined) throw `Error: ${varName} is null or undefined, but must be a boolean!`;
+  if (typeof val !== 'boolean') throw `Error: ${varName} must be a boolean!`;
+  
+};
+
 module.exports = {
   checkId,
   checkInt,
@@ -157,5 +164,6 @@ module.exports = {
   checkRelease,
   checkTracks,
   checkEmail,
-  checkMoneyAmt
+  checkMoneyAmt,
+  checkBoolean
 };
