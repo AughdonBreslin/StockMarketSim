@@ -8,7 +8,7 @@ const userData = data.users;
 router.get('/', (req, res) => {
     if(req.session.username) {
         res.render('homePages/activity.handlebars',
-            {title: 'Activity', loggedIn: true, user: 'TODO'});
+            {title: 'Activity', user: 'TODO'});
     } else {
         res.redirect('/login');
     }

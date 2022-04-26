@@ -5,35 +5,63 @@ const validation = require('../validation');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-const createUser = async function createUser(username, password) {
+const createUser = async function createUser(fullName, email, username, password, emailUpdates) {
     // Error Checking
-    validation.checkNumOfArgs(arguments,2,2);
+    validation.checkNumOfArgs(arguments,5,5);
+
+    //Checking if arguments are of appropriate type
+    validation.checkIsProper(fullName, 'string', 'First name');
+    validation.checkIsProper(email, 'string', 'Email');
     validation.checkIsProper(username, 'string', 'username');
-    // NOTE: Check usernames with spaces/non-alphanumeric characters
-    validation.checkString(username, 4, 'username', true, false);
     validation.checkIsProper(password, 'string', 'password');
+    validation.checkIsProper(emailUpdates, 'string', 'Email updates');
+
+    //Trim strings + toLowerCase - Formatting
+    let tFullName = fullName.trim();
+
+    let tEmail = email.trim();
+    tEmail = tEmail.toLowerCase();
+
+    let tUsername = username.trim();
+    tUsername = tUsername.toLowerCase();
+
+    let tPassword = password.trim();
+    
+    let tEmailUpdates = emailUpdates.trim();
+    tEmailUpdates = tEmailUpdates.toLowerCase();
+
+    //Check if email update selection is a valid selection
+    if (tEmailUpdates !== 'none' && tEmailUpdates !== 'hourly' && tEmailUpdates !== 'daily' && tEmailUpdates !== 'weekly' && tEmailUpdates !== 'monthly') {
+        throw `Error: Not a valid email update option!`;
+    }
+
+    // NOTE: Check usernames with spaces/non-alphanumeric characters
+    validation.checkString(tUsername, 4, 'username', true, false);
+    
     // NOTE: Check passwords with length < 6
-    validation.checkString(password, 6, 'password', false, false);
-    // Formatting
-    username = username.trim();
-    username = username.toLowerCase();
-    password = password.trim();
+    validation.checkString(tPassword, 6, 'password', false, false);
+
+    //Check if email is a valid address (throw errors if otherwise)
+    validation.checkEmail(tEmail);
 
     // Get database
     const userCollection = await users();
     if(!userCollection) throw `Error: Could not find userCollection.`;
 
     // Check if user already exists
-    const user = await userCollection.findOne({username: username});
-    if(user) throw `Error: User already exists with username ${username}.`;
+    const user = await userCollection.findOne({username: tUsername});
+    if(user) throw `Error: User already exists with username ${tUsername}.`;
     
     // Encrypt password (done after checking user so we dont waste time)
-    const hash = await bcrypt.hash(password, saltRounds);
+    const hash = await bcrypt.hash(tPassword, saltRounds);
 
     // Create entry
     let newUser = {
-      username: username,
-      password: hash
+        fullName: tFullName,
+        email: tEmail,
+        username: tUsername,
+        hashedPassword: hash,
+        emailUpdates: tEmailUpdates
     };
 
     // Add entry into database
@@ -48,27 +76,32 @@ const checkUser = async function checkUser(username, password) {
     // Error Checking
     validation.checkNumOfArgs(arguments,2,2);
     validation.checkIsProper(username, 'string', 'username');
+
     // NOTE: Check usernames with spaces/non-alphanumeric characters
     validation.checkString(username, 4, 'username', true, false);
     validation.checkIsProper(password, 'string', 'password');
     // NOTE: Check passwords with length < 6
     validation.checkString(password, 6, 'password', false, false);
 
+
+    const tUsername = username.trim().toLowerCase();
+
+    const tPassword = password.trim();
+
     // Get database
     const userCollection = await users();
     if(!userCollection) throw `Error: Could not find userCollection.`;
 
     // Check if user exists
-    const user = await userCollection.findOne({username: username});
+    const user = await userCollection.findOne({username: tUsername});
     if(!user) throw `Error: Either the username or password is invalid.`;
 
     const hash = user.password;
     let match = false;
     try {
-        match = await bcrypt.compare(password, hash);
+        match = await bcrypt.compare(tPassword, hash);
     } catch (e) {
-        // no shot this bitch will fail
-        // they used to call this bad boy 'mr. ole reliable' back in highschool
+        
     }
 
     // Failure

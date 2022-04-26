@@ -1,6 +1,6 @@
 body {
   font-family: sans-serif;
-  background-color: gray;
+  background-color: rgb(99, 99, 99);
   color: white;
 }
 
@@ -22,6 +22,40 @@ nav a:hover {
   background-color:#009000;
 }
 
+a.idkuser {
+
+  text-decoration: none;
+  color: white;
+}
+a.idkuser:hover {
+  font-size: 1.01rem;
+  text-decoration: underline;
+}
+
+input, button {
+  border-radius: 5px;
+  background: #fffafa;
+  border-color: rgb(75, 75, 75);
+  border-style: outset;
+  color: black;
+}
+
+/* For forms that have non-empty errors, output error after */
+.userInfo[data-error]:not([data-error=""])::after {
+  background-color: #fffafa;
+  content: attr(data-error);
+
+  display: inline-block;
+  margin: 10px 0;
+
+  border-color: #c92423;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 5px;
+  color: #c92423;
+  padding: 2px;
+}
+
 footer {
 	text-decoration: none;
   position: absolute;
@@ -29,7 +63,6 @@ footer {
   width: 95%;
   padding: 4px 4px;
   border-top: 1px groove white;
-
 }
 
 
