@@ -8,11 +8,10 @@ const userData = data.users;
 router.get('/', (req, res) => {
     if(req.session.username) {
         res.render('homePages/trade.handlebars',
-            {title: 'Trade', loggedIn: true, user: 'TODO'});
-    } else {
-        res.render('account/login.handlebars',
-            {title: 'Login', loggedIn: false, error: 'Please login first.'});
-    }
+            {title: 'Trade', user: 'TODO'});
+        } else {
+            res.redirect('/login');
+        }
 });
 
 module.exports = router;

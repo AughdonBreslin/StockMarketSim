@@ -10,10 +10,9 @@ const constructorMethod = (app) => {
     app.get('/', (req, res) => {
         if(req.session.username) {
             res.render('homePages/home.handlebars',
-                {title: 'My Market Simulator', loggedIn: true, username: req.session.username});
+                {title: 'My Market Simulator', username: req.session.username});
         } else {
-            res.render('account/login.handlebars',
-                {title: 'Login', loggedIn: false});
+            res.redirect('/login')
         }
     });
 
@@ -23,11 +22,23 @@ const constructorMethod = (app) => {
 
     // Main Pages
     app.use('/activity', activityRoutes);
-    // app.use('/home', homeRoutes);
     app.use('/positions', positionsRoutes);
     app.use('/trade', tradeRoutes); // ha
 
     // etc
+
+
+    // User is logged in and is not having it
+    app.get('/logout', (req, res) => {
+        if(req.session.username) {
+            req.session.destroy(function (err) {
+
+                res.render('account/login.handlebars', {title: "You've been logged out."});
+            });
+        } else {
+            res.redirect('/');
+        }
+    });
 
     app.use('*', (req, res) => {
         res.status(404).json({ error: 'Not found' });
