@@ -1,33 +1,15 @@
 const axios = require('axios')
+const validation = require('../validation')
 const key = "FN6CRSE4MHKTRH4X"
 
 // price(ticker)
 async function price(ticker, interval) {
     // validate ticker and interval
-    if(!ticker) throw "No ticker provided"
-    if(!interval) throw "No interval provided"
-    if(typeof ticker !== 'string') throw "Ticker is not a string"
-    if(typeof interval !== 'string') throw "Interval is not a string"
+    ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
+    interval = validation.checkString(interval, 1, "Interval", true, false)
 
-    ticker = ticker.trim()
-    interval = interval.trim()
-
-    if(!ticker.length) throw "Ticker is empty"
-    if(!interval.length) throw "Interval is empty" 
     if(ticker.length>5) throw "Invalid Ticker" // May want to change 5 if there are longer tickers
     if(interval.length!==4 && interval.length!==5) throw "Invalid Interval"
-    
-    // tickers cannnot be longer than 5 characters and must be alphanumeric
-
-    // TODO: Nitpick -- theres a validation.checkString function that covers this
-    const alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    ticker = ticker.toUpperCase()
-    for(let i=0; i<ticker.length; i++) {
-        if(!alphanumeric.includes(ticker[i])) throw "Invalid Ticker"
-    }
-
-    // intervals can only be 1min, 5min, 15min, 30min, 60min
-    interval = interval.toLowerCase()
     if(interval !== "1min" && interval !== "5min" && interval !== "15min" && interval !== "30min" && interval !== "60min") throw "Interval is invalid"
     
     // use an axios request to get the price, may change this to ajax
