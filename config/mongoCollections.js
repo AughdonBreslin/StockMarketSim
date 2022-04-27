@@ -18,6 +18,11 @@ const getCollectionFn = (collection) => {
 /* Now, you can list your collections here: */
 module.exports = {
     users: getCollectionFn('users'),
+    portfolios: getCollectionFn('portfolios'),
     deposits: getCollectionFn('deposits'),
+    autoBuys: getCollectionFn('autoBuys'),
+    autoSells: getCollectionFn('autoSells'),
+    transactions: getCollectionFn('transactions'),
+    awaitingTrades: getCollectionFn('awaitingTrades'),
     stockSettings: getCollectionFn('stockMarketSettings')
 };

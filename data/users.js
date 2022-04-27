@@ -49,8 +49,11 @@ const createUser = async function createUser(fullName, email, username, password
     if(!userCollection) throw `Error: Could not find userCollection.`;
 
     // Check if user already exists
-    const user = await userCollection.findOne({username: tUsername});
-    if(user) throw `Error: User already exists with username ${tUsername}.`;
+    const user1 = await userCollection.findOne({username: tUsername});
+    if(user1) throw `Error: User already exists with username ${tUsername}.`;
+
+    const user2 = await userCollection.findOne({email: tEmail});
+    if (user2) throw `Error: Email ${tEmail} is already in use!`
     
     // Encrypt password (done after checking user so we dont waste time)
     const hash = await bcrypt.hash(tPassword, saltRounds);
