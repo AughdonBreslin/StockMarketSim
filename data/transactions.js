@@ -3,10 +3,9 @@ const portfolios = mongoCollections.portfolios
 const autoBuys = mongoCollections.autoBuys
 const autoSells = mongoCollections.autoSells
 const transactions = mongoCollections.transactions
-const awaitingTrades = mongoCollections.awaitingTrades
 const validation = require('../validation')
 const api = require('./api')
-const interval = 15 // possible to set from stockmarketsettings
+const autoInterval = 15 // possible to set from stockmarketsettings
 
 let awaiting = false
 
@@ -93,32 +92,56 @@ async function Transaction(id, type, ticker, quant, amount, date) {
 }
 
 // AwaitingTrade
-async function AwaitingTrade(id, type, ticker, quant) {
+async function AwaitingTrade(id, type, ticker, quant, threshold) {
     //validate all inputs
 
     const awaitingTrade = {
         "portfolio_id": id,
-        "type": type,
         "ticker": ticker,
-        "quantity": quant
+        "quantity": quant,
+        "threshold": threshold
     }
-    const insertInfo = await awaitingTrades().insertOne(awaitingTrade)
-    if(!insertInfo["acknowledged"] || !insertInfo["insertedId"]) throw "awaitingTrade was not inserted"
+    let insertInfo = ""
+    if(type=="buy") {
+        insertInfo = await autoBuys().insertOne(awaitingTrade)
+    } else if(type=="sell") {
+        insertInfo = await autoSells().insertOne(awaitingTrade)
+    } else {
+        throw "Invalid trade type"
+    }
+    if(!insertInfo["acknowledged"] || !insertInfo["insertedId"]) throw "awaiting trade was not inserted"
     id = insertInfo["insertedId"].toString()
     return id
 }
 
+// TODO: Add priority
 // buy
-async function buy(ticker, quant, id, interval="1min") {
+async function buy(id, ticker, quant, threshold=0, auto=false, interval="1min") {
+    id = validation.checkId(id, "Stock Portfolio ID")
     ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
     quant = validation.checkInt(quant, "Quantity")
-    id = validation.checkId(id, "Stock Portfolio ID")
+    threshold = validation.checkInt(threshold, "Threshold")
+    auto = validation.checkBoolean(auto, "Auto Flag")
     interval = validation.checkString(interval, 1, "Interval", true, false)
     if(ticker.length>5) throw "Invalid Ticker" // May want to change 5 if there are longer tickers
     if(interval!="1min" && interval!="5min" && interval!="15min" && interval!="30min" && interval!="60min") throw "Invalid Interval"
+    let autoFlag = false
+    let retId = ""
 
-    // determine if during trading hours (9:30am - 4:00pm)
-    if(!duringTradingHours()) throw "Unable to buy outside of trading hours"
+    // determine if during trading hours (9:30am - 4:00pm on weekdays)
+    // if auto, don't throw an error, add to autoBuys collection, set awaiting to true 
+    if(!duringTradingHours()) {
+        if(auto) {
+            autoFlag = true
+            if(!awaiting) {
+                awaiting = true
+                setTimeout(autoTrade(), timeToOpen())
+            }
+            retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
+        } else {
+            throw "Unable to buy outside of trading hours"
+        }
+    }
     // may want to add this to an awaiting trades collection (use setTimeout)
 
     // find stockPortfolio using id
@@ -127,41 +150,71 @@ async function buy(ticker, quant, id, interval="1min") {
 
     // get the stock price from the api
     const price = await api.price(ticker, interval)
-    if((price*quant)>portfolio["current-balance"]) throw "Insufficient Funds"
-
-    // create a new transaction
-    const transaction_id = await Transaction(id, "buy", ticker, quant, price*quant, getDate())
-
-    // update the portfolio
-    portfolio["balance"]-=(price*quant)
-    const tickers = portfolio["stocks"].map(stock => Object.keys(stock)[0])
-    if(tickers.includes(ticker)) {
-        portfolio["stocks"][tickers.indexOf(ticker)][ticker]+=quant
-    } else {
-        portfolio["stocks"].push({[ticker]:quant})
+    // if auto, don't throw an error add to autoBuys collection, set awaiting to true
+    if((price*quant)>portfolio["current-balance"]) {
+        if(!autoFlag && auto) {
+            autoFlag = true
+            if(!awaiting) {
+                awaiting = true
+                setTimeout(autoTrade(), timeToOpen())
+            }
+            retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
+        } else {
+            throw "Insufficient Funds"
+        }
     }
-    portfolio["stocks"].push({ticker: quant})
-    portfolio["transactions"].push(transaction_id)
+
+    if(!autoFlag) {
+        // create a new transaction
+        retId = await Transaction(id, "buy", ticker, quant, price*quant, getDate())
+        // update the portfolio
+        portfolio["balance"]-=(price*quant)
+        const tickers = portfolio["stocks"].map(stock => Object.keys(stock)[0])
+        if(tickers.includes(ticker)) {
+            portfolio["stocks"][tickers.indexOf(ticker)][ticker]+=quant
+        } else {
+            portfolio["stocks"].push({ticker:quant})
+        }
+        portfolio["transactions"].push(retId)
+    } else { // if autoFlag, update autoBuys field only
+        portfolio["autoBuys"].push(retId)
+    }
 
     // update in portfolio database
     const updateInfo = await portfolios().updateOne({_id: id}, {$set: portfolio})
     if(!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "portfolio was not updated"
 
     // unsure what to return
-    return transaction_id
+    return retId
 }
 
 // sell
-async function sell(ticker, quant, id, interval="1min") {
+async function sell(id, ticker, quant, threshold=0, auto=false, interval="1min") {
+    id = validation.checkId(id, "Stock Portfolio ID")
     ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
     quant = validation.checkInt(quant, "Quantity")
-    id = validation.checkId(id, "Stock Portfolio ID")
+    threshold = validation.checkInt(threshold, "Threshold")
+    auto = validation.checkBoolean(auto, "Auto Flag")
     interval = validation.checkString(interval, 1, "Interval", true, false)
     if(ticker.length>5) throw "Invalid Ticker" // May want to change 5 if there are longer tickers
     if(interval!="1min" && interval!="5min" && interval!="15min" && interval!="30min" && interval!="60min") throw "Invalid Interval"
+    let autoFlag = false
+    let retId = ""
 
-    // determine if during trading hours (9:30am - 4:00pm)
-    if(!duringTradingHours()) throw "Unable to sell outside of trading hours"
+    // determine if during trading hours (9:30am - 4:00pm on weekdays)
+    // if auto, don't throw an error, add to autoBuys collection, set awaiting to true 
+    if(!duringTradingHours()) {
+        if(auto) {
+            autoFlag = true
+            if(!awaiting) {
+                awaiting = true
+                setTimeout(autoTrade(), timeToOpen())
+            }
+            retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
+        } else {
+            throw "Unable to buy outside of trading hours"
+        }
+    }
     // may want to add this to an awaiting trades collection (use setTimeout)
 
     // find stockPortfolio using id
@@ -175,23 +228,27 @@ async function sell(ticker, quant, id, interval="1min") {
     // get the stock price from the api
     const price = await api.price(ticker, interval)
 
-    // create a new transaction
-    const transaction_id = await Transaction(id, "sell", ticker, quant, price*quant, getDate())
-
-    // update the portfolio
-    portfolio["balance"]+=(price*quant)
-    portfolio["stocks"][ticker]-=quant
-    portfolio["stocks"].filter(stock => stock[Object.keys(stock)[0]]>0)
-    portfolio["transactions"].push(transaction_id)
+    if(!autoFlag) {
+        // create a new transaction
+        retId = await Transaction(id, "sell", ticker, quant, price*quant, getDate())
+        // update the portfolio
+        portfolio["balance"]+=(price*quant)
+        portfolio["stocks"][ticker]-=quant
+        portfolio["stocks"].filter(stock => stock[Object.keys(stock)[0]]>0)
+        portfolio["transactions"].push(retId)
+    } else { // if autoFlag, update autoSells field only
+        portfolio["autoSells"].push(retId)
+    }
 
     // update in portfolio database
     const updateInfo = await portfolios().updateOne({_id: id}, {$set: portfolio})
     if(!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "portfolio was not updated"
 
     // unsure what to return
-    return transaction_id
+    return retId
 }
 
+/*
 // autoBuy
 async function autoBuy(ticker, quant, id) {
     ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
@@ -247,22 +304,21 @@ async function autoSell(ticker, quant, id) {
         return await AwaitingTrade(id, "sell", ticker, quant)
     }
 
-    /*
-    // find stockPortfolio using id
-    let portfolio = await portfolios().findOne({_id: id})
-    if(!portfolio) throw "Stock Portfolio not found"
+    // // find stockPortfolio using id
+    // let portfolio = await portfolios().findOne({_id: id})
+    // if(!portfolio) throw "Stock Portfolio not found"
 
-    // determine if holding ticker and enough shares
-    if(!portfolio["stocks"][ticker]) throw "Not holding ticker"
-    if(portfolio["stocks"][ticker]<quant) throw `Not holding enough of ${ticker}`
+    // // determine if holding ticker and enough shares
+    // if(!portfolio["stocks"][ticker]) throw "Not holding ticker"
+    // if(portfolio["stocks"][ticker]<quant) throw `Not holding enough of ${ticker}`
     
-    // get the stock price from the api
-    const price = await api.price(ticker, interval)
-    */
+    // // get the stock price from the api
+    // const price = await api.price(ticker, interval)
 
     // stock can be sold
     return sell(ticker, quant, id)
 }
+*/
 
 // autoTrade
 async function autoTrade() {
@@ -273,10 +329,31 @@ async function autoTrade() {
     }
 
     // check if there are any awaiting trades
-    const count = await awaitingTrades().count()
-    if(count>0) {
-        const trades = await awaitingTrades().find().toArray()
-        if(!trades) throw "Unable to retrieve awaiting trades"
+    let buyCount = await autoBuys().count()
+    let sellCount = await autoSells().count()
+    if((buyCount+sellCount)>0) {
+        const buys = await autoBuys().find().toArray()
+        const sells = await autoSells().find().toArray()
+        for(let j=0; j<sells.length; j++) {
+            const trade = sells[j]
+            try {
+                await sell(trade["id"], trade["ticker"], trade["quant"], trade["threshold"])
+            } catch(e) {
+                continue
+            }
+            await autoSells().deleteOne({_id: trade["_id"]})
+        }
+        for(let i=0; i<buys.length; i++) {
+            const trade = buys[i]
+            try {
+                await buy(trade["id"], trade["ticker"], trade["quant"], trade["threshold"])
+            } catch(e) {
+                continue
+            }
+            await autoBuys().deleteOne({_id: trade["_id"]})
+        }
+        /*
+        const trades = buys.concat(sells) // assumes empty collection will result in an empty array
         for(let i=0; i<trades.length; i++) {
             const trade = trades[i]
             if(trade["type"]=="buy") {
@@ -294,18 +371,20 @@ async function autoTrade() {
             }
             await awaitingTrades().deleteOne({_id: trade["_id"]})
         }
+        */
     }
 
-    count = await awaitingTrades().count()
-    if(count) {
-        setTimeout(autoTrade(), (interval*60*1000))
+    buyCount = await autoBuys().count()
+    sellCount = await autoSells().count()
+    if((buyCount+sellCount)>0) {
+        setTimeout(autoTrade(), (autoInterval*60*1000))
+    } else {
+        awaiting = false
     }
     return
 }
 
 module.exports = {
     buy,
-    sell,
-    autoBuy,
-    autoSell
+    sell
 }
