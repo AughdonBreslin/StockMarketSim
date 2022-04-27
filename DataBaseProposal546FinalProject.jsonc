@@ -4,8 +4,7 @@
 {
     "_id": "507f1f77bcf86cd799439011", /* ObjectId user_id*/
 
-    "firstName": "Daniel",
-    "lastName": "Dae Kim",
+    "fullName": "Daniel Dae Kim",
 
     "email": "danielKim4815162342@gmail.com",
     "username": "Jin Soo Kwon",
