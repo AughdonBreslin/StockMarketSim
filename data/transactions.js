@@ -114,7 +114,31 @@ async function AwaitingTrade(id, type, ticker, quant, threshold) {
     return id
 }
 
-// TODO: Add priority
+// priorities
+async function priorities(id) {
+    // validate id
+    id = validation.checkId(id, "Stock Portfolio ID")
+
+    // find portfolio using id
+    let portfolio = await portfolios().findOne({_id: id})
+    if(!portfolio) throw "Stock Portfolio not found"
+
+    // check to see if portfolio has any autoBuys
+    if(!portfolio["autoBuys"]) throw "No autoBuys found"
+
+    // get all autoBuys from the ids in autoBuys
+    let allAutoBuys = {}
+    for(let i=0; i<portfolio["autoBuys"].length; i++) {
+        let autoBuy = await autoBuys().findOne({_id: portfolio["autoBuys"][i]})
+        if(!autoBuy) throw "No autoBuy found"
+        allAutoBuys[autoBuy["_id"]] = autoBuy["priority"]
+    }
+
+    return allAutoBuys    
+}
+
+
+// TODO: Add support for priorities
 // buy
 async function buy(id, ticker, quant, threshold=0, priority=0, auto=false, interval="1min") {
     id = validation.checkId(id, "Stock Portfolio ID")
@@ -169,12 +193,19 @@ async function buy(id, ticker, quant, threshold=0, priority=0, auto=false, inter
         retId = await Transaction(id, "buy", ticker, quant, price*quant, getDate())
         // update the portfolio
         portfolio["balance"]-=(price*quant)
+        if(!portfolio["stocks"][ticker]) {
+            portfolio["stocks"][ticker] = quant
+        } else {
+            portfolio["stocks"][ticker] += quant
+        }
+        /*
         const tickers = portfolio["stocks"].map(stock => Object.keys(stock)[0])
         if(tickers.includes(ticker)) {
             portfolio["stocks"][tickers.indexOf(ticker)][ticker]+=quant
         } else {
             portfolio["stocks"].push({ticker:quant})
         }
+        */
         portfolio["transactions"].push(retId)
     } else { // if autoFlag, update autoBuys field only
         portfolio["autoBuys"].push(retId)
@@ -234,7 +265,11 @@ async function sell(id, ticker, quant, threshold=0, auto=false, interval="1min")
         // update the portfolio
         portfolio["balance"]+=(price*quant)
         portfolio["stocks"][ticker]-=quant
+        if(portfolio["stocks"][ticker]==0) delete portfolio["stocks"][ticker]
+        /*
+        portfolio["stocks"][ticker]-=quant
         portfolio["stocks"].filter(stock => stock[Object.keys(stock)[0]]>0)
+        */
         portfolio["transactions"].push(retId)
     } else { // if autoFlag, update autoSells field only
         portfolio["autoSells"].push(retId)

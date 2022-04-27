@@ -22,9 +22,12 @@
 
     "value": 15000, /* Combined value of all owned stocks. min: 0 */
     "balance": 19000, /* amount of $ that can be spent min: 0 */
-    "stocks": [
-        {"GOOG": 10}, {"TSLA": 5}, {"AAPL": 6}, {"AMZN": 100}
-    ],
+    "stocks": {
+        "GOOG": 10,
+        "TSLA": 5,
+        "AAPL": 6,
+        "AMZN": 100
+    },
 
     "depositHistory": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of deposit-history_id"s */
 
