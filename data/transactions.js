@@ -116,7 +116,7 @@ async function AwaitingTrade(id, type, ticker, quant, threshold) {
 
 // TODO: Add priority
 // buy
-async function buy(id, ticker, quant, threshold=0, auto=false, interval="1min") {
+async function buy(id, ticker, quant, threshold=0, priority=0, auto=false, interval="1min") {
     id = validation.checkId(id, "Stock Portfolio ID")
     ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
     quant = validation.checkInt(quant, "Quantity")

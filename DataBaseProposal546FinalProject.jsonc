@@ -14,26 +14,26 @@
     "email-updates": "weekly" /* none, hourly, daily, weekly, monthly */
 }
 
-// stockPortfolio 
+// portfolio 
 {
     "_id": "507f1f77bcf86cd799439011",
     "user_id": "507f1f77bcf86cd799439011", /* Each stock-portfolio must correspond to a user_id */
-    "stockMarketSettings_id": "507f1f77bcf86cd799439011", /* Each stock-portfolio must have a stockMarketSettings_id */
+    "settings_id": "507f1f77bcf86cd799439011", /* Each stock-portfolio must have a stockMarketSettings_id */
 
-    "portfolio-value": 15000, /* Combined value of all owned stocks. min: 0 */
-    "current-balance": 19000, /* amount of $ that can be spent min: 0 */
+    "value": 15000, /* Combined value of all owned stocks. min: 0 */
+    "balance": 19000, /* amount of $ that can be spent min: 0 */
     "stocks": [
         {"GOOG": 10}, {"TSLA": 5}, {"AAPL": 6}, {"AMZN": 100}
     ],
 
     "depositHistory": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of deposit-history_id"s */
 
-    "automatedPurchases": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of automated-purchase id"s */
-    "automatedSells": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of automated-sells id"s */
+    "autoBuys": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of automated-purchase id"s */
+    "autoSells": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of automated-sells id"s */
 
-    "transactionLog": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of transaction_id"s */
+    "transactions": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of transaction_id"s */
 
-    "portfolio-value-history": [15000, 16000, 15000, 18000, 19000], /* tracks portfolio value over time -- updated daily */
+    "dailyValues": [15000, 16000, 15000, 18000, 19000], /* tracks portfolio value over time -- updated daily */
 
     "stockMarketSettings": /* Store the settings as a subdocument */
                         {
