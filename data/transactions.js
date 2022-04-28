@@ -92,8 +92,14 @@ async function Transaction(id, type, ticker, quant, amount, date) {
 }
 
 // AwaitingTrade
-async function AwaitingTrade(id, type, ticker, quant, threshold) {
+async function AwaitingTrade(id, type, ticker, quant, threshold, priority=-1) {
     //validate all inputs
+    id = validation.checkId(id, "Stock Portfolio ID")
+    type = validation.checkString(type, 1, "Type", true, false)
+    ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
+    quant = validation.checkInt(quant, "Quantity")
+    threshold = validation.checkInt(threshold, "Threshold")
+    priority = validation.checkInt(priority, "Priority")
 
     const awaitingTrade = {
         "portfolio_id": id,
@@ -103,6 +109,7 @@ async function AwaitingTrade(id, type, ticker, quant, threshold) {
     }
     let insertInfo = ""
     if(type=="buy") {
+        awaitingTrade["priority"] = priority
         insertInfo = await autoBuys().insertOne(awaitingTrade)
     } else if(type=="sell") {
         insertInfo = await autoSells().insertOne(awaitingTrade)
@@ -124,7 +131,7 @@ async function priorities(id) {
     if(!portfolio) throw "Stock Portfolio not found"
 
     // check to see if portfolio has any autoBuys
-    if(!portfolio["autoBuys"]) throw "No autoBuys found"
+    if(!portfolio["autoBuys"]) throw "No autoBuys found" // may just return an empty object instead of throwing an error
 
     // get all autoBuys from the ids in autoBuys
     let allAutoBuys = {}
@@ -137,14 +144,88 @@ async function priorities(id) {
     return allAutoBuys    
 }
 
+// dupes
+function dupes(arr) {
+    for(let i=0; i<arr.length-1; i++) {
+        for(let j=i+1; j<arr.length; j++) {
+            if(arr[i]==arr[j]) return [i,j]
+        }
+    }
+    return false
+}
+
+// updatePriorities
+// NOTE: Assumes, no more than TWO duplicates
+async function updatePriorities(id, priority) {
+    // validate id and priority
+    id = validation.checkId(id, "Stock Portfolio ID")
+    priority = validation.checkInt(priority, "Priority")
+    
+    // find portfolio using id
+    let portfolio = await portfolios().findOne({_id: id})
+    if(!portfolio) throw "Stock Portfolio not found"
+
+    // check to see if portfolio has any autoBuys
+    if(!portfolio["autoBuys"]) throw "No autoBuys found" // may just return an empty object instead of throwing an error
+
+    // get all priorities from autoBuys
+    let priorities = []
+    for(let i=0; i<portfolio["autoBuys"].length; i++) {
+        let autoBuy = await autoBuys().findOne({_id: portfolio["autoBuys"][i]})
+        if(!autoBuy) throw "No autoBuy found"
+        priorities.push(autoBuy["priority"])
+    }
+    // let priorities = portfolio["autoBuys"].map(x => x["priority"])
+
+    // if there are duplicate priorities, increment the duplicate and run until no duplicates
+    let higher = [] // priorities higher than priority
+    let indices = [] // corresponds to indices in priorities
+    let incremented = [] // 0 if not incremented, 1 if incremented
+    for(let i=0; i<priorities.length; i++) {
+        if(priorities[i]>=priority) {
+            higher.push(higher)
+            indices.push(i)
+            incremented.push(0)
+        }
+    }
+    while(higher.includes(priority)) {
+        higher[higher.indexOf(priority)]++
+        incremented[higher.indexOf(priority)]++
+    }
+    let dupeIndices = dupes(higher)
+    while(dupeIndices) {
+        // update the priority of the older duplicate
+        if(incremented[dupeIndices[0]]<incremented[dupeIndices[1]]) {
+            higher[dupeIndices[0]]++
+            incremented[dupeIndices[0]]++
+        } else { //if(incremented[dupeIndices[1]]<incremented[dupeIndices[0]]) {
+            higher[dupeIndices[1]]++
+            incremented[dupeIndices[1]]++
+        }
+        dupeIndices = dupes(higher)
+    }
+
+    // update autoBuys with new priorities
+    for(let i=0; i<indices.length; i++) {
+        let autoBuy = await autoBuys().findOne({_id: portfolio["autoBuys"][indices[i]]})
+        if(!autoBuy) throw "No autoBuy found"
+        autoBuy["priority"] = higher[i]
+        const updateInfo = await autoBuys().updateOne({_id: autoBuy["_id"]}, autoBuy)
+        if(!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "autoBuy was not updated"
+    }
+
+    return priority
+}
+
 
 // TODO: Add support for priorities
-// buy
+// buy(
 async function buy(id, ticker, quant, threshold=0, priority=0, auto=false, interval="1min") {
     id = validation.checkId(id, "Stock Portfolio ID")
     ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
     quant = validation.checkInt(quant, "Quantity")
     threshold = validation.checkInt(threshold, "Threshold")
+    priority = validation.checkInt(priority, "Priority")
     auto = validation.checkBoolean(auto, "Auto Flag")
     interval = validation.checkString(interval, 1, "Interval", true, false)
     if(ticker.length>5) throw "Invalid Ticker" // May want to change 5 if there are longer tickers
@@ -157,11 +238,12 @@ async function buy(id, ticker, quant, threshold=0, priority=0, auto=false, inter
     if(!duringTradingHours()) {
         if(auto) {
             autoFlag = true
+            updatePriorities(id, priority)
+            retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
             if(!awaiting) {
                 awaiting = true
                 setTimeout(autoTrade(), timeToOpen())
             }
-            retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
         } else {
             throw "Unable to buy outside of trading hours"
         }
@@ -178,11 +260,12 @@ async function buy(id, ticker, quant, threshold=0, priority=0, auto=false, inter
     if((price*quant)>portfolio["current-balance"]) {
         if(!autoFlag && auto) {
             autoFlag = true
+            updatePriorities(id, priority)
+            retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
             if(!awaiting) {
                 awaiting = true
                 setTimeout(autoTrade(), timeToOpen())
             }
-            retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
         } else {
             throw "Insufficient Funds"
         }
