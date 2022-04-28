@@ -1,6 +1,6 @@
 // Stock Market Simulation Project Database Proposal
 
-// Users collection
+// users
 {
     "_id": "507f1f77bcf86cd799439011", /* ObjectId user_id*/
 
@@ -14,12 +14,12 @@
     "email-updates": "weekly" /* none, hourly, daily, weekly, monthly */
 }
 
+
 // portfolio 
 {
     "_id": "507f1f77bcf86cd799439011",
     "user_id": "507f1f77bcf86cd799439011", /* Each stock-portfolio must correspond to a user_id */
-    "settings_id": "507f1f77bcf86cd799439011", /* Each stock-portfolio must have a stockMarketSettings_id */
-
+    
     "value": 15000, /* Combined value of all owned stocks. min: 0 */
     "balance": 19000, /* amount of $ that can be spent min: 0 */
     "stocks": {
@@ -36,21 +36,21 @@
 
     "transactions": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of transaction_id"s */
 
-    "dailyValues": [15000, 16000, 15000, 18000, 19000], /* tracks portfolio value over time -- updated daily */
+    "dailyValues": [15000, 16000, 15000, 18000, 19000], /* tracks portfolio value over time -- updated daily */ 
+    
+    "settings": {
+        "_id": "507f1f77bcf86cd799439011",
+    
+        "initial_deposit": 15000,
+    
+        "automated-deposit-freq": "weekly", /* none, daily, weekly, monthly */
+        "automated-deposit-amount": 50, /* min: 0 */
+    
+        "minimum-account-balance": 5000, /* min: 0 */
+    
+        "insufficient-funds-option": false /*  "true" = buy as many shares as you can afford. "false" = do not buy any shares at all */
+    }
 
-    "stockMarketSettings": /* Store the settings as a subdocument */
-                        {
-                            "_id": "507f1f77bcf86cd799439011",
-
-                            "initial_deposit": 15000,
-
-                            "automated-deposit-freq": "weekly", /* none, daily, weekly, monthly */
-                            "automated-deposit-amount": 50, /* min: 0 */
-
-                            "minimum-account-balance": 5000, /* min: 0 */
-
-                            "insufficient-funds-option": false /*  "true" = buy as many shares as you can afford. "false" = do not buy any shares at all */
-                        }
 }
 
 
@@ -66,30 +66,30 @@
     "deposit-date": "<YYYY-mm-dd>" /* store as new Date Object */
 }
 
-// automatedPurchases
+// autoBuys
 {
     // Purchase up to 10 shares of google (GOOG) stock if the share-price reaches $2500 per share.
     // If the purchase is fulfilled, this object is deleted. 
     "_id": "507f1f77bcf86cd799439011",
 
-    "stockPortfolio_id": "507f1f77bcf86cd799439011", /* Each automated-purchase request must correspond to a stock-portfolio document */
+    "portfolio_id": "507f1f77bcf86cd799439011", /* Each automated-purchase request must correspond to a stock-portfolio document */
 
-    "stock-symbol": "GOOG",
+    "ticker": "GOOG",
     "quantity": 10,
-    "purchase-threshold": 2500, /* must be < current stock price */
+    "threshold": 2500, /* must be < current stock price */
     "priority": 1 /* In the array of automated-purchases for a user, every priority must be unique */
 }
 
-// automatedSells
+// autoSells
 {
     // Sell up to 5 shares of google (GOOG) stock if the share price reaches $2700 per share.
     "_id": "507f1f77bcf86cd799439011",
 
-    "stockPortfolio_id": "507f1f77bcf86cd799439011", /* Each automated-sell request must correspond to a stock portfolio document */
+    "portfolio_id": "507f1f77bcf86cd799439011", /* Each automated-sell request must correspond to a stock portfolio document */
 
-    "Stock-symbol": "GOOG",
+    "ticker": "GOOG",
     "quantity": 5, /* must be >= 1 */
-    "sell-threshold": 2700, /* must be > current stock price */
+    "threshold": 2700, /* must be > current stock price */
 }
 
 
@@ -97,11 +97,11 @@
 {
     "_id": "507f1f77bcf86cd799439011",
 
-    "stockPortfolio_id": "507f1f77bcf86cd799439011", /* Each transaction must correspond to a stock-portfolio document */
+    "portfolio_id": "507f1f77bcf86cd799439011", /* Each transaction must correspond to a stock-portfolio document */
 
-    "trade-type": "purchase", /* "purchase" or "sell" */
-    "stock-traded": "GOOG",
-    "quantity-traded": 5,
-    "total-transaction-amount": 9000 /* positive number */,
-    "date-of-trade": "<YYYY-mm-dd>" /* store as new Date Object */
+    "type": "purchase", /* "purchase" or "sell" */
+    "ticker": "GOOG",
+    "quantity": 5,
+    "amount": 9000 /* positive number */,
+    "date": "<YYYY-mm-dd>" /* store as new Date Object */
 }

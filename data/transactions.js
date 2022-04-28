@@ -217,9 +217,7 @@ async function updatePriorities(id, priority) {
     return priority
 }
 
-
-// TODO: Add support for priorities
-// buy(
+// buy
 async function buy(id, ticker, quant, threshold=0, priority=0, auto=false, interval="1min") {
     id = validation.checkId(id, "Stock Portfolio ID")
     ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
