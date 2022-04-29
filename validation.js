@@ -36,7 +36,7 @@ const checkWithinBounds = function checkWithinBounds(num, lower, upper) {
   if(num < lower || num > upper) throw `Error: ${numName} must be within [${lower}, ${upper}].`;
 }
 
-const checkMoneyAmt = function checkinteger(num, numName, negatives) {
+const checkMoneyAmt = function checkMoneyAmt(num, numName, negatives) {
 
     if (arguments.length != 3) throw `There are not enough arguments for this function!`
 
