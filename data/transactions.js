@@ -297,7 +297,8 @@ async function buy(id, ticker, quant, threshold=0, priority=0, auto=false, inter
     if(!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "portfolio was not updated"
 
     // unsure what to return
-    return retId
+    return `Bought ${quant} stocks of ${ticker}.`;
+    // return retId
 }
 
 // sell
@@ -361,7 +362,8 @@ async function sell(id, ticker, quant, threshold=0, auto=false, interval="1min")
     if(!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "portfolio was not updated"
 
     // unsure what to return
-    return retId
+    return  `Sold ${quant} stocks of ${ticker}.`;
+    // return retId /* Return an acknowledgement. */
 }
 
 /*
