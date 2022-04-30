@@ -235,7 +235,38 @@ const addToAutoSell = async function addToAutoSell(id, userId, autoSellEntry) {
     return {updated: true}
 }
 
-const addToTransactionLog = async function addToTransactionLog() {
+const addToTransactionLog = async function addToTransactionLog(id, userId, logEntry) {
+
+    //Check number of args
+    validation.checkNumOfArgs(arguments, 3, 3);
+
+    //Checking id
+    validation.checkId(id, 'Stock Portfolio ID');
+    const tId = id.trim();
+
+    //Checking userId
+    validation.checkId(userId, 'User Id');
+    const tUserId = userId.trim();
+
+    //Checking depHistEntry
+    validation.checkId(logEntry, 'Transaction Log ID');
+    const tLogEntry = logEntry.trim();
+
+    const stockPortCollection = await stockPortfolios();
+    if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
+
+    const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
+    if(!stockPort) throw `Error: This user doesn't have a stock portfolio!`;
+
+    const update = await stockPortCollection.updateOne(
+        {_id: ObjectId(tId)},
+        { $addToSet: { transactions: tLogEntry } }
+    );
+
+    if (!update.matchedCount && !update.modifiedCount)
+       throw 'Adding auto sell id to array failed!';
+
+    return {updated: true}
 
 }
 

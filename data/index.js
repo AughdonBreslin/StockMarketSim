@@ -10,5 +10,5 @@ module.exports = {
   depHist: depHistData,
   stockSettings: stockSet,
   stockPortfolio: stockPort,
-  transactions: transactionsData
+  transactions: transactionData
 };

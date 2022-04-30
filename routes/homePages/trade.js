@@ -17,7 +17,7 @@ router.get('/', (req, res) => {
 
 
 /* When user makes a trade, post the transaction to /activity */
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     if(req.session.username) {
         // Check if user wants to sell or buy stocks.
         const act = req.body.buy || req.body.sell; /* true = buy and false = sell. */

@@ -52,6 +52,7 @@ const createUser = async function createUser(fullName, email, username, password
     const user1 = await userCollection.findOne({username: tUsername});
     if(user1) throw `Error: User already exists with username ${tUsername}.`;
 
+    //Check if email has already been used
     const user2 = await userCollection.findOne({email: tEmail});
     if (user2) throw `Error: Email ${tEmail} is already in use!`
     
@@ -71,8 +72,11 @@ const createUser = async function createUser(fullName, email, username, password
     const insertInfo = await userCollection.insertOne(newUser);
     if (!insertInfo.acknowledged || !insertInfo.insertedId) throw `Error: Could not add new user.`;    
     
-    // Return acknowledgement
-    return {userInserted: true};
+    // Return user json
+    let newUserId = insertInfo.insertedId;
+
+    const user = await this.getUser(newUserId.toString());
+    return user;
 }
 
 const checkUser = async function checkUser(username, password) {
@@ -114,8 +118,29 @@ const checkUser = async function checkUser(username, password) {
     return {authenticated: match};
 }
 
+const getUser = async function getUser(userId) {
+
+    //Check number of arguments
+    validation.checkNumOfArgs(arguments, 1, 1);
+
+    //Check if valid id
+    validation.checkId(userId, 'User ID');
+
+    const newUserId = userId.trim();
+
+    const userCollection = await users();
+    if(!userCollection) throw `Error: Could not find userCollection.`;
+
+    const user = await userCollection.findOne({_id: ObjectId(newUserId)});
+    if (!user) throw `Error: User could not be found!`;
+
+    user._id = newUserId;
+    return user;
+}
+
 module.exports = {
     createUser,
-    checkUser
+    checkUser,
+    getUser
 }
 

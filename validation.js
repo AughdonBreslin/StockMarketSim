@@ -1,4 +1,9 @@
+const {ObjectId} = require('mongodb');
+
 const checkNumOfArgs = function checkNumOfArgs(args, numArgsLow, numArgsHigh) {
+
+  if (numArgsLow < 0 || numArgsHigh < 0) throw `Error: Neither argument bound can be negative!`;
+
   if(args.length < numArgsLow || args.length > numArgsHigh) throw (numArgsLow == numArgsHigh)
    ? ((numArgsLow == 1) 
       ? `Error: Exactly ${numArgsLow} argument must be provided.`
@@ -7,7 +12,7 @@ const checkNumOfArgs = function checkNumOfArgs(args, numArgsLow, numArgsHigh) {
 };
 
 const checkIsProper = function checkIsProper (val, varType, variableName) {
-  if(!val) throw `Error: ${variableName || 'Variable'} is not defined.`;
+  if(!val && varType !== 'number') throw `Error: ${variableName || 'Variable'} is not defined.`;
   // Check parameter type is correct (also checks if its defined)
   if (typeof val != varType) throw `Error: ${variableName || 'provided variable'} must be a ${varType}.`;
 
@@ -76,22 +81,22 @@ const checkYear = function checkYear(year) {
   if (year < 1900 || year > 2022) throw `Error: Year must be within the range [1900,2022].`;
 };
 
-const checkTracks = function checkTracks(array, elemType, arrName) {
-  if(!Array.isArray(array)) throw `Error: ${arrName} must be an array.`;
-  if(array.length < 3) throw `Error: ${arrName} must contain at least three tracks.`;
-  for (const elem of array) {
-      checkIsProper(elem,elemType,`Within ${arrName}, ${elem}`);
-  }
-}
+// const checkTracks = function checkTracks(array, elemType, arrName) {
+//   if(!Array.isArray(array)) throw `Error: ${arrName} must be an array.`;
+//   if(array.length < 3) throw `Error: ${arrName} must contain at least three tracks.`;
+//   for (const elem of array) {
+//       checkIsProper(elem,elemType,`Within ${arrName}, ${elem}`);
+//   }
+// }
 
-const checkRelease = function checkRelease(date) {
-  if (date.length != 10) throw `Error: Release date must be in form 'MM/DD/YYYY'.`;
-  let year = parseInt(date.substr(-4));
-  if (isNaN(year) || !Number.isInteger(year) || year < 1900 || year > 2023) throw `Error: Year must be a number within the range [1900,2023].`;
-}
-const checkRating = function checkRating(rating) {
-  if(rating < 1 || rating > 5) throw `Error: Rating must be a number within the range [1,5].`;
-}
+// const checkRelease = function checkRelease(date) {
+//   if (date.length != 10) throw `Error: Release date must be in form 'MM/DD/YYYY'.`;
+//   let year = parseInt(date.substr(-4));
+//   if (isNaN(year) || !Number.isInteger(year) || year < 1900 || year > 2023) throw `Error: Year must be a number within the range [1900,2023].`;
+// }
+// const checkRating = function checkRating(rating) {
+//   if(rating < 1 || rating > 5) throw `Error: Rating must be a number within the range [1,5].`;
+// }
 
 const trimArray = function trimArray(array) {
   for (i in array) {
@@ -160,9 +165,9 @@ module.exports = {
   checkWebsite,
   checkYear,
   trimArray,
-  checkRating,
-  checkRelease,
-  checkTracks,
+  // checkRating,
+  // checkRelease,
+  // checkTracks,
   checkEmail,
   checkMoneyAmt,
   checkBoolean
