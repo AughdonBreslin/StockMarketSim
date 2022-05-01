@@ -8,6 +8,7 @@ const userData = data.users;
 router.get('/', async (req, res) => {
     res.render('account/login.handlebars',
       {title: 'Login', error: ''});
+    return;
 });
 
 // POST /login
@@ -23,9 +24,10 @@ router.post('/', async (req, res) => {
       validation.checkIsProper(userInfo.password, 'string', 'Password');
       validation.checkString(userInfo.password, 6, 'password', false, false);
       const {username,password} = userInfo;
-      status = await userData.checkUser(username,password);
+      status = await userData.checkUser(username.trim(),password.trim());
       if(!status || !status.authenticated) throw `Error: Invalid credentials.`;
-      req.session.username = userInfo.username;
+      const tUsername = username.trim();
+      req.session.username = tUsername;
     } catch (e) {
       //  Render the login screen once again, and this time showing an error message (along with an HTTP 400 status code) to the user explaining what they had entered incorrectly.
       error = e;

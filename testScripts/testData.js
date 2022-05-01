@@ -89,13 +89,19 @@ const main = async function main() {
         console.log(`Failed: ${e}`)
     }
 
-
-
     try {
         user3 = await users.createUser("William Crabtree", "willcrab@stevens.edu", "   will crabtree   ", "elarbolgrande", "");
         console.log(`Failed!`);
     } catch (e) {
         console.log(`Success: ${e}`)
+    }
+
+    //Testing stockPortfolio.js
+    console.log('----------Testing stockPortfolio.js------------')
+    try {
+        
+    } catch (e) {
+        
     }
 
 

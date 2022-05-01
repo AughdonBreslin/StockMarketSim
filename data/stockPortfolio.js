@@ -41,7 +41,7 @@ const createPortfolio = async function createPortfolio(userId, initialDeposit) {
     }
 
     let newStockPort = {
-        user_id: tUserId,
+        user_id: ObjectId(tUserId),
         value: 0,
         balance: 0,
         stocks: {},
@@ -57,7 +57,10 @@ const createPortfolio = async function createPortfolio(userId, initialDeposit) {
     if (!insertInfo.acknowledged || !insertInfo.insertedId) throw `Error: Could not add new stock portfolio.`;    
     
     // Return acknowledgement
-    return {stockPortfolioCreated: true};
+    let stockPortId = insertInfo.insertedId;
+    const stockPortAdded = this.getSP(stockPortId.toString().trim(), tUserId);
+
+    return stockPortAdded;
 
 }
 
@@ -93,7 +96,8 @@ const updatePVal = async function updatePVal(id, userId, pVal) {
     if (!update.matchedCount && !update.modifiedCount)
        throw 'Updating portfolio value failed';
 
-    return {updated: true}
+    const stockPortAdded = this.getSP(tId, tUserId);
+    return stockPortAdded;
 }
 
 //Updates current-balance field with the current stock 
@@ -127,7 +131,8 @@ const updateCurrentBal = async function updateCurrentBal(id, userId, currBal) {
     if (!update.matchedCount && !update.modifiedCount)
        throw 'Updating current portfolio balance failed';
 
-    return {updated: true}
+    const stockPortAdded = this.getSP(tId, tUserId);
+    return stockPortAdded;
 }
 
 //Adds despoitHistory document id to array in stockPortfolio
@@ -162,7 +167,8 @@ const addToDepHist = async function addToDepHist(id, userId, depHistEntry) {
     if (!update.matchedCount && !update.modifiedCount)
        throw 'Adding deposit history id to array failed!';
 
-    return {updated: true}
+    const stockPortAdded = this.getSP(tId, tUserId);
+    return stockPortAdded;
 }
 
 //Adds AutomatedPurchase document id to array in stockPortfolio document
@@ -197,7 +203,8 @@ const addToAutoPurchases = async function addToAutoPurchases(id, userId, autoPur
     if (!update.matchedCount && !update.modifiedCount)
        throw 'Adding auto buy id to array failed!';
 
-    return {updated: true}
+    const stockPortAdded = this.getSP(tId, tUserId);
+    return stockPortAdded;
 }
 
 //Adds AutomatedSelling document id to array in stockPortfolio document
@@ -232,7 +239,8 @@ const addToAutoSell = async function addToAutoSell(id, userId, autoSellEntry) {
     if (!update.matchedCount && !update.modifiedCount)
        throw 'Adding auto sell id to array failed!';
 
-    return {updated: true}
+    const stockPortAdded = this.getSP(tId, tUserId);
+    return stockPortAdded;
 }
 
 const addToTransactionLog = async function addToTransactionLog(id, userId, logEntry) {
@@ -266,12 +274,55 @@ const addToTransactionLog = async function addToTransactionLog(id, userId, logEn
     if (!update.matchedCount && !update.modifiedCount)
        throw 'Adding auto sell id to array failed!';
 
-    return {updated: true}
+    const stockPortAdded = this.getSP(tId, tUserId);
+    return stockPortAdded;
 
 }
 
-const resetPortfolio = async function resetPortfolio() {
+const resetPortfolio = async function resetPortfolio(id, userId) {
+
+    //Check number of args
+    validation.checkNumOfArgs(arguments, 2, 2);
+
+    //Checking id
+    validation.checkId(id, 'Stock Portfolio ID');
+    const tId = id.trim();
+
+    //Checking userId
+    validation.checkId(userId, 'User Id');
+    const tUserId = userId.trim();
+
+    const stockPortCollection = await stockPortfolios();
+    if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
+
+    const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
+    if(!stockPort) throw `Error: This user doesn't have a stock portfolio!`;
+
     
+
+}
+
+const getSP = async function getSP(id, userId) {
+
+    //Checking num of arguments
+    validation.checkNumOfArgs(arguments, 2, 2);
+
+    //Checking ids
+    validation.checkId(id, 'Stock Portfolio Id');
+    const newId = id.trim();
+
+    validation.checkId(userId, 'User Id');
+    const newUserId = userId.trim();
+
+    const stockPortCollection = await stockPortfolios();
+    if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
+
+    const stockPort = await stockPortCollection.findOne({id: ObjectId(newId), user_id: ObjectId(newUserId)});
+    if(!stockPort) throw `Error: This user doesn't have a stock portfolio!`;
+
+    stockPort._id = newId;
+    stockPort.user_id = newUserId;
+    return stockPort;
 }
 
 module.exports = {
@@ -281,5 +332,6 @@ module.exports = {
     addToDepHist,
     addToAutoPurchases,
     addToAutoSell,
-    addToTransactionLog
+    addToTransactionLog,
+    getSP
 }
