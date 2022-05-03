@@ -73,10 +73,7 @@ const createUser = async function createUser(fullName, email, username, password
     if (!insertInfo.acknowledged || !insertInfo.insertedId) throw `Error: Could not add new user.`;    
     
     // Return user json
-    let newUserId = insertInfo.insertedId;
-
-    const user = await this.getUser(newUserId.toString());
-    return user;
+    return {userInserted: true}
 }
 
 const checkUser = async function checkUser(username, password) {
@@ -92,8 +89,9 @@ const checkUser = async function checkUser(username, password) {
 
 
     const tUsername = username.trim().toLowerCase();
-
     const tPassword = password.trim();
+
+    const passwordHash = await bcrypt.hash(tPassword, saltRounds);
 
     // Get database
     const userCollection = await users();
@@ -102,20 +100,22 @@ const checkUser = async function checkUser(username, password) {
     // Check if user exists
     const user = await userCollection.findOne({username: tUsername});
     if(!user) throw `Error: Either the username or password is invalid.`;
-
-    const hash = user.password;
+    
+    const hash = user.hashedPassword;
     let match = false;
     try {
-        match = await bcrypt.compare(tPassword, hash);
+        match = bcrypt.compare(passwordHash, hash);
     } catch (e) {
         
     }
-
     // Failure
     if(!match) throw `Error: Either the username or password is invalid.`;
     
     // Success
-    return {authenticated: match};
+
+    user._id = user._id.toString();
+
+    return {user: user, authenticated: match};
 }
 
 const getUser = async function getUser(userId) {

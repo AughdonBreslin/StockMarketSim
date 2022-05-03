@@ -1,3 +1,6 @@
+let signUpForm = document.getElementById('signup-form');
+
+
 function checkboxClicked(checkBox) {
     let checkBoxes = document.getElementsByClassName('emailUpdates');
 
@@ -5,5 +8,15 @@ function checkboxClicked(checkBox) {
         if (checkBox.checked === false || (checkBox.checked === true && item !== checkBox)) {
             item.checked = false;
         }
+    });
+}
+
+if (signUpForm) {
+    signUpForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        console.log("Hello");
+        
+        event.target.submit();
     });
 }
