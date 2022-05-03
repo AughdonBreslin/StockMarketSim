@@ -39,7 +39,8 @@
     "dailyValues": [15000, 16000, 15000, 18000, 19000], /* tracks portfolio value over time -- updated daily */ 
     
     "settings": {
-        "_id": "507f1f77bcf86cd799439011",
+        "_id": "507f1f77bcf86cd799439011",        /* Dont need this either */
+        // "user_id": "507f1f77bcf86cd799439011",    /* Added - though this probably isn't neccessary */
     
         "initial_deposit": 15000,
     
