@@ -20,10 +20,10 @@
     "_id": "507f1f77bcf86cd799439011",
     "user_id": "507f1f77bcf86cd799439011", /* Each stock-portfolio must correspond to a user_id */
     
-    "value": 15000, /* Combined value of all owned stocks. min: 0. max: Number.MAX_SAFE_INTEGER*/
-    "balance": 19000, /* amount of $ that can be spent min: 0. max: Number.MAX_SAFE_INTEGER */
+    "value": 15000, /* Combined value of all owned stocks. min: 0. max: Number.MAX_SAFE_INTEGER - 1*/
+    "balance": 19000, /* amount of $ that can be spent min: 0. max: Number.MAX_SAFE_INTEGER - 1 */
     "stocks": {
-        "GOOG": 10, /* min: 0. max: Number.MAX_SAFE_INTEGER */
+        "GOOG": 10, /* min: 0. max: Number.MAX_SAFE_INTEGER - 1 */
         "TSLA": 5,
         "AAPL": 6,
         "AMZN": 100
@@ -36,18 +36,18 @@
 
     "transactions": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of transaction_id"s */
 
-    "dailyValues": [15000, 16000, 15000, 18000, 19000], /* tracks portfolio value over time -- updated daily. | min: 0. max: Number.MAX_SAFE_INTEGER */ 
+    "dailyValues": [15000, 16000, 15000, 18000, 19000], /* tracks portfolio value over time -- updated daily. | min: 0. max: Number.MAX_SAFE_INTEGER - 1 */ 
     
     "settings": {
         "_id": "507f1f77bcf86cd799439011",        /* Dont need this either */
         // "user_id": "507f1f77bcf86cd799439011",    /* Added - though this probably isn't neccessary */
     
-        "initial_deposit": 15000,   /* min - 0 and max - 1,000,000 */
+        "initial_deposit": 15000,   /* min - 0 and max - Number.MAX_SAFE_INTEGER - 1 */
     
         "automated-deposit-freq": "weekly", /* none, daily, weekly, monthly */
-        "automated-deposit-amount": 50, /* min: 1 and max: 100,000 */
+        "automated-deposit-amount": 50, /* min: 1 and Number.MAX_SAFE_INTEGER - 1 */
     
-        "minimum-account-balance": 5000, /* min: 0. max: Number.MAX_SAFE_INTEGER*/
+        "minimum-account-balance": 5000, /* min: 0. max: Number.MAX_SAFE_INTEGER - 1*/
     
         "insufficient-funds-option": false /*  "true" = buy as many shares as you can afford. "false" = do not buy any shares at all */
     }
@@ -62,7 +62,7 @@
 
     "stockPortfolio_id": "507f1f77bcf86cd799439011", /* Each deposit must correspond to a stock-portfolio document */
 
-    "deposit-amount": 400, /* min: 1 and max: 100,000 */
+    "deposit-amount": 400, /* min: 1 and max: Number.MAX_SAFE_INTEGER - 1 */
     "manual-or-automated": true, /* false=automated deposite, true=manual */
     "deposit-date": "<YYYY-mm-dd>" /* store as new Date Object */
 }
@@ -76,7 +76,7 @@
     "portfolio_id": "507f1f77bcf86cd799439011", /* Each automated-purchase request must correspond to a stock-portfolio document */
 
     "ticker": "GOOG",
-    "quantity": 10,     /* min: 1.  max: Number.MAX_SAFE_INTEGER */
+    "quantity": 10,     /* min: 1.  max: Number.MAX_SAFE_INTEGER - 1 */
     "threshold": 2500, /* must be < current stock price */
     "priority": 1 /* In the array of automated-purchases for a user, every priority must be unique */
 }
@@ -102,7 +102,7 @@
 
     "type": "purchase", /* "purchase" or "sell" */
     "ticker": "GOOG",
-    "quantity": 5, /* min: 1.  max: Number.MAX_SAFE_INTEGER */
+    "quantity": 5, /* min: 1.  max: Number.MAX_SAFE_INTEGER - 1 */
     "amount": 9000 /* positive number */,
     "date": "<YYYY-mm-dd>" /* store as new Date Object */
 }
