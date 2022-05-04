@@ -129,11 +129,11 @@ const resetStockSettings = async function resetStockSettings(userId, initialDepo
 
 const changeAutoDepositFrequency = async function changeAutoDepositFrequency(id, autoDepFreq) {
     //Checks number of arguments
-    validation.checkNumOfArgs(arguments, 3, 3);
+    validation.checkNumOfArgs(arguments, 2, 2);
 
     //Checking userId field
-    validation.checkId(userId, "User Id");
-    userId = userId.trim();
+    // validation.checkId(userId, "User Id");
+    // userId = userId.trim();
 
     //Checking id field
     validation.checkId(id, "Settings id");
