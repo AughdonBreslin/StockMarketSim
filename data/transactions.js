@@ -8,8 +8,13 @@ const validation = require('../validation')
 const api = require('./api')
 const autoInterval = 15 // possible to set from stockmarketsettings
 
-
 let awaiting = false
+
+/**TODO
+ * - Adjust functions to account for new price per share (for transactions, autoBuys, autoSells)
+ * - Adjust functions to account for new database schema (no separate collections for transactions, autoBuys, and autoSells. All are now subdocs of portfolios)
+ * - Fix getTransactions function
+ */
 
 // getDate
 function getDate() {
