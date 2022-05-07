@@ -508,7 +508,7 @@ async function autoTrade() {
  * @returns list of transaction objects
  */
 async function getTransactions(ids) {
-    return ids.map(id => await transactions().findOne({ _id: id }))
+    return ids.map( async (id) => { await transactions().findOne({ _id: id }) } )
 }
 
 module.exports = {

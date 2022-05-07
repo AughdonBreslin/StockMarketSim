@@ -67,8 +67,7 @@ const createUser = async function createUser(fullName, email, username, password
         username: tUsername,
         hashedPassword: hash,
         emailUpdates: tEmailUpdates,
-        lastUpdate: dateCreated,
-        firstTimeLogIn: false
+        lastUpdate: dateCreated
     };
 
     // Add entry into database

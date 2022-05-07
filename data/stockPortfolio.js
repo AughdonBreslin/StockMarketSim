@@ -28,13 +28,18 @@ const createPortfolio = async function createPortfolio(userId, initialDeposit, a
     const tAutoDepFreq = validation.checkAutoDepFreq(autoDepFreq);
     const tAutoDepAmt = validation.checkMoneyAmt(autoDepAmt, 'Automatic Deposit Amount', false);
     const tMinActBal = validation.checkMoneyAmt(minActBal, 'Minimum Account Balance', false);
-    const tIFOption = validation.checkInsufficientFundOption(IFOption);
+    let tIFOption;
+    if (typeof IFOption === 'string') {
+        tIFOption = validation.checkInsufficientFundOption(IFOption);
+    } else if (typeof IFOption === 'boolean') {
+        tIFOption = IFOption;
+    } else throw `Error: Insufficient Fund Option not of type string or boolean!`;
 
     const stockPortCollection = await stockPortfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
     const stockPort = await stockPortCollection.findOne({user_id: ObjectId(tUserId)});
-    if(stockPort) throw `Error: This user already has a stock portfolio set!`;
+    if (stockPort) throw `Error: This user already has a stock portfolio set!`;
 
     let stockSet = {
         initial_deposit: tInitialDepo,
@@ -61,6 +66,7 @@ const createPortfolio = async function createPortfolio(userId, initialDeposit, a
     if (!insertInfo.acknowledged || !insertInfo.insertedId) throw `Error: Could not add new stock portfolio.`;    
     
     // Return acknowledgement
+    console.log('hello');
     let stockPortId = insertInfo.insertedId;
     const stockPortAdded = this.getSP(stockPortId.toString().trim(), tUserId);
 
@@ -306,6 +312,28 @@ const resetPortfolio = async function resetPortfolio(id, userId) {
 
 }
 
+const checkStockPortExists = async function checkStockPortExists(userId) {
+    
+    //Checking num of arguments
+    validation.checkNumOfArgs(arguments, 1, 1);
+
+    //Checking ID argument
+    validation.checkId(userId, 'User ID');
+    const newUserId = userId.trim();
+
+    const stockPortCollection = await stockPortfolios();
+    if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
+    const stockPort = await stockPortCollection.findOne({user_id: ObjectId(newUserId)});
+
+    if(!stockPort) {
+        return null;
+    } else {
+        stockPort._id = stockPort._id.toString();
+        stockPort.user_id = stockPort.user_id.toString();
+        return stockPort;
+    }
+}
+
 const getSP = async function getSP(id, userId) {
 
     //Checking num of arguments
@@ -337,5 +365,6 @@ module.exports = {
     addToAutoPurchases,
     addToAutoSell,
     addToTransactionLog,
+    checkStockPortExists,
     getSP
 }

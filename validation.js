@@ -157,8 +157,8 @@ const checkBoolean = function checkBoolean(val, varName) {
 
 /** Returns the auto deposit frequency if input is valid. Otherwise, throws error */
 const checkAutoDepFreq = function checkAutoDepFreq(freq) {
-  if (val == null || val == undefined) throw `Error: frequency is null or undefined, but must be a string!`;
-  if (typeof val !== 'string') throw `Error: frequency must be a string!`;
+  if (freq == null || freq == undefined) throw `Error: frequency is null or undefined, but must be a string!`;
+  if (typeof freq !== 'string') throw `Error: frequency must be a string!`;
 
   const valid_freqs = ["none", "daily", "weekly", "monthly"];
   freq = freq.trim().toLowerCase();
