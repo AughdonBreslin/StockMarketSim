@@ -323,7 +323,7 @@ const checkStockPortExists = async function checkStockPortExists(userID) {
     if (!portCollection) throw `Error: Could not find stock portfolio collection.`;
     const port = await portCollection.findOne({user_id: ObjectId(userID)});
 
-    if(!port) throw `Error: Could not find portfolio with userID ${userID}`;
+    if(!port) return port;
 
     port._id = port._id.toString();
     port.user_id = port.user_id.toString();
