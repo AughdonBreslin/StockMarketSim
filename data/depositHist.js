@@ -71,7 +71,7 @@ const addDepositRecord = async function(stockPortfolio_id, dep_amnt, man_or_aut)
     validation.checkNumOfArgs(arguments,3,3);
     if (!ObjectId.isValid(stockPortfolio_id)) throw `Error: Invalid stock portfolio ID provided.`;
     validation.checkInt(dep_amnt, "Deposit Amount");
-    validation.checkBoolean(man_or_aut, "Manual or Automated");
+    validation.checkIsProper(man_or_aut, 'boolean', "Manual or Automated");
 
     // Make the depositRecord Object
     const depRecObj = {

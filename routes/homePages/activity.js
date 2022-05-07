@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
         // For testing comment this later:
         const transaction_ids = ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"];
 
-        const allUserTransactions = data.transactions.getTranactionObjects(transaction_ids);
+        const allUserTransactions = data.transactions.getTransactionObjects(transaction_ids);
 
         res.render('homePages/activity.handlebars',
             { title: 'Activity', user: 'TODO', transactions: allUserTransactions });

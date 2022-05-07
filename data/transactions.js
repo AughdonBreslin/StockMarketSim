@@ -224,7 +224,7 @@ async function buy(id, ticker, quant, threshold = 0, priority = 0, auto = false,
     quant = validation.checkInt(quant, "Quantity")
     threshold = validation.checkInt(threshold, "Threshold")
     priority = validation.checkInt(priority, "Priority")
-    auto = validation.checkBoolean(auto, "Auto Flag")
+    auto = validation.checkIsProper(auto, 'boolean', "Auto Flag")
     interval = validation.checkString(interval, 1, "Interval", true, false)
     if (ticker.length > 5) throw "Invalid Ticker" // May want to change 5 if there are longer tickers
     if (interval != "1min" && interval != "5min" && interval != "15min" && interval != "30min" && interval != "60min") throw "Invalid Interval"
@@ -307,7 +307,7 @@ async function sell(id, ticker, quant, threshold = 0, auto = false, interval = "
     ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
     quant = validation.checkInt(quant, "Quantity")
     threshold = validation.checkInt(threshold, "Threshold")
-    auto = validation.checkBoolean(auto, "Auto Flag")
+    auto = validation.checkIsProper(auto, 'boolean', "Auto Flag")
     interval = validation.checkString(interval, 1, "Interval", true, false)
     if (ticker.length > 5) throw "Invalid Ticker" // May want to change 5 if there are longer tickers
     if (interval != "1min" && interval != "5min" && interval != "15min" && interval != "30min" && interval != "60min") throw "Invalid Interval"
