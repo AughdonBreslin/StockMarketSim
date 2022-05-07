@@ -166,7 +166,7 @@ const getUserIdFromUsername = async function getUserIdFromUsername(username) {
 const changePortUpdate = async function changePortUpdate(userId, updateOption) {
 
     //Check number of arguments
-    validation.checkNumOfArgs(arguments, 1, 1);
+    validation.checkNumOfArgs(arguments, 2, 2);
 
     //Check if valid id
     validation.checkId(userId, 'User ID');

@@ -11,7 +11,8 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-    const {changedPortUpdates, minActBal, insufficientFunds} = req.body;
+
+    let {changedPortUpdates, minActBal, insufficientFunds} = req.body;
 
     try {
 
