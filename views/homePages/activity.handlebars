@@ -8,9 +8,26 @@
 
   <p> Currently active automated purchase/sell orders: </p>
   {{!-- List of automated purchase/sell orders is displayed here --}}
+  {{#if awaitingTrades}}
+    <ul class="awaitingTrades_list">
+      {{#each awaitingTrades}}
+          <a>
+            <p>
+              You have an automated order to {{this.type}} {{this.quantity}} {{plural this.quantity "share" "shares"}} of {{this.ticker}} once its share price {{direction this.type}} ${{this.pps_threshold}} per share. {{prio_msg this.type this.priority}}
+            </p>
+          </a>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p class="noAwaitingTrades"> 
+      &emsp;You haven't set up any automated trades. Go to the 'Trade' tab to set one up!
+    </p>
+  {{/if}}
 
+{{!-- Sample output: You have an automated order to [sell or purchase] 10 shares of GOOG once its share price [reaches or falls to] $50.42 per share. [If purchase: state the priority]. --}}
 
-  <p>Displaying your recent stock purchases/sells:</p>
+  <br>
+  <p>Recent stock purchases/sells:</p>
   {{!-- List of transactions is displayed here --}}
 
   {{#if transactions}}
@@ -28,4 +45,29 @@
       &emsp;You haven't made any transactions yet. Go to the 'Trade' tab to make a transaction!
     </p>
   {{/if}}
+
+ <br>
+  <p>Deposit History:</p>
+  {{!-- List of Deposits is displayed here --}}
+
+  {{#if deposits}}
+    <ul class="deposits_list">
+      {{#each deposits}}
+          <a>
+            <p>
+              On {{this.deposit-date}}, ${{deposit-amount}} was deposited into your account. This was {{isManual this.manual-or-automated}} deposit.
+            </p>
+          </a>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p class="noDeposits"> 
+      &emsp;You haven't made any deposits yet. Go to the 'Deposits' tab to deposit money into your account!
+    </p>
+  {{/if}}
+
+
+
+
+
 </main>
