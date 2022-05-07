@@ -22,6 +22,5 @@ module.exports = {
     deposits: getCollectionFn('deposits'),
     autoBuys: getCollectionFn('autoBuys'),
     autoSells: getCollectionFn('autoSells'),
-    transactions: getCollectionFn('transactions'),
-    stockSettings: getCollectionFn('stockMarketSettings')
+    transactions: getCollectionFn('transactions')
 };

@@ -5,5 +5,12 @@
         <a href='/trade'>Trade</a>
         <a href='/activity'>Activity</a>
     </nav>
-  <p>im a position</p>
+  <p> These are the stocks you own: (ticker,quantity) </p>
+
+  <ul class="stocks_list">
+    {{#each stocks}}
+        <li> {{ this }} </li>
+    {{/each}}
+  </ul>
+  
 </main>

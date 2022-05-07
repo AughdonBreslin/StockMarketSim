@@ -58,7 +58,7 @@ app.use('/signup', (req, res, next) => {
   if (req.session.username) {
     return res.redirect('/');
   } else {
-    req.method = 'POST';
+    // req.method = 'GET';
     next();
   }
 });
@@ -66,7 +66,7 @@ app.use('/login', (req, res, next) => {
   if (req.session.username) {
     return res.redirect('/');
   } else {
-    req.method = 'POST';
+    // req.method = 'GET';
     next();
   }
 });

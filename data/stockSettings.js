@@ -1,6 +1,6 @@
 const mongoCollections = require('../config/mongoCollections');
 const stockSettings = mongoCollections.stockSettings;
-const {ObjectId} = require('mongodb');
+const { ObjectId } = require('mongodb');
 const validation = require('../validation');
 
 
@@ -9,7 +9,7 @@ const validation = require('../validation');
 const accountCreatedSettings = async function accountCreatedSettings(userId, initialDeposit, autoDepFreq, autoDepAmt, minAccBal, insufficientFunds) {
 
     //Checks number of arguments
-    validation.checkNumOfArgs(arguments,6,6);
+    validation.checkNumOfArgs(arguments, 6, 6);
 
     //Should I check if the user is authenticated???
 
@@ -42,8 +42,8 @@ const accountCreatedSettings = async function accountCreatedSettings(userId, ini
     const stockSetCollection = await stockSettings();
     if (!stockSetCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockSet = await stockSetCollection.findOne({user_id: ObjectId(tUserId)});
-    if(stockSet) throw `Error: This user already has initial settings set!`;
+    const stockSet = await stockSetCollection.findOne({ user_id: ObjectId(tUserId) });
+    if (stockSet) throw `Error: This user already has initial settings set!`;
 
     let newSettings = {
         user_id: ObjectId(tUserId),
@@ -55,17 +55,17 @@ const accountCreatedSettings = async function accountCreatedSettings(userId, ini
     }
 
     const insertInfo = await stockSetCollection.insertOne(newSettings);
-    if (!insertInfo.acknowledged || !insertInfo.insertedId) throw `Error: Could not add new stock settings.`;    
-    
+    if (!insertInfo.acknowledged || !insertInfo.insertedId) throw `Error: Could not add new stock settings.`;
+
     // Return acknowledgement
-    return {stockSettingsInserted: true};
+    return { stockSettingsInserted: true };
 }
 
 //If the user wants to reset the simulation, they can reset all of their stock settings besides userId
 const resetStockSettings = async function resetStockSettings(userId, initialDeposit, autoDepFreq, autoDepAmt, minAccBal, insufficientFunds) {
 
     //Check the arguments
-    validation.checkNumOfArgs(arguments,6,6);
+    validation.checkNumOfArgs(arguments, 6, 6);
 
     //Check the userId
     validation.checkId(userId, "User Id");
@@ -98,7 +98,7 @@ const resetStockSettings = async function resetStockSettings(userId, initialDepo
     if (!stockSetCollection) throw `Error: Could not find stock settings collection`;
 
     //Get the user according to the userId.  If they don't exist, return an error.
-    const stockSet = await stockSetCollection.findOne({user_id: ObjectId(tUserId)});
+    const stockSet = await stockSetCollection.findOne({ user_id: ObjectId(tUserId) });
     if (!stockSet) throw `Error: There are no current settings set for this user!`;
 
     const resetSettings = {
@@ -115,31 +115,138 @@ const resetStockSettings = async function resetStockSettings(userId, initialDepo
     const updatedInfo = await stockSetCollection.updateOne(
         { _id: ObjectId(newId) },
         { $set: resetSettings }
-     );
+    );
 
     if (updatedInfo.modifiedCount === 0) {
         throw 'could not update stock settings successfully';
     }
 
-    return {reset: true};
+    return { reset: true };
 
 }
 
 //--------------- Functions called when the user wants to update settings while current simulation is runnning -----------------------
 
-const changeAutoDepositFrequency = async function changeAutoDepositFrequency(id, userId, autoDepFreq) {
+const changeAutoDepositFrequency = async function changeAutoDepositFrequency(id, autoDepFreq) {
+    //Checks number of arguments
+    validation.checkNumOfArgs(arguments, 2, 2);
+
+    //Checking userId field
+    // validation.checkId(userId, "User Id");
+    // userId = userId.trim();
+
+    //Checking id field
+    validation.checkId(id, "Settings id");
+    id = id.trim();
+
+    autoDepFreq = validation.checkAutoDepFreq(autoDepFreq);
+
+    // Get collection & change DB data
+    const stockSetCollection = await stockSettings();
+    if (!stockSetCollection) throw `Error: Could not find stock settings collection`;
+
+
+    const updatedSettings = {
+        "automated-deposit-freq": autoDepFreq
+    };
+
+    //Get the settings subdoc according to its id and update it.  If they don't exist, return an error.
+    const stockSetUpdate = await stockSetCollection.updateOne({ _id: ObjectId(id) }, { $set: updatedSettings });
+    if (!stockSetUpdate) throw `Error: There are no current settings set for this user!`;
+
+    if (stockSetUpdate.modifiedCount === 0) {
+        throw 'could not update settings successfully';
+    }
+
+    return { changedAutoDepositFrequency: true };
 
 }
 
-const changeAutoDepositAmount = async function changeAutoDepositAmount(id, userId, autoDepAmt) {
+const changeAutoDepositAmount = async function changeAutoDepositAmount(id, autoDepAmt) {
+    validation.checkNumOfArgs(arguments, 2, 2);
+
+    //Checking id field
+    validation.checkId(id, "Settings id");
+    id = id.trim();
+
+    validation.checkInt(autoDepAmt, "Automatic Deposit Amount");
+    validation.checkWithinBounds(autoDepAmt, 1, 100000);
+
+    // Get collection & change DB data
+    const stockSetCollection = await stockSettings();
+    if (!stockSetCollection) throw `Error: Could not find stock settings collection`;
+
+
+    const updatedSettings = {
+        "automated-deposit-amount": autoDepAmt
+    };
+
+    //Get the settings subdoc according to its id and update it.  If they don't exist, return an error.
+    const stockSetUpdate = await stockSetCollection.updateOne({ _id: ObjectId(id) }, { $set: updatedSettings });
+    if (!stockSetUpdate) throw `Error: There are no current settings set for this user!`;
+
+    if (stockSetUpdate.modifiedCount === 0) {
+        throw 'could not update settings successfully';
+    }
+
+    return { changedAutoDepositAmount: true };
+}
+
+const changeMinAccountBalance = async function changeMinAccountBalance(id, minAccBal) {
+    validation.checkNumOfArgs(arguments, 2, 2);
+
+    //Checking id field
+    validation.checkId(id, "Settings id");
+    id = id.trim();
+
+    validation.checkInt(minAccBal, "Min Account Balance");
+    validation.checkWithinBounds(minAccBal, 1, Number.MAX_SAFE_INTEGER);
+
+    // Get collection & change DB data
+    const stockSetCollection = await stockSettings();
+    if (!stockSetCollection) throw `Error: Could not find stock settings collection`;
+
+    const updatedSettings = {
+        "minimum-account-balance": minAccBal
+    };
+
+    //Get the settings subdoc according to its id and update it.  If they don't exist, return an error.
+    const stockSetUpdate = await stockSetCollection.updateOne({ _id: ObjectId(id) }, { $set: updatedSettings });
+    if (!stockSetUpdate) throw `Error: There are no current settings set for this user!`;
+
+    if (stockSetUpdate.modifiedCount === 0) {
+        throw 'could not update settings successfully';
+    }
+
+    return { changedMinAccountBalance: true };
 
 }
 
-const changeMinAccountBalance = async function changeMinAccountBalance(id, userId, minAccBal) {
+const changeInsufficientFundOption = async function changeInsufficientFundOption(id, IFOption) {
+    validation.checkNumOfArgs(arguments, 2, 2);
 
-}
+    //Checking id field
+    validation.checkId(id, "Settings id");
+    id = id.trim();
 
-const changeInsufficientFundOption = async function changeInsufficientFundOption(id, userId, IFOption) {
+    validation.checkBoolean(IFOption, "Insufficient funds option");
+
+    // Get collection & change DB data
+    const stockSetCollection = await stockSettings();
+    if (!stockSetCollection) throw `Error: Could not find stock settings collection`;
+
+    const updatedSettings = {
+        "insufficient-funds-option": IFOption
+    };
+
+    //Get the settings subdoc according to its id and update it.  If they don't exist, return an error.
+    const stockSetUpdate = await stockSetCollection.updateOne({ _id: ObjectId(id) }, { $set: updatedSettings });
+    if (!stockSetUpdate) throw `Error: There are no current settings set for this user!`;
+
+    if (stockSetUpdate.modifiedCount === 0) {
+        throw 'could not update settings successfully';
+    }
+    return { changedInsufficientFundOption: true };
 
 }
 

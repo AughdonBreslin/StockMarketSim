@@ -1,13 +1,13 @@
 const mongoCollections = require('../config/mongoCollections');
 const users = mongoCollections.users;
-const {ObjectId} = require('mongodb');
+const { ObjectId } = require('mongodb');
 const validation = require('../validation');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
 const createUser = async function createUser(fullName, email, username, password, emailUpdates) {
     // Error Checking
-    validation.checkNumOfArgs(arguments,5,5);
+    validation.checkNumOfArgs(arguments, 5, 5);
 
     //Checking if arguments are of appropriate type
     validation.checkIsProper(fullName, 'string', 'First name');
@@ -26,7 +26,7 @@ const createUser = async function createUser(fullName, email, username, password
     tUsername = tUsername.toLowerCase();
 
     let tPassword = password.trim();
-    
+
     let tEmailUpdates = emailUpdates.trim();
     tEmailUpdates = tEmailUpdates.toLowerCase();
 
@@ -37,7 +37,7 @@ const createUser = async function createUser(fullName, email, username, password
 
     // NOTE: Check usernames with spaces/non-alphanumeric characters
     validation.checkString(tUsername, 4, 'username', true, false);
-    
+
     // NOTE: Check passwords with length < 6
     validation.checkString(tPassword, 6, 'password', false, false);
 
@@ -46,15 +46,16 @@ const createUser = async function createUser(fullName, email, username, password
 
     // Get database
     const userCollection = await users();
-    if(!userCollection) throw `Error: Could not find userCollection.`;
+    if (!userCollection) throw `Error: Could not find userCollection.`;
 
     // Check if user already exists
-    const user1 = await userCollection.findOne({username: tUsername});
-    if(user1) throw `Error: User already exists with username ${tUsername}.`;
+    const user1 = await userCollection.findOne({ username: tUsername });
+    if (user1) throw `Error: User already exists with username ${tUsername}.`;
 
-    const user2 = await userCollection.findOne({email: tEmail});
+    //Check if email has already been used
+    const user2 = await userCollection.findOne({ email: tEmail });
     if (user2) throw `Error: Email ${tEmail} is already in use!`
-    
+
     // Encrypt password (done after checking user so we dont waste time)
     const hash = await bcrypt.hash(tPassword, saltRounds);
 
@@ -69,15 +70,15 @@ const createUser = async function createUser(fullName, email, username, password
 
     // Add entry into database
     const insertInfo = await userCollection.insertOne(newUser);
-    if (!insertInfo.acknowledged || !insertInfo.insertedId) throw `Error: Could not add new user.`;    
-    
-    // Return acknowledgement
-    return {userInserted: true};
+    if (!insertInfo.acknowledged || !insertInfo.insertedId) throw `Error: Could not add new user.`;
+
+    // Return user json
+    return { userInserted: true }
 }
 
 const checkUser = async function checkUser(username, password) {
     // Error Checking
-    validation.checkNumOfArgs(arguments,2,2);
+    validation.checkNumOfArgs(arguments, 2, 2);
     validation.checkIsProper(username, 'string', 'username');
 
     // NOTE: Check usernames with spaces/non-alphanumeric characters
@@ -88,34 +89,82 @@ const checkUser = async function checkUser(username, password) {
 
 
     const tUsername = username.trim().toLowerCase();
-
     const tPassword = password.trim();
+
+    const passwordHash = await bcrypt.hash(tPassword, saltRounds);
 
     // Get database
     const userCollection = await users();
-    if(!userCollection) throw `Error: Could not find userCollection.`;
+    if (!userCollection) throw `Error: Could not find userCollection.`;
 
     // Check if user exists
-    const user = await userCollection.findOne({username: tUsername});
-    if(!user) throw `Error: Either the username or password is invalid.`;
+    const user = await userCollection.findOne({ username: tUsername });
+    if (!user) throw `Error: Either the username or password is invalid.`;
 
-    const hash = user.password;
+    const hash = user.hashedPassword;
     let match = false;
     try {
-        match = await bcrypt.compare(tPassword, hash);
+        match = bcrypt.compare(passwordHash, hash);
     } catch (e) {
-        
-    }
 
+    }
     // Failure
-    if(!match) throw `Error: Either the username or password is invalid.`;
-    
+    if (!match) throw `Error: Either the username or password is invalid.`;
+
     // Success
-    return {authenticated: match};
+
+    user._id = user._id.toString();
+
+    return { user: user, authenticated: match };
+}
+
+const getUser = async function getUser(userId) {
+
+    //Check number of arguments
+    validation.checkNumOfArgs(arguments, 1, 1);
+
+    //Check if valid id
+    validation.checkId(userId, 'User ID');
+
+    const newUserId = userId.trim();
+
+    const userCollection = await users();
+    if (!userCollection) throw `Error: Could not find userCollection.`;
+
+    const user = await userCollection.findOne({ _id: ObjectId(newUserId) });
+    if (!user) throw `Error: User could not be found!`;
+
+    user._id = newUserId;
+    return user;
+}
+
+const getUserIdFromUsername = async function getUserIdFromUsername(username) {
+
+    //Check number of arguments
+    validation.checkNumOfArgs(arguments, 1, 1);
+
+    //Check if valid username
+    validation.checkIsProper(username, 'string', 'Username');
+    validation.checkString(username, 4, 'username', true, false);
+
+    username = username.trim();
+
+    const userCollection = await users();
+    if (!userCollection) throw `Error: Could not find userCollection.`;
+
+    // const user = await userCollection.findOne({ username: username });
+
+    // Get the user_id
+    const user = await userCollection.findOne({ username: username }, { _id: 1 });
+    if (!user) throw `Error: User could not be found!`;
+
+    return user._id;
 }
 
 module.exports = {
     createUser,
-    checkUser
+    checkUser,
+    getUser,
+    getUserIdFromUsername
 }
 

@@ -1,9 +1,26 @@
 <div class='userInfo' data-error="{{error}}">
     <form action='/signup' id='signup-form' method='POST'>
+        <label for='fullname'> Full Name: </label><br>
+        <input id='fullname' name='fullname'/><br><br>
+        <label for='email'> Email Address: </label><br>
+        <input id='email' name='email' type='email'/><br><br>
         <label for='username'>Username:</label><br>
         <input id='username' name='username'><br><br>
         <label for='password'>Password:</label><br>
         <input id='password' name='password' type='password'><br><br>
+        <div>
+            <h3> I want email updates...</h3>
+            <label for='none'> None </label>
+            <input type='checkbox' id='none' name='emailUpdates' class='emailUpdates' value='none' onclick = 'checkboxClicked(this)' checked/>
+            <label for='hourly'> Hourly </label>
+            <input type='checkbox' id='hourly' name='emailUpdates' class='emailUpdates' value='hourly' onclick = 'checkboxClicked(this)'/>
+            <label for='daily'> Daily </label>
+            <input type='checkbox' id='daily' name='emailUpdates' class='emailUpdates' value='daily' onclick = 'checkboxClicked(this)'/>
+            <label for='weekly'> Monthly </label>
+            <input type='checkbox' id='weekly' name='emailUpdates' class='emailUpdates' value='weekly' onclick = 'checkboxClicked(this)'/>
+            <label for='monthly'> Weekly </label>
+            <input type='checkbox' id='monthly' name='emailUpdates' class='emailUpdates' value='monthly' onclick = 'checkboxClicked(this)'/><br><br>
+        </div>
         <button type='submit'>Submit</button>
     </form>
 </div>
