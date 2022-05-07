@@ -166,7 +166,10 @@ const checkAutoDepFreq = function checkAutoDepFreq(freq) {
 
 const checkInsufficientFundOption = function checkInsufficientFundOption(option) {
   if (option == null || option == undefined) throw `Error: Insufficient Fund option is null or undefined!`;
-  if (typeof option !== 'string') throw `Error: Insufficient Funds Option must be a string!`;
+
+  if (typeof option === 'boolean') return option;
+
+  if (typeof option !== 'string') throw `Error: Insufficient Funds Option must be either a string or a boolean!`;
   option = option.trim().toLowerCase();
 
   if (option.length == 0) throw `Error: Insufficient Funds Option cannot be an empty string`;

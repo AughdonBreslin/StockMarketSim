@@ -38,9 +38,12 @@ router.post('/', async (req, res) => {
         const IFbool = validation.checkInsufficientFundOption(insufficientFunds);
 
         const userId = await userData.getUserIdFromUsername(req.session.username);
+
         const updatedUser = await userData.changePortUpdate(userId, changedPortUpdates);
         if (!updatedUser) throw `Error: Portfolio Updates couldn't be changed!`;
 
+        console.log(IFbool);
+        console.log(typeof IFbool);
         const updatedStockPort = await stockPortData.changePortSettings(req.session.stockPortId, numMinActBal, IFbool);
         if (!updatedStockPort) throw `Error: Stock Portfolio settings couldn't be changed!`;
 

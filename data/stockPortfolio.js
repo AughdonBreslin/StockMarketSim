@@ -362,7 +362,7 @@ const changePortSettings = async function changeMutableSettings(portID, minAccBa
     validation.checkId(portID, "P ID");
     portID = portID.trim();
 
-    validation.checkIsProper(IFOption, 'boolean', "Insufficient funds option");
+    IFOption = validation.checkInsufficientFundOption(IFOption);
 
     if (minAccBal) {
         validation.checkIsProper(minAccBal, 'number', 'Min Account Balance');
