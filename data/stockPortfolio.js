@@ -415,5 +415,6 @@ module.exports = {
     checkStockPortExists,
     getSP,
     changeMinAccountBalance,
-    changeInsufficientFundsOption
+    changeInsufficientFundsOption,
+    removePortfolio
 }
