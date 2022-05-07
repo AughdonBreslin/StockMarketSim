@@ -189,8 +189,8 @@ const changePortUpdate = async function changePortUpdate(userId, updateOption) {
     if (!user) throw `Error: User could not be found!`;
 
     const updatedUser = await userCollection.findOneAndUpdate({_id: ObjectId(newUserId)}, {$set: {profileUpdates: updateOption}});
-    updatedUser._id = updatedUser._id.toString();
-    return updatedUser;
+    
+    return this.getUser(newUserId);
 }
 
 module.exports = {

@@ -13,7 +13,7 @@ const users = require('../data/users');
 const constructorMethod = (app) => {
     // Home Page
     app.get('/', async (req, res) => {
-        if(req.session.username) {
+        if(req.session.username && req.session.stockPortId) {
             let userID = ""
             let portfolio = {}
             try {
@@ -31,8 +31,10 @@ const constructorMethod = (app) => {
                     percentChange: "TODO",
                     value: portfolio.balance
                 });
+        } else if (req.session.username) {
+            res.redirect('/createPortfolio');
         } else {
-            res.redirect('/login')
+            res.redirect('/login');
         }
     });    
 

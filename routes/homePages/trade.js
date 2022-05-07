@@ -5,20 +5,22 @@ const data = require('../../data');
 const userData = data.users;
 const transactionsData = data.transactions;
 
-// GET /trade
+// GET /trade page
 router.get('/', (req, res) => {
-    if(req.session.username) {
+    if (req.session.username) {
         res.render('homePages/trade.handlebars',
-            {title: 'Trade', user: 'TODO'});
-        } else {
-            res.redirect('/login');
-        }
+            { title: 'Make A Trade', user: 'TODO' });
+    } else {
+        res.redirect('/login');
+    }
 });
+
+// POST /trade (submit a trade)
 
 
 /* When user makes a trade, post the transaction to /activity */
 router.post('/', async (req, res) => {
-    if(req.session.username) {
+    if (req.session.username) {
         // Check if user wants to sell or buy stocks.
         const act = req.body.buy || req.body.sell; /* true = buy and false = sell. */
 
@@ -33,16 +35,16 @@ router.post('/', async (req, res) => {
 
         let trade_ack;
 
-        if(act) {
+        if (act) {
             trade_ack = await transactionsData.buy(stkport_id, ticker, quant);
         } else {
             trade_ack = await transactionsData.sell(stkport_id, ticker, quant);
         }
 
         res.render('homePages/trade.handlebars',
-            {title: 'Trade', user: 'TODO', trans_log: trade_ack});
-        } else {
-            res.redirect('/login');
-        }
+            { title: 'Trade', user: 'TODO', trans_log: trade_ack });
+    } else {
+        res.redirect('/login');
+    }
 });
 module.exports = router;
