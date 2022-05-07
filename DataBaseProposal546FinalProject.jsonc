@@ -7,7 +7,7 @@
     "fullName": "Daniel Dae Kim",
 
     "email": "danielKim4815162342@gmail.com",
-    "username": "Jin Soo Kwon",
+    "username": "JinSooKwon",
 
     "hashed-password": "$5$MnfsQ4iN$ZMTppKN16y/tIsUYs/obHlhdP.Os80yXhTurpBMUbA5",
 
@@ -24,12 +24,19 @@
     
     "value": 15000, /* Combined value of all owned stocks. min: 0. max: Number.MAX_SAFE_INTEGER - 1*/
     "balance": 19000, /* amount of $ that can be spent min: 0. max: Number.MAX_SAFE_INTEGER - 1 */
-    "stocks": {
-        "GOOG": 10, /* min: 0. max: Number.MAX_SAFE_INTEGER - 1 */
-        "TSLA": 5,
-        "AAPL": 6,
-        "AMZN": 100
-    },
+
+    /* Do it this way! */
+    "stocks": [ /* store stocks as nested array */
+        ["GOOG", 10], /* min: 0. max: Number.MAX_SAFE_INTEGER - 1 */
+        ["TSLA", 5],
+        ["AAPL", 6],
+        ["AMZN", 100]
+    ],
+
+    /* Store stocks as 2 seperate arrays */
+    // "stockNames": ["GOOG", "TSLA", "AAPL", "AMZN"],
+    // "stockQuant": [10, 5, 6, 100],
+
 
     "depositHistory": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of deposit-history_id"s */
 
