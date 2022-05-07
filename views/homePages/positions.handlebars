@@ -5,7 +5,8 @@
         <a href='/trade'>Trade</a>
         <a href='/activity'>Activity</a>
     </nav>
-  <p> Your Stock Portfolio: </p>
+  <p> Here's whats in your Stock Portfolio! </p>
+  <p> You own: </p>
   
   <div>
     {{#if stocks}}
@@ -15,7 +16,7 @@
             {{!-- this.[0] is ticker --}}
             {{!-- this.[1] is quantity --}}
                 <li> 
-                  You own {{this.[1]}} {{plural this.[1] "share" "shares"}} of {{this.[0]}} 
+                  {{this.[1]}} {{plural this.[1] "share" "shares"}} of {{this.[0]}} 
                 </li>
             {{/each}}
             </ul>
