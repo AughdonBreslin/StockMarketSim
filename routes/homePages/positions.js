@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
         const stocks = [ /* store stocks as nested array */
             ["GOOG", 10], /* min: 0. max: Number.MAX_SAFE_INTEGER - 1 */
             ["TSLA", 5],
-            ["AAPL", 6],
+            ["AAPL", 1],
             ["AMZN", 100]
         ];
 
