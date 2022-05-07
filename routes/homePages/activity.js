@@ -6,7 +6,7 @@ const userData = data.users;
 
 // GET /activity
 router.get('/', async (req, res) => {
-    if (req.session.username) {
+    if (req.session.username && req.session.stockPortId) {
 
         try {
             /* Get user_id from their username */

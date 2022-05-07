@@ -78,12 +78,16 @@ app.set("view engine", "handlebars");
 app.use(
   session({
     name: "AuthCookie",
-    secret: "This is a secret.. shhh don\"t tell anyone",
+    secret: "This is a secret.. shhh don\'t tell anyone",
     saveUninitialized: true,
     resave: false,
     cookie: { maxAge: 600000 }
   })
 );
+
+/*************************
+ ***      Middlewares      ***
+ *************************/
 
 // User is logged in and trying to access login/signup pages
 app.use('/signup', (req, res, next) => {
@@ -100,7 +104,7 @@ app.use('/signup', (req, res, next) => {
 app.use('/login', (req, res, next) => {
   if (req.session.username && req.session.stockPortId) {
     return res.redirect('/');
-  } else if (req.session.username) {
+  } else if (req.session.username && !req.session.stockPortId) {
     return res.redirect('/createPortfolio');
   } else {
     next();
@@ -118,6 +122,65 @@ app.use('/createPortfolio', (req, res, next) => {
   }
 });
 
+app.use('/activity', (req, res, next) => {
+  if (!req.session.username) {
+    return res.redirect('/login');
+  } else if (req.session.username && !req.session.stockPortId) {
+    return res.redirect('/createPortfolio');
+  } else {
+    next();
+  }
+});
+
+app.use('/positions', (req, res, next) => {
+  if (!req.session.username) {
+    return res.redirect('/login');
+  } else if (req.session.username && !req.session.stockPortId) {
+    return res.redirect('/createPortfolio');
+  } else {
+    next();
+  }
+});
+
+app.use('/trade', (req, res, next) => {
+  if (!req.session.username) {
+    return res.redirect('/login');
+  } else if (req.session.username && !req.session.stockPortId) {
+    return res.redirect('/createPortfolio');
+  } else {
+    next();
+  }
+});
+
+app.use('/settings', (req, res, next) => {
+  if (!req.session.username) {
+    return res.redirect('/login');
+  } else if (req.session.username && !req.session.stockPortId) {
+    return res.redirect('/createPortfolio');
+  } else {
+    next();
+  }
+});
+
+app.use('/settings/reset', (req, res, next) => {
+  if (!req.session.username) {
+    return res.redirect('/login');
+  } else if (req.session.username && !req.session.stockPortId) {
+    return res.redirect('/createPortfolio');
+  } else {
+    next();
+  }
+});
+
+app.use('/logout', (req, res, next) => {
+  if (!req.session.username) {
+    return res.redirect('/login');
+  } else if (req.session.username && !req.session.stockPortId) {
+    return res.redirect('/createPortfolio');
+  } else {
+    next();
+  }
+})
 
 
 
