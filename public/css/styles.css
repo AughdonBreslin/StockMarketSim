@@ -1,9 +1,11 @@
 body {
   font-family: sans-serif;
-  background-color: rgb(99, 99, 99);
+  background-color: rgb(75, 75, 75);
   color: white;
 }
-
+h1 {
+  display: inline-block;
+}
 nav {
   background-color: green;
   position: sticky;
@@ -33,8 +35,8 @@ a.idkuser:hover {
 }
 
 input, button {
-  border-radius: 5px;
   background: #fffafa;
+  border-radius: 5px;
   border-color: rgb(75, 75, 75);
   border-style: outset;
   color: black;
@@ -47,13 +49,77 @@ input, button {
 
   display: inline-block;
   margin: 10px 0;
-
   border-color: #c92423;
   border-style: solid;
   border-width: 1px;
   border-radius: 5px;
   color: #c92423;
   padding: 2px;
+}
+
+/* For logout */
+#cancelButton {
+  display:none;
+}
+#continueButton {
+  display:none;
+}
+#logoutButton {
+  display: inline-block;
+  position: fixed;
+  right: 5px;
+  background-color: green;
+  color: white;
+  box-shadow: 0 1px 1px 0 black;
+  border:none;
+  /* border-radius: 0; */
+  padding: 4px;
+  cursor: pointer;
+}
+
+.logoutPopup {
+  background-color:rgb(75, 75, 75);
+  display: none;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border: 3px solid white;
+}
+
+.logoutPopup h1 {
+  display: inline;
+  font-size: 1rem;
+  align-self: center;
+  padding: 4px;
+}
+
+.logoutPopup a {
+  background-color: green;
+  display: block;
+  color: white;
+  box-shadow: 0 1px 1px 0 black;
+
+  padding: 8px 8px;
+  text-decoration: none;
+  align-self: center;
+  margin: 4px 4px;
+}
+
+.logoutPopup a:hover {
+  background-color:#009000;
+}
+
+.fakeButton {
+  background-color: white;
+  border: none;
+  border-radius: 5px;
+  color: black;
+  padding: 4px 4px;
+  text-align: center;
+  text-decoration: none;
+  display: none;
+  margin: 4px 2px;
+  cursor: pointer;
 }
 
 footer {

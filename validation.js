@@ -148,13 +148,6 @@ const checkString = function checkString(strVal, length, varName, alphanumeric =
   return strVal;
 };
 
-const checkBoolean = function checkBoolean(val, varName) {
-  if (val == null || val == undefined) throw `Error: ${varName} is null or undefined, but must be a boolean!`;
-  if (typeof val !== 'boolean') throw `Error: ${varName} must be a boolean!`;
-
-};
-
-
 /** Returns the auto deposit frequency if input is valid. Otherwise, throws error */
 const checkAutoDepFreq = function checkAutoDepFreq(freq) {
   if (freq == null || freq == undefined) throw `Error: frequency is null or undefined, but must be a string!`;
@@ -194,12 +187,8 @@ module.exports = {
   checkWebsite,
   checkYear,
   trimArray,
-  // checkRating,
-  // checkRelease,
-  // checkTracks,
   checkEmail,
   checkMoneyAmt,
-  checkBoolean,
   checkAutoDepFreq,
   checkInsufficientFundOption
 };
