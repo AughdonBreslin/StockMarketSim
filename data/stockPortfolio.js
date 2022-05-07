@@ -370,8 +370,8 @@ const changePortSettings = async function changeMutableSettings(portID, minAccBa
     }
 
     // Get collection & change DB data
-    const portCollection = await portfolios();
-    if (!portCollection) throw `Error: Could not find portfolio collection`;
+    const portfolioCollection = await portfolios();
+    if (!portfolioCollection) throw `Error: Could not find portfolio collection`;
 
     const portfolio = await portfolioCollection.findOne({ _id: ObjectId(portID) });
     if(!portfolio) throw `Error: Portfolio not found with ID ${portID}.`;
@@ -388,39 +388,6 @@ const changePortSettings = async function changeMutableSettings(portID, minAccBa
     return newPortfolio;
 }
 
-// const changeMinAccountBalance = async function changeMinAccountBalance(portID, minAccBal) {
-    
-
-    
-
-    
-//     ;
-// }
-
-// const changeInsufficientFundsOption = async function changeInsufficientFundsOption(portID, IFOption) {
-//     validation.checkNumOfArgs(arguments, 2, 2);
-
-//     //Checking id field
-//     validation.checkId(portID, "PortID");
-//     portID = portID.trim();
-
-    
-    
-//     // Get collection & change DB data
-//     const portCollection = await portfolios();
-//     if (!portCollection) throw `Error: Could not find portfolio collection`;
-
-//     const portfolio = await portfolioCollection.findOne({ _id: ObjectId(portID) });
-//     if(!portfolio) throw `Error: Portfolio not found with ID ${portID}.`;
-
-//     let settings = portfolio.settings;
-//     if (!settings) throw `Error: No settings?`
-
-//     settings.insufficient_funds_option = IFOption;
-//     const newPortfolio = await portfolioCollection.findOneAndUpdate({_id: ObjectId(portID)}, {$set: {settings: settings}});
-//     return newPortfolio;
-// }
-
 module.exports = {
     createPortfolio,
     updatePVal,
@@ -432,7 +399,5 @@ module.exports = {
     checkStockPortExists,
     getSP,
     changePortSettings,
-    // changeMinAccountBalance,
-    // changeInsufficientFundsOption,
     removePortfolio
 }
