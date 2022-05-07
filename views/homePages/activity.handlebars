@@ -5,6 +5,11 @@
         <a href='/trade'>Trade</a>
         <a href='/activity'>Activity</a>
     </nav>
+
+  <p> Currently active automated purchase/sell orders: </p>
+  {{!-- List of automated purchase/sell orders is displayed here --}}
+
+
   <p>Displaying your recent stock purchases/sells:</p>
   {{!-- List of transactions is displayed here --}}
 
@@ -16,23 +21,6 @@
               On {{this.date}}, you {{action this.type}} {{this.quantity}} {{plural this.quantity "share" "shares"}} of {{this.ticker}} for ${{this.amount}} each, for a total transaction amount of ${{multiply this.amount this.quantity}}.
             </p>
           </a>
-          
-          
-          {{!-- <li> 
-            <a>
-              Date: {{this.date}}
-              <br>
-              Type: {{this.type}}
-              <br>
-              Ticker: {{this.ticker}}
-              <br>
-              Transaction Amount: ${{this.amount}}
-              <br>
-              Total Transaction Amount: ${{this.amount * this.quantity}}
-              <br>
-            </a>
-          </li> --}}
-          {{!-- <br> --}}
       {{/each}}
     </ul>
   {{else}}
