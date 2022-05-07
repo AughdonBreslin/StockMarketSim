@@ -5,6 +5,7 @@ const createPortRoutes = require('./account/createPort');
 const activityRoutes = require('./homePages/activity');
 const positionsRoutes = require('./homePages/positions');
 const tradeRoutes = require('./homePages/trade');
+const settingRoutes = require('./homePages/settings');
 
 const constructorMethod = (app) => {
     // Home Page
@@ -26,6 +27,7 @@ const constructorMethod = (app) => {
     app.use('/activity', activityRoutes);
     app.use('/positions', positionsRoutes);
     app.use('/trade', tradeRoutes); // ha
+    app.use('/settings', settingRoutes);
 
     // etc
 

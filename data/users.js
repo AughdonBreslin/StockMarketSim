@@ -66,7 +66,7 @@ const createUser = async function createUser(fullName, email, username, password
         email: tEmail,
         username: tUsername,
         hashedPassword: hash,
-        emailUpdates: tEmailUpdates,
+        profileUpdates: tEmailUpdates,
         lastUpdate: dateCreated
     };
 
@@ -163,10 +163,40 @@ const getUserIdFromUsername = async function getUserIdFromUsername(username) {
     return user._id;
 }
 
+const changePortUpdate = async function changePortUpdate(userId, updateOption) {
+
+    //Check number of arguments
+    validation.checkNumOfArgs(arguments, 1, 1);
+
+    //Check if valid id
+    validation.checkId(userId, 'User ID');
+
+    const newUserId = userId.trim();
+
+    validation.checkIsProper(updateOption, 'string', 'Portfolio Update Option');
+    updateOption = updateOption.trim().toLowerCase();
+
+    //Check if email update selection is a valid selection
+    if (updateOption !== 'none' && updateOption !== 'hourly' && updateOption !== 'daily' && updateOption !== 'weekly' && updateOption !== 'monthly') {
+        throw `Error: Not a valid email update option!`;
+    }
+
+    const userCollection = await users();
+    if (!userCollection) throw `Error: Could not find userCollection.`;
+
+    const user = await userCollection.findOne({ _id: ObjectId(newUserId) });
+    if (!user) throw `Error: User could not be found!`;
+
+    const updatedUser = await userCollection.findOneAndUpdate({_id: ObjectId(newUserId)}, {$set: {profileUpdates: updateOption}});
+    updatedUser._id = updatedUser._id.toString();
+    return updatedUser;
+}
+
 module.exports = {
     createUser,
     checkUser,
     getUser,
-    getUserIdFromUsername
+    getUserIdFromUsername,
+    changePortUpdate
 }
 
