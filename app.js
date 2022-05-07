@@ -14,9 +14,21 @@ const handlebarsInstance = exphbs.create({
         return new Handlebars.SafeString(JSON.stringify(obj, null, spacing));
 
       return new Handlebars.SafeString(JSON.stringify(obj));
+    },
+    multiply: (num1, num2) => {
+      return num1 * num2;
+    },
+    action: (type) => {
+      return type == "purchase" ? "bought" : "sold";
+    },
+
+    // If value == 1, return the singular form. Else return the plural form
+    plural: (value, single, plural) => {
+      return value == 1 ? single : plural;
     }
   }
 });
+
 
 const rewriteUnsupportedBrowserMethods = (req, res, next) => {
   // If the user posts to the server with a property called _method, rewrite the request"s method
@@ -34,7 +46,7 @@ const rewriteUnsupportedBrowserMethods = (req, res, next) => {
 app.use;
 app.use("/public", static);
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(rewriteUnsupportedBrowserMethods);
 
 app.engine("handlebars", handlebarsInstance.engine);
@@ -49,7 +61,7 @@ app.use(
     secret: "This is a secret.. shhh don\"t tell anyone",
     saveUninitialized: true,
     resave: false,
-    cookie: {maxAge: 600000}
+    cookie: { maxAge: 600000 }
   })
 );
 
@@ -57,7 +69,7 @@ app.use(
 app.use('/signup', (req, res, next) => {
   if (req.session.username && req.session.stockPortId) {
     return res.redirect('/');
-  } else if (req.session.username && !req.session.stockPortId){
+  } else if (req.session.username && !req.session.stockPortId) {
     // req.method = 'GET';
     return res.redirect('/createPortfolio')
   } else {
@@ -68,7 +80,7 @@ app.use('/signup', (req, res, next) => {
 app.use('/login', (req, res, next) => {
   if (req.session.username && req.session.stockPortId) {
     return res.redirect('/');
-  } else if (req.session.username){
+  } else if (req.session.username) {
     return res.redirect('/createPortfolio');
   } else {
     next();

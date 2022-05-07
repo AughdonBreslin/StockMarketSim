@@ -5,12 +5,26 @@
         <a href='/trade'>Trade</a>
         <a href='/activity'>Activity</a>
     </nav>
-  <p> These are the stocks you own: (ticker,quantity) </p>
-
-  <ul class="stocks_list">
-    {{#each stocks}}
-        <li> {{ this }} </li>
-    {{/each}}
-  </ul>
+  <p> Your Stock Portfolio: </p>
+  
+  <div>
+    {{#if stocks}}
+        <section>
+            <ul class="stocks_list">
+            {{#each stocks}}
+            {{!-- this.[0] is ticker --}}
+            {{!-- this.[1] is quantity --}}
+                <li> 
+                  You own {{this.[1]}} {{plural this.[1] "share" "shares"}} of {{this.[0]}} 
+                </li>
+            {{/each}}
+            </ul>
+        </section>
+    {{else}}
+        <p class="noStocksOwned">
+            You currently don't own any stocks. Go to the 'Trade' tab to purchase stocks.
+        </p>
+    {{/if}}
+</div>
   
 </main>
