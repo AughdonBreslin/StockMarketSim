@@ -34,7 +34,7 @@ const constructorMethod = (app) => {
         } else {
             res.redirect('/login')
         }
-    });
+    });    
 
     // Login and Signup Page
     app.use('/signup', signupRoutes);
