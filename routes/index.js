@@ -12,7 +12,7 @@ const users = require('../data/users');
 
 const constructorMethod = (app) => {
     // Home Page
-    app.get('/', (req, res) => {
+    app.get('/', async (req, res) => {
         if(req.session.username) {
             let userID = ""
             let portfolio = {}
