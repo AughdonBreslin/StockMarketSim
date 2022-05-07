@@ -355,40 +355,20 @@ const getSP = async function getSP(id, userId) {
     return stockPort;
 }
 
-const changeMinAccountBalance = async function changeMinAccountBalance(portID, minAccBal) {
-    validation.checkNumOfArgs(arguments, 2, 2);
+const changePortSettings = async function changeMutableSettings(portID, minAccBal, IFOption) {
+    validation.checkNumOfArgs(arguments, 3, 3);
 
     //Checking id field
     validation.checkId(portID, "P ID");
     portID = portID.trim();
 
-    validation.checkIsProper(minAccBal, 'number', 'Min Account Balance');
-    validation.checkWithinBounds(minAccBal, 0, Number.MAX_SAFE_INTEGER);
-
-    // Get collection & change DB data
-    const portCollection = await portfolios();
-    if (!portCollection) throw `Error: Could not find portfolio collection`;
-
-    const portfolio = await portfolioCollection.findOne({ _id: ObjectId(portID) });
-    if(!portfolio) throw `Error: Portfolio not found with ID ${portID}.`;
-
-    let settings = portfolio.settings;
-    if (!settings) throw `Error: No settings?`
-
-    settings.minimum_account_balance = minAccBal;
-    const newPortfolio = await portfolioCollection.findOneAndUpdate({_id: ObjectId(portID)}, {$set: {settings: settings}});
-    return newPortfolio;
-}
-
-const changeInsufficientFundsOption = async function changeInsufficientFundsOption(portID, IFOption) {
-    validation.checkNumOfArgs(arguments, 2, 2);
-
-    //Checking id field
-    validation.checkId(portID, "PortID");
-    portID = portID.trim();
-
     validation.checkIsProper(IFOption, 'boolean', "Insufficient funds option");
-    
+
+    if (minAccBal) {
+        validation.checkIsProper(minAccBal, 'number', 'Min Account Balance');
+        validation.checkWithinBounds(minAccBal, 0, Number.MAX_SAFE_INTEGER);
+    }
+
     // Get collection & change DB data
     const portCollection = await portfolios();
     if (!portCollection) throw `Error: Could not find portfolio collection`;
@@ -399,10 +379,47 @@ const changeInsufficientFundsOption = async function changeInsufficientFundsOpti
     let settings = portfolio.settings;
     if (!settings) throw `Error: No settings?`
 
+    if (minAccBal) {
+        settings.minimum_account_balance = minAccBal;
+    }
     settings.insufficient_funds_option = IFOption;
+
     const newPortfolio = await portfolioCollection.findOneAndUpdate({_id: ObjectId(portID)}, {$set: {settings: settings}});
     return newPortfolio;
 }
+
+// const changeMinAccountBalance = async function changeMinAccountBalance(portID, minAccBal) {
+    
+
+    
+
+    
+//     ;
+// }
+
+// const changeInsufficientFundsOption = async function changeInsufficientFundsOption(portID, IFOption) {
+//     validation.checkNumOfArgs(arguments, 2, 2);
+
+//     //Checking id field
+//     validation.checkId(portID, "PortID");
+//     portID = portID.trim();
+
+    
+    
+//     // Get collection & change DB data
+//     const portCollection = await portfolios();
+//     if (!portCollection) throw `Error: Could not find portfolio collection`;
+
+//     const portfolio = await portfolioCollection.findOne({ _id: ObjectId(portID) });
+//     if(!portfolio) throw `Error: Portfolio not found with ID ${portID}.`;
+
+//     let settings = portfolio.settings;
+//     if (!settings) throw `Error: No settings?`
+
+//     settings.insufficient_funds_option = IFOption;
+//     const newPortfolio = await portfolioCollection.findOneAndUpdate({_id: ObjectId(portID)}, {$set: {settings: settings}});
+//     return newPortfolio;
+// }
 
 module.exports = {
     createPortfolio,
@@ -414,7 +431,8 @@ module.exports = {
     addToTransactionLog,
     checkStockPortExists,
     getSP,
-    changeMinAccountBalance,
-    changeInsufficientFundsOption,
+    changePortSettings,
+    // changeMinAccountBalance,
+    // changeInsufficientFundsOption,
     removePortfolio
 }
