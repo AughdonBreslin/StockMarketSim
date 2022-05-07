@@ -1,0 +1,44 @@
+<main>
+    <nav>
+        <a href='/'>Home</a>
+        <a href='/positions'>Positions</a>
+        <a href='/trade'>Trade</a>
+        <a href='/activity'>Activity</a>
+        <a href='/settings'> Change Portfolio Settings </a>
+    </nav>
+    <h2> Change your user/stock portfolio settings here </h2>
+    <div class='userInfo' data-error="{{error}}">
+    <form action='/settings' id='change-settings-form' method='POST'>
+        
+        <div>
+            <h3> I now want portolio updates... </h3>
+            <label for='none'> None </label>
+            <input type='checkbox' id='none' name='changedPortUpdates' class='changedPortUpdates' value='none' onclick = "checkboxClicked(this, 'changedPortUpdates')" checked/>
+            <label for='hourly'> Hourly </label>
+            <input type='checkbox' id='hourly' name='changedPortUpdates' class='changedPortUpdates' value='hourly' onclick = "checkboxClicked(this, 'changedPortUpdates')"/>
+            <label for='daily'> Daily </label>
+            <input type='checkbox' id='daily' name='changedPortUpdates' class='changedPortUpdates' value='daily' onclick = "checkboxClicked(this, 'changedPortUpdates')"/>
+            <label for='weekly'> Monthly </label>
+            <input type='checkbox' id='weekly' name='changedPortUpdates' class='changedPortUpdates' value='weekly' onclick = "checkboxClicked(this, 'changedPortUpdates')"/>
+            <label for='monthly'> Weekly </label>
+            <input type='checkbox' id='monthly' name='changedPortUpdates' class='changedPortUpdates' value='monthly' onclick = "checkboxClicked(this, 'changedPortUpdates')"/><br><br>
+        </div>
+        
+        <label for='minActBal'> Enter a minimum account balance </label>
+        <input id='minActBal' name='minActBal' type='text'/>
+
+        <div>
+            <h3> If you are attempting to buy more shares than you can afford, would you like to... </h3>
+            <label for='IFfalse'> Not buy any shares at all </label>
+            <input id='IFfalse' name='insufficientFunds' class='insufficientFunds' value='true' type='checkbox' onclick="checkboxClicked(this, 'insufficientFunds')" checked/>
+            <label for='IFtrue'> Buy as many shares as you can afford </label>
+            <input id='IFtrue' name='insufficientFunds' class='insufficientFunds' value='false' type='checkbox' onclick="checkboxClicked(this, 'insufficientFunds')"/>
+        </div>
+        <button type='submit'> Create portfolio </button>
+    </form>
+</div>
+    <h2> Or decide to reset your portfolio! </h2>
+    <form action='/settings/reset' id='reset-portfolio' method='GET'>
+        <button type='submit'> Reset Portfolio </button>
+    </form>
+</main>
