@@ -66,7 +66,6 @@ const createPortfolio = async function createPortfolio(userId, initialDeposit, a
     if (!insertInfo.acknowledged || !insertInfo.insertedId) throw `Error: Could not add new stock portfolio.`;    
     
     // Return acknowledgement
-    console.log('hello');
     let stockPortId = insertInfo.insertedId;
     const stockPortAdded = this.getSP(stockPortId.toString().trim(), tUserId);
 
@@ -349,7 +348,7 @@ const getSP = async function getSP(id, userId) {
     const stockPortCollection = await stockPortfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({id: ObjectId(newId), user_id: ObjectId(newUserId)});
+    const stockPort = await stockPortCollection.findOne({_id: ObjectId(newId), user_id: ObjectId(newUserId)});
     if(!stockPort) throw `Error: This user doesn't have a stock portfolio!`;
 
     stockPort._id = newId;
