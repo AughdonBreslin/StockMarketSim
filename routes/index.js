@@ -1,5 +1,6 @@
 const signupRoutes = require('./account/signup');
 const loginRoutes = require('./account/login');
+const createPortRoutes = require('./account/createPort');
 
 const activityRoutes = require('./homePages/activity');
 const positionsRoutes = require('./homePages/positions');
@@ -19,6 +20,7 @@ const constructorMethod = (app) => {
     // Login and Signup Page
     app.use('/signup', signupRoutes);
     app.use('/login', loginRoutes);
+    app.use('/createPortfolio', createPortRoutes);
 
     // Main Pages
     app.use('/activity', activityRoutes);
