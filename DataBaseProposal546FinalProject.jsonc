@@ -11,7 +11,9 @@
 
     "hashed-password": "$5$MnfsQ4iN$ZMTppKN16y/tIsUYs/obHlhdP.Os80yXhTurpBMUbA5",
 
-    "email-updates": "weekly" /* none, hourly, daily, weekly, monthly */
+    "email-updates": "weekly", /* none, hourly, daily, weekly, monthly */
+    "lastUpdate" : "<YYYY-mm-dd>", /* store as new Date Object */
+    "firstTimeLogIn": false //Initially sent to false, then turned to true when stock portfolio is created
 }
 
 

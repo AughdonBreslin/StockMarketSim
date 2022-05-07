@@ -14,10 +14,10 @@ const validation = require('../validation');
     Afterwards, they can choose to change settings and buy/sell stocks on their portfolio
 
 */
-const createPortfolio = async function createPortfolio(userId, initialDeposit) {
+const createPortfolio = async function createPortfolio(userId, initialDeposit, autoDepFreq, autoDepAmt, minActBal, IFOption) {
 
     //Check number of args
-    validation.checkNumOfArgs(arguments, 2, 2);
+    validation.checkNumOfArgs(arguments, 6, 6);
 
     //Checking userId
     validation.checkId(userId, 'User Id');
@@ -25,6 +25,10 @@ const createPortfolio = async function createPortfolio(userId, initialDeposit) {
     
     //Checking value
     const tInitialDepo = validation.checkMoneyAmt(initialDeposit, 'Initial Deposit', false);
+    const tAutoDepFreq = validation.checkAutoDepFreq(autoDepFreq);
+    const tAutoDepAmt = validation.checkMoneyAmt(autoDepAmt, 'Automatic Deposit Amount', false);
+    const tMinActBal = validation.checkMoneyAmt(minActBal, 'Minimum Account Balance', false);
+    const tIFOption = validation.checkInsufficientFundOption(IFOption);
 
     const stockPortCollection = await stockPortfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
@@ -34,16 +38,16 @@ const createPortfolio = async function createPortfolio(userId, initialDeposit) {
 
     let stockSet = {
         initial_deposit: tInitialDepo,
-        automated_deposit_freq: "none",
-        automated_deposit_amount: 0,
-        minimum_account_balance: 0,
-        insufficient_funds_option: false
+        automated_deposit_freq: tAutoDepFreq,
+        automated_deposit_amount: tAutoDepAmt,
+        minimum_account_balance: tMinActBal,
+        insufficient_funds_option: tIFOption
     }
 
     let newStockPort = {
         user_id: ObjectId(tUserId),
         value: 0,
-        balance: 0,
+        balance: tInitialDepo,
         stocks: {},
         depositHistory: [],
         autoBuys: [],

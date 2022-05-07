@@ -59,13 +59,16 @@ const createUser = async function createUser(fullName, email, username, password
     // Encrypt password (done after checking user so we dont waste time)
     const hash = await bcrypt.hash(tPassword, saltRounds);
 
+    const dateCreated = new Date();
     // Create entry
     let newUser = {
         fullName: tFullName,
         email: tEmail,
         username: tUsername,
         hashedPassword: hash,
-        emailUpdates: tEmailUpdates
+        emailUpdates: tEmailUpdates,
+        lastUpdate: dateCreated,
+        firstTimeLogIn: false
     };
 
     // Add entry into database

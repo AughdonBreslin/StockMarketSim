@@ -71,6 +71,17 @@ app.use('/login', (req, res, next) => {
   }
 });
 
+// User has already created a portfolio and trying to access it again
+app.use('/login/createPortfolio', (req, res, next) => {
+  if (req.session.username && req.session.firsLogIn === false) {
+    return res.redirect('/');
+  } else if (!req.session.username) {
+    return res.redirect('/login');
+  } else {
+    next();
+  }
+});
+
 /*************************
  ***      Booting      ***
  *************************/

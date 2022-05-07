@@ -11,15 +11,15 @@
         <div>
             <h3> I want email updates...</h3>
             <label for='none'> None </label>
-            <input type='checkbox' id='none' name='emailUpdates' class='emailUpdates' value='none' onclick = 'checkboxClicked(this)' checked/>
+            <input type='checkbox' id='none' name='emailUpdates' class='emailUpdates' value='none' onclick = "checkboxClicked(this, 'emailUpdates')" checked/>
             <label for='hourly'> Hourly </label>
-            <input type='checkbox' id='hourly' name='emailUpdates' class='emailUpdates' value='hourly' onclick = 'checkboxClicked(this)'/>
+            <input type='checkbox' id='hourly' name='emailUpdates' class='emailUpdates' value='hourly' onclick = "checkboxClicked(this, 'emailUpdates')"/>
             <label for='daily'> Daily </label>
-            <input type='checkbox' id='daily' name='emailUpdates' class='emailUpdates' value='daily' onclick = 'checkboxClicked(this)'/>
+            <input type='checkbox' id='daily' name='emailUpdates' class='emailUpdates' value='daily' onclick = "checkboxClicked(this, 'emailUpdates')"/>
             <label for='weekly'> Monthly </label>
-            <input type='checkbox' id='weekly' name='emailUpdates' class='emailUpdates' value='weekly' onclick = 'checkboxClicked(this)'/>
+            <input type='checkbox' id='weekly' name='emailUpdates' class='emailUpdates' value='weekly' onclick = "checkboxClicked(this, 'emailUpdates')"/>
             <label for='monthly'> Weekly </label>
-            <input type='checkbox' id='monthly' name='emailUpdates' class='emailUpdates' value='monthly' onclick = 'checkboxClicked(this)'/><br><br>
+            <input type='checkbox' id='monthly' name='emailUpdates' class='emailUpdates' value='monthly' onclick = "checkboxClicked(this, 'emailUpdates')"/><br><br>
         </div>
         <button type='submit'>Submit</button>
     </form>
