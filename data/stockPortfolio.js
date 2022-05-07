@@ -288,27 +288,26 @@ const addToTransactionLog = async function addToTransactionLog(id, userId, logEn
 
 }
 
-const resetPortfolio = async function resetPortfolio(id, userId) {
+const removePortfolio = async function removePortfolio(portID, userId) {
 
     //Check number of args
     validation.checkNumOfArgs(arguments, 2, 2);
 
     //Checking id
-    validation.checkId(id, 'Stock Portfolio ID');
-    const tId = id.trim();
+    validation.checkId(portID, 'Stock Portfolio ID');
+    portId = portID.trim();
 
     //Checking userId
     validation.checkId(userId, 'User Id');
-    const tUserId = userId.trim();
+    userId = userId.trim();
 
-    const stockPortCollection = await portfolios();
-    if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
+    const portCollection = await portfolios();
+    if (!portCollection) throw `Error: Could not find port collection`;
 
-    const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
-    if(!stockPort) throw `Error: This user doesn't have a stock portfolio!`;
+    const stockPort = await portCollection.findOneAndDelete({id: ObjectId(portID), user_id: ObjectId(userID)});
+    if(!stockPort.value) throw `Error: This user doesn't have a stock portfolio!`;
 
-    
-
+    return `${stockPort.value.name} has been successfully deleted!`;
 }
 
 const checkStockPortExists = async function checkStockPortExists(userId) {
