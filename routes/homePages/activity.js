@@ -29,7 +29,11 @@ router.get('/', async (req, res) => {
                 { title: 'Activity', user: 'TODO', transactions: allUserTransactions });
 
         } catch (error) {
-            // What do i do if there's an error? Display an error page?
+            res.render('homePages/error.handlebars',
+                {
+                    title: 'Error', errorMessage: error.toString()
+                }
+            );
         }
 
     } else {
