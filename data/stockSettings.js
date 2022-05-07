@@ -1,11 +1,11 @@
-const mongoCollections = require('../config/mongoCollections');
-const stockSettings = mongoCollections.stockSettings;
-const { ObjectId } = require('mongodb');
-const validation = require('../validation');
+// const mongoCollections = require('../config/mongoCollections');
+// const stockSettings = mongoCollections.stockSettings;
+// const { ObjectId } = require('mongodb');
+// const validation = require('../validation');
 
 
-//Called when a new account has been created.  Takes the user inputted settings and creates an entry within the document
-//---Note--- This is only called when an account has been created.  Any other settings changed post-account creation are different functions
+// //Called when a new account has been created.  Takes the user inputted settings and creates an entry within the document
+// //---Note--- This is only called when an account has been created.  Any other settings changed post-account creation are different functions
 // const accountCreatedSettings = async function accountCreatedSettings(userId, initialDeposit, autoDepFreq, autoDepAmt, minAccBal, insufficientFunds) {
 
 //     //Checks number of arguments
@@ -125,7 +125,7 @@ const validation = require('../validation');
 
 // }
 
-//--------------- Functions called when the user wants to update settings while current simulation is runnning -----------------------
+// //--------------- Functions called when the user wants to update settings while current simulation is runnning -----------------------
 
 // const changeAutoDepositFrequency = async function changeAutoDepositFrequency(id, autoDepFreq) {
 //     //Checks number of arguments
@@ -192,69 +192,13 @@ const validation = require('../validation');
 //     return { changedAutoDepositAmount: true };
 // }
 
-const changeMinAccountBalance = async function changeMinAccountBalance(id, minAccBal) {
-    validation.checkNumOfArgs(arguments, 2, 2);
 
-    //Checking id field
-    validation.checkId(id, "Settings id");
-    id = id.trim();
 
-    validation.checkInt(minAccBal, "Min Account Balance");
-    validation.checkWithinBounds(minAccBal, 1, Number.MAX_SAFE_INTEGER);
-
-    // Get collection & change DB data
-    const stockSetCollection = await stockSettings();
-    if (!stockSetCollection) throw `Error: Could not find stock settings collection`;
-
-    const updatedSettings = {
-        "minimum-account-balance": minAccBal
-    };
-
-    //Get the settings subdoc according to its id and update it.  If they don't exist, return an error.
-    const stockSetUpdate = await stockSetCollection.updateOne({ _id: ObjectId(id) }, { $set: updatedSettings });
-    if (!stockSetUpdate) throw `Error: There are no current settings set for this user!`;
-
-    if (stockSetUpdate.modifiedCount === 0) {
-        throw 'could not update settings successfully';
-    }
-
-    return { changedMinAccountBalance: true };
-
-}
-
-const changeInsufficientFundOption = async function changeInsufficientFundOption(id, IFOption) {
-    validation.checkNumOfArgs(arguments, 2, 2);
-
-    //Checking id field
-    validation.checkId(id, "Settings id");
-    id = id.trim();
-
-    validation.checkBoolean(IFOption, "Insufficient funds option");
-
-    // Get collection & change DB data
-    const stockSetCollection = await stockSettings();
-    if (!stockSetCollection) throw `Error: Could not find stock settings collection`;
-
-    const updatedSettings = {
-        "insufficient-funds-option": IFOption
-    };
-
-    //Get the settings subdoc according to its id and update it.  If they don't exist, return an error.
-    const stockSetUpdate = await stockSetCollection.updateOne({ _id: ObjectId(id) }, { $set: updatedSettings });
-    if (!stockSetUpdate) throw `Error: There are no current settings set for this user!`;
-
-    if (stockSetUpdate.modifiedCount === 0) {
-        throw 'could not update settings successfully';
-    }
-    return { changedInsufficientFundOption: true };
-
-}
-
-module.exports = {
-    // accountCreatedSettings,
-    // resetStockSettings,
-    // changeAutoDepositFrequency,
-    // changeAutoDepositAmount,
-    changeMinAccountBalance,
-    changeInsufficientFundOption
-}
+// module.exports = {
+//     accountCreatedSettings,
+//     resetStockSettings,
+//     changeAutoDepositFrequency,
+//     changeAutoDepositAmount,
+//     changeMinAccountBalance,
+//     changeInsufficientFundOption
+// }

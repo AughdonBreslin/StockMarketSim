@@ -1,5 +1,5 @@
 const mongoCollections = require('../config/mongoCollections');
-const stockPortfolios = mongoCollections.portfolios;
+const portfolios = mongoCollections.portfolios;
 const users = mongoCollections.users
 const {ObjectId} = require('mongodb');
 const validation = require('../validation');
@@ -35,7 +35,7 @@ const createPortfolio = async function createPortfolio(userId, initialDeposit, a
         tIFOption = IFOption;
     } else throw `Error: Insufficient Fund Option not of type string or boolean!`;
 
-    const stockPortCollection = await stockPortfolios();
+    const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
     const stockPort = await stockPortCollection.findOne({user_id: ObjectId(tUserId)});
@@ -91,7 +91,7 @@ const updatePVal = async function updatePVal(id, userId, pVal) {
     //Checking pVal
     const tPVal = validation.checkMoneyAmt(pVal, "Portfolio Value", false);
 
-    const stockPortCollection = await stockPortfolios();
+    const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
     const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
@@ -126,7 +126,7 @@ const updateCurrentBal = async function updateCurrentBal(id, userId, currBal) {
     //Checking currBal
     const tCurrBal = validation.checkMoneyAmt(currBal, "Current Balance", false);
 
-    const stockPortCollection = await stockPortfolios();
+    const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
     const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
@@ -162,7 +162,7 @@ const addToDepHist = async function addToDepHist(id, userId, depHistEntry) {
     validation.checkId(depHistEntry, 'Deposit History ID');
     const tDepHistEntry = depHistEntry.trim();
 
-    const stockPortCollection = await stockPortfolios();
+    const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
     const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
@@ -198,7 +198,7 @@ const addToAutoPurchases = async function addToAutoPurchases(id, userId, autoPur
     validation.checkId(autoPurchaseEntry, 'Auto Purchase ID');
     const tAutoPurchaseEntry = autoPurchaseEntry.trim();
 
-    const stockPortCollection = await stockPortfolios();
+    const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
     const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
@@ -234,7 +234,7 @@ const addToAutoSell = async function addToAutoSell(id, userId, autoSellEntry) {
     validation.checkId(autoSellEntry, 'Auto Sell ID');
     const tAutoSellEntry = autoSellEntry.trim();
 
-    const stockPortCollection = await stockPortfolios();
+    const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
     const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
@@ -269,7 +269,7 @@ const addToTransactionLog = async function addToTransactionLog(id, userId, logEn
     validation.checkId(logEntry, 'Transaction Log ID');
     const tLogEntry = logEntry.trim();
 
-    const stockPortCollection = await stockPortfolios();
+    const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
     const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
@@ -301,7 +301,7 @@ const resetPortfolio = async function resetPortfolio(id, userId) {
     validation.checkId(userId, 'User Id');
     const tUserId = userId.trim();
 
-    const stockPortCollection = await stockPortfolios();
+    const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
     const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
@@ -320,7 +320,7 @@ const checkStockPortExists = async function checkStockPortExists(userId) {
     validation.checkId(userId, 'User ID');
     const newUserId = userId.trim();
 
-    const stockPortCollection = await stockPortfolios();
+    const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
     const stockPort = await stockPortCollection.findOne({user_id: ObjectId(newUserId)});
 
@@ -345,7 +345,7 @@ const getSP = async function getSP(id, userId) {
     validation.checkId(userId, 'User Id');
     const newUserId = userId.trim();
 
-    const stockPortCollection = await stockPortfolios();
+    const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
     const stockPort = await stockPortCollection.findOne({_id: ObjectId(newId), user_id: ObjectId(newUserId)});
@@ -354,6 +354,55 @@ const getSP = async function getSP(id, userId) {
     stockPort._id = newId;
     stockPort.user_id = newUserId;
     return stockPort;
+}
+
+const changeMinAccountBalance = async function changeMinAccountBalance(portID, minAccBal) {
+    validation.checkNumOfArgs(arguments, 2, 2);
+
+    //Checking id field
+    validation.checkId(portID, "P ID");
+    portID = portID.trim();
+
+    validation.checkIsProper(minAccBal, 'number', 'Min Account Balance');
+    validation.checkWithinBounds(minAccBal, 0, Number.MAX_SAFE_INTEGER);
+
+    // Get collection & change DB data
+    const portCollection = await portfolios();
+    if (!portCollection) throw `Error: Could not find portfolio collection`;
+
+    const portfolio = await portfolioCollection.findOne({ _id: ObjectId(portID) });
+    if(!portfolio) throw `Error: Portfolio not found with ID ${portID}.`;
+
+    let settings = portfolio.settings;
+    if (!settings) throw `Error: No settings?`
+
+    settings.minimum_account_balance = minAccBal;
+    const newPortfolio = await portfolioCollection.findOneAndUpdate({_id: ObjectId(portID)}, {$set: {settings: settings}});
+    return newPortfolio;
+}
+
+const changeInsufficientFundsOption = async function changeInsufficientFundsOption(portID, IFOption) {
+    validation.checkNumOfArgs(arguments, 2, 2);
+
+    //Checking id field
+    validation.checkId(portID, "PortID");
+    portID = portID.trim();
+
+    validation.checkIsProper(IFOption, 'boolean', "Insufficient funds option");
+    
+    // Get collection & change DB data
+    const portCollection = await portfolios();
+    if (!portCollection) throw `Error: Could not find portfolio collection`;
+
+    const portfolio = await portfolioCollection.findOne({ _id: ObjectId(portID) });
+    if(!portfolio) throw `Error: Portfolio not found with ID ${portID}.`;
+
+    let settings = portfolio.settings;
+    if (!settings) throw `Error: No settings?`
+
+    settings.insufficient_funds_option = IFOption;
+    const newPortfolio = await portfolioCollection.findOneAndUpdate({_id: ObjectId(portID)}, {$set: {settings: settings}});
+    return newPortfolio;
 }
 
 module.exports = {
@@ -365,5 +414,7 @@ module.exports = {
     addToAutoSell,
     addToTransactionLog,
     checkStockPortExists,
-    getSP
+    getSP,
+    changeMinAccountBalance,
+    changeInsufficientFundsOption
 }
