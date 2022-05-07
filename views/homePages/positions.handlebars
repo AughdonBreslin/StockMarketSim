@@ -5,5 +5,31 @@
         <a href='/trade'>Trade</a>
         <a href='/activity'>Activity</a>
     </nav>
-  <p>im a position</p>
+  <p>im a position!</p>
+  <p> {{str}} </p>
+
+  {{!-- <ul class="stocks_list">
+    {{#each stockNames}}
+      <li> {{this}} </li>
+    {{/each}}
+
+  </ul> --}}
+
+  <ul class="a_list">
+    <li> example item </li>
+    {{#each myList}}
+        <li> {{{this}}} </li>
+    {{/each}}
+  </ul>
+
+  <ul class="stocks_list">
+    {{#each stocks.stocks}}
+        <li> {{ this }} </li>
+    {{/each}}
+  </ul>
+  
+  <ul class="test">
+    <li> GOOG 10 </li>
+  </ul>
+
 </main>
