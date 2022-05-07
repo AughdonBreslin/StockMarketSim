@@ -5,13 +5,34 @@ const data = require('../../data');
 const userData = data.users;
 
 // GET /positions
-router.get('/', (req, res) => {
-    if(req.session.username) {
-        res.render('homePages/positions.handlebars',
-            {title: 'Positions', user: 'TODO'});
-        } else {
-            res.redirect('/login');
-        }
+router.get('/', async (req, res) => {
+    if (req.session.username) {
+
+        /* Get user_id from their username */
+        /* username must be unique */
+        const userId = await data.users.getUserIdFromUsername(req.session.username);
+
+        // uncomment this 
+        // const stk_prt = await data.stockPortfolio.getSP(userId);
+        // const stocks = stk_prt.stocks;
+
+        // For testing comment this later:
+        const stocks = [ /* store stocks as nested array */
+            ["GOOG", 10], /* min: 0. max: Number.MAX_SAFE_INTEGER - 1 */
+            ["TSLA", 5],
+            ["AAPL", 6],
+            ["AMZN", 100]
+        ];
+
+        res.render('../views/homePages/positions.handlebars',
+            {
+                title: 'Positions', user: 'TODO', stocks: stocks
+            }
+        );
+
+    } else {
+        res.redirect('/login');
+    }
 });
 
 module.exports = router;

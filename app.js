@@ -55,26 +55,40 @@ app.use(
 
 // User is logged in and trying to access login/signup pages
 app.use('/signup', (req, res, next) => {
-  if (req.session.username) {
+  if (req.session.username && req.session.stockPortId) {
     return res.redirect('/');
+  } else if (req.session.username && !req.session.stockPortId){
+    // req.method = 'GET';
+    return res.redirect('/createPortfolio')
   } else {
-    req.method = 'POST';
-    next();
-  }
-});
-app.use('/login', (req, res, next) => {
-  if (req.session.username) {
-    return res.redirect('/');
-  } else {
-    req.method = 'POST';
     next();
   }
 });
 
-app.use('/logout', (req, res, next) => {
-  req.method = 'GET';
-  next();
-})
+app.use('/login', (req, res, next) => {
+  if (req.session.username && req.session.stockPortId) {
+    return res.redirect('/');
+  } else if (req.session.username){
+    return res.redirect('/createPortfolio');
+  } else {
+    next();
+  }
+});
+
+// User has already created a portfolio and trying to access it again
+app.use('/createPortfolio', (req, res, next) => {
+  if (req.session.username && req.session.stockPortId) {
+    return res.redirect('/');
+  } else if (!req.session.username) {
+    return res.redirect('/login');
+  } else {
+    next();
+  }
+});
+
+
+
+
 
 /*************************
  ***      Booting      ***
