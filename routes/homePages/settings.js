@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
             //Indicates to keep original number and to not update it
             numMinActBal = null;
         } else {
-            numMinActBal = validation.checkMoneyAmt(numMinActBal);
+            numMinActBal = validation.checkMoneyAmt(minActBal, 'Minimum Account Balance', false);
         }
 
         const IFbool = validation.checkInsufficientFundOption(insufficientFunds);

@@ -356,7 +356,7 @@ const getSP = async function getSP(id, userId) {
 }
 
 const changePortSettings = async function changeMutableSettings(portID, minAccBal, IFOption) {
-    validation.checkNumOfArgs(arguments, 3, 3);
+    validation.checkNumOfArgs(arguments, 2, 3);
 
     //Checking id field
     validation.checkId(portID, "P ID");
