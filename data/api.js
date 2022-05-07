@@ -43,7 +43,7 @@ async function pval(stocks) {
         total+=((await price(tickers[i], "1min"))*stocks[tickers[i]])
     }
     
-    console.log(total) // debugging purposes only
+    console.log("pval: "+total); // debugging purposes only
     return total
 }
 

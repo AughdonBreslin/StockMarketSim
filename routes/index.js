@@ -18,7 +18,9 @@ const constructorMethod = (app) => {
             let portfolio = {}
             try {
                 userID = await users.getUserIdFromUsername(req.session.username);
-                portfolio = await stockPortfolio.getSP(userID, req.session.stockPortId);
+                userID = userID.toString();
+                console.log(`User ${userID} went to home page.`);
+                portfolio = await stockPortfolio.getSP(req.session.stockPortId, userID);
             } catch (e) {
                 console.log(e);
             }

@@ -58,7 +58,7 @@ app.set("view engine", "handlebars");
 app.use(
   session({
     name: "AuthCookie",
-    secret: "This is a secret.. shhh don\"t tell anyone",
+    secret: "This is a secret.. shhh don\'t tell anyone",
     saveUninitialized: true,
     resave: false,
     cookie: { maxAge: 600000 }
