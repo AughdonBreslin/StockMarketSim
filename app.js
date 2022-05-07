@@ -15,9 +15,13 @@ const handlebarsInstance = exphbs.create({
 
       return new Handlebars.SafeString(JSON.stringify(obj));
     },
+
+    // basic multiplication 
     multiply: (num1, num2) => {
       return num1 * num2;
     },
+
+    // map transaction types to words. 'Purchase' = 'bought' and 'sell' = 'sold'
     action: (type) => {
       return type == "purchase" ? "bought" : "sold";
     },
@@ -25,7 +29,23 @@ const handlebarsInstance = exphbs.create({
     // If value == 1, return the singular form. Else return the plural form
     plural: (value, single, plural) => {
       return value == 1 ? single : plural;
+    },
+
+    // sell once a stock 'reaches' a set price and buy once a stock 'falls to' a certain price.
+    direction: (type) => {
+      return type == "sell" ? "reaches" : "falls to";
+    },
+
+    // If automated trade type is a purchase, return its priority.
+    prio_msg: (type, prio) => {
+      return type == "sell" ? "" : `Priority: ${prio}`;
+    },
+
+    /* true=manual deposit, false=automated deposit*/
+    isManual: (isManDep) => {
+      return isManDep ? "a manual" : "an automated";
     }
+
   }
 });
 
