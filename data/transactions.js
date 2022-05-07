@@ -552,7 +552,6 @@ async function getTransactions(ids) {
         }
     ];
 
-
     return sample_trans_list;
 
 }
