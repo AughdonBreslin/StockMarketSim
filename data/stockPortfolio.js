@@ -14,14 +14,14 @@ const validation = require('../validation');
     Afterwards, they can choose to change settings and buy/sell stocks on their portfolio
 
 */
-const createPortfolio = async function createPortfolio(userId, initialDeposit, autoDepFreq, autoDepAmt, minActBal, IFOption) {
+const createPortfolio = async function createPortfolio(userID, initialDeposit, autoDepFreq, autoDepAmt, minActBal, IFOption) {
 
     //Check number of args
     validation.checkNumOfArgs(arguments, 6, 6);
 
-    //Checking userId
-    validation.checkId(userId, 'User Id');
-    const tUserId = userId.trim();
+    //Checking userID
+    validation.checkId(userID, 'User Id');
+    const tUserId = userID.trim();
     
     //Checking value
     const tInitialDepo = validation.checkMoneyAmt(initialDeposit, 'Initial Deposit', false);
@@ -75,220 +75,220 @@ const createPortfolio = async function createPortfolio(userId, initialDeposit, a
 
 //Updates portfolio-value field with the current stock portfolio value
 //Adds old PVal to PValHistory array
-const updatePVal = async function updatePVal(id, userId, pVal) {
+const updatePVal = async function updatePVal(portID, userID, pVal) {
 
     //Check number of args
     validation.checkNumOfArgs(arguments, 3, 3);
 
-    //Checking id
-    validation.checkId(id, 'Stock Portfolio ID');
-    const tId = id.trim();
+    //Checking portID
+    validation.checkId(portID, 'Stock Portfolio ID');
+    portID = portID.trim();
 
-    //Checking userId
-    validation.checkId(userId, 'User Id');
-    const tUserId = userId.trim();
+    //Checking userID
+    validation.checkId(userID, 'User Id');
+    userID = userID.trim();
 
     //Checking pVal
-    const tPVal = validation.checkMoneyAmt(pVal, "Portfolio Value", false);
+    pVal = validation.checkMoneyAmt(pVal, "Portfolio Value", false);
 
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
-    if(!stockPort) throw `Error: This user doesn't have a stock portfolio!`;
+    const stockPort = await stockPortCollection.findOne({id: ObjectId(portID), user_id: ObjectId(userID)});
+    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
-        {_id: ObjectId(tId)},
-        { $set: {value: tPVal} }
+        {_id: ObjectId(portID)},
+        { $set: {value: pVal} }
     );
 
     if (!update.matchedCount && !update.modifiedCount)
        throw 'Updating portfolio value failed';
 
-    const stockPortAdded = this.getSP(tId, tUserId);
+    const stockPortAdded = this.getSP(portID, userID);
     return stockPortAdded;
 }
 
 //Updates current-balance field with the current stock 
-const updateCurrentBal = async function updateCurrentBal(id, userId, currBal) {
+const updateCurrentBal = async function updateCurrentBal(portID, userID, currBal) {
 
     //Check number of args
     validation.checkNumOfArgs(arguments, 3, 3);
 
-    //Checking id
-    validation.checkId(id, 'Stock Portfolio ID');
-    const tId = id.trim();
+    //Checking portID
+    validation.checkId(portID, 'Stock Portfolio ID');
+    portID = portID.trim();
 
-    //Checking userId
-    validation.checkId(userId, 'User Id');
-    const tUserId = userId.trim();
+    //Checking userID
+    validation.checkId(userID, 'User Id');
+    userID = userID.trim();
 
     //Checking currBal
-    const tCurrBal = validation.checkMoneyAmt(currBal, "Current Balance", false);
+    currBal = validation.checkMoneyAmt(currBal, "Current Balance", false);
 
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
-    if(!stockPort) throw `Error: This user doesn't have a stock portfolio!`;
+    const stockPort = await stockPortCollection.findOne({id: ObjectId(portID), user_id: ObjectId(userID)});
+    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
-        {_id: ObjectId(tId)},
-        { $set: {balance: tCurrBal} }
+        {_id: ObjectId(portID)},
+        { $set: {balance: currBal} }
     );
 
     if (!update.matchedCount && !update.modifiedCount)
        throw 'Updating current portfolio balance failed';
 
-    const stockPortAdded = this.getSP(tId, tUserId);
+    const stockPortAdded = this.getSP(portID, userID);
     return stockPortAdded;
 }
 
 //Adds despoitHistory document id to array in stockPortfolio
-const addToDepHist = async function addToDepHist(id, userId, depHistEntry) {
+const addToDepHist = async function addToDepHist(portID, userID, depHistEntry) {
 
     //Check number of args
     validation.checkNumOfArgs(arguments, 3, 3);
 
-    //Checking id
-    validation.checkId(id, 'Stock Portfolio ID');
-    const tId = id.trim();
+    //Checking portID
+    validation.checkId(portID, 'Stock Portfolio ID');
+    portID = portID.trim();
 
-    //Checking userId
-    validation.checkId(userId, 'User Id');
-    const tUserId = userId.trim();
+    //Checking userID
+    validation.checkId(userID, 'User Id');
+    userID = userID.trim();
 
     //Checking depHistEntry
     validation.checkId(depHistEntry, 'Deposit History ID');
-    const tDepHistEntry = depHistEntry.trim();
+    depHistEntry = depHistEntry.trim();
 
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
-    if(!stockPort) throw `Error: This user doesn't have a stock portfolio!`;
+    const stockPort = await stockPortCollection.findOne({id: ObjectId(portID), user_id: ObjectId(userID)});
+    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
-        {_id: ObjectId(tId)},
-        { $addToSet: { depositHistory: tDepHistEntry } }
+        {_id: ObjectId(portID)},
+        { $addToSet: { depositHistory: depHistEntry } }
     );
 
     if (!update.matchedCount && !update.modifiedCount)
        throw 'Adding deposit history id to array failed!';
 
-    const stockPortAdded = this.getSP(tId, tUserId);
+    const stockPortAdded = this.getSP(portID, userID);
     return stockPortAdded;
 }
 
 //Adds AutomatedPurchase document id to array in stockPortfolio document
-const addToAutoPurchases = async function addToAutoPurchases(id, userId, autoPurchaseEntry) {
+const addToAutoPurchases = async function addToAutoPurchases(portID, userID, autoPurchaseEntry) {
 
     //Check number of args
     validation.checkNumOfArgs(arguments, 3, 3);
 
     //Checking id
-    validation.checkId(id, 'Stock Portfolio ID');
-    const tId = id.trim();
+    validation.checkId(portID, 'Stock Portfolio ID');
+    portID = portID.trim();
 
-    //Checking userId
-    validation.checkId(userId, 'User Id');
-    const tUserId = userId.trim();
+    //Checking userID
+    validation.checkId(userID, 'User Id');
+    userId = userID.trim();
 
     //Checking depHistEntry
     validation.checkId(autoPurchaseEntry, 'Auto Purchase ID');
-    const tAutoPurchaseEntry = autoPurchaseEntry.trim();
+    autoPurchaseEntry = autoPurchaseEntry.trim();
 
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
-    if(!stockPort) throw `Error: This user doesn't have a stock portfolio!`;
+    const stockPort = await stockPortCollection.findOne({id: ObjectId(portID), user_id: ObjectId(userID)});
+    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
-        {_id: ObjectId(tId)},
-        { $addToSet: { autoBuys: tAutoPurchaseEntry } }
+        {_id: ObjectId(portID)},
+        { $addToSet: { autoBuys: autoPurchaseEntry } }
     );
 
     if (!update.matchedCount && !update.modifiedCount)
        throw 'Adding auto buy id to array failed!';
 
-    const stockPortAdded = this.getSP(tId, tUserId);
+    const stockPortAdded = this.getSP(portID, userID);
     return stockPortAdded;
 }
 
 //Adds AutomatedSelling document id to array in stockPortfolio document
-const addToAutoSell = async function addToAutoSell(id, userId, autoSellEntry) {
+const addToAutoSell = async function addToAutoSell(portID, userID, autoSellEntry) {
 
     //Check number of args
     validation.checkNumOfArgs(arguments, 3, 3);
 
     //Checking id
-    validation.checkId(id, 'Stock Portfolio ID');
-    const tId = id.trim();
+    validation.checkId(portID, 'Stock Portfolio ID');
+    portID = portID.trim();
 
-    //Checking userId
-    validation.checkId(userId, 'User Id');
-    const tUserId = userId.trim();
+    //Checking userID
+    validation.checkId(userID, 'User Id');
+    userId = userID.trim();
 
     //Checking depHistEntry
     validation.checkId(autoSellEntry, 'Auto Sell ID');
-    const tAutoSellEntry = autoSellEntry.trim();
+    autoSellEntry = autoSellEntry.trim();
 
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
-    if(!stockPort) throw `Error: This user doesn't have a stock portfolio!`;
+    const stockPort = await stockPortCollection.findOne({id: ObjectId(portID), user_id: ObjectId(userID)});
+    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
-        {_id: ObjectId(tId)},
-        { $addToSet: { autoSells: tAutoSellEntry } }
+        {_id: ObjectId(portID)},
+        { $addToSet: { autoSells: autoSellEntry } }
     );
 
     if (!update.matchedCount && !update.modifiedCount)
        throw 'Adding auto sell id to array failed!';
 
-    const stockPortAdded = this.getSP(tId, tUserId);
+    const stockPortAdded = this.getSP(portID, userID);
     return stockPortAdded;
 }
 
-const addToTransactionLog = async function addToTransactionLog(id, userId, logEntry) {
+const addToTransactionLog = async function addToTransactionLog(portID, userID, logEntry) {
 
     //Check number of args
     validation.checkNumOfArgs(arguments, 3, 3);
 
     //Checking id
-    validation.checkId(id, 'Stock Portfolio ID');
-    const tId = id.trim();
+    validation.checkId(portID, 'Stock Portfolio ID');
+    portID = portID.trim();
 
-    //Checking userId
-    validation.checkId(userId, 'User Id');
-    const tUserId = userId.trim();
+    //Checking userID
+    validation.checkId(userID, 'User Id');
+    userID = userID.trim();
 
     //Checking depHistEntry
     validation.checkId(logEntry, 'Transaction Log ID');
-    const tLogEntry = logEntry.trim();
+    logEntry = logEntry.trim();
 
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({id: ObjectId(tId), user_id: ObjectId(tUserId)});
-    if(!stockPort) throw `Error: This user doesn't have a stock portfolio!`;
+    const stockPort = await stockPortCollection.findOne({id: ObjectId(portID), user_id: ObjectId(userID)});
+    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
-        {_id: ObjectId(tId)},
-        { $addToSet: { transactions: tLogEntry } }
+        {_id: ObjectId(portID)},
+        { $addToSet: { transactions: logEntry } }
     );
 
     if (!update.matchedCount && !update.modifiedCount)
        throw 'Adding auto sell id to array failed!';
 
-    const stockPortAdded = this.getSP(tId, tUserId);
+    const stockPortAdded = this.getSP(portID, userID);
     return stockPortAdded;
 
 }
 
-const removePortfolio = async function removePortfolio(portID, userId) {
+const removePortfolio = async function removePortfolio(portID, userID) {
 
     //Check number of args
     validation.checkNumOfArgs(arguments, 2, 2);
@@ -297,61 +297,61 @@ const removePortfolio = async function removePortfolio(portID, userId) {
     validation.checkId(portID, 'Stock Portfolio ID');
     portId = portID.trim();
 
-    //Checking userId
-    validation.checkId(userId, 'User Id');
-    userId = userId.trim();
+    //Checking userID
+    validation.checkId(userID, 'User Id');
+    userID = userID.trim();
 
     const portCollection = await portfolios();
     if (!portCollection) throw `Error: Could not find port collection`;
 
     const stockPort = await portCollection.findOneAndDelete({id: ObjectId(portID), user_id: ObjectId(userID)});
-    if(!stockPort.value) throw `Error: This user doesn't have a stock portfolio!`;
+    if(!stockPort.value) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     return `${stockPort.value.name} has been successfully deleted!`;
 }
 
-const checkStockPortExists = async function checkStockPortExists(userId) {
+const checkStockPortExists = async function checkStockPortExists(userID) {
     
     //Checking num of arguments
     validation.checkNumOfArgs(arguments, 1, 1);
 
     //Checking ID argument
-    validation.checkId(userId, 'User ID');
-    const newUserId = userId.trim();
+    validation.checkId(userID, 'User ID');
+    userID = userID.trim();
 
-    const stockPortCollection = await portfolios();
-    if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
-    const stockPort = await stockPortCollection.findOne({user_id: ObjectId(newUserId)});
+    const portCollection = await portfolios();
+    if (!portCollection) throw `Error: Could not find stock portfolio collection.`;
+    const port = await portCollection.findOne({user_id: ObjectId(userID)});
 
-    if(!stockPort) {
-        return null;
-    } else {
-        stockPort._id = stockPort._id.toString();
-        stockPort.user_id = stockPort.user_id.toString();
-        return stockPort;
-    }
+    if(!port) throw `Error: Could not find portfolio with userID ${userID}`;
+
+    port._id = port._id.toString();
+    port.user_id = port.user_id.toString();
+    return port;
 }
 
-const getSP = async function getSP(id, userId) {
+const getSP = async function getSP(portID, userID) {
 
     //Checking num of arguments
     validation.checkNumOfArgs(arguments, 2, 2);
 
     //Checking ids
-    validation.checkId(id, 'Stock Portfolio Id');
-    const newId = id.trim();
-
-    validation.checkId(userId, 'User Id');
-    const newUserId = userId.trim();
+    validation.checkIsProper(portID, 'string', 'Stock Portfolio ID');
+    validation.checkId(portID, 'Stock Portfolio Id');
+    portID = portID.trim();
+    
+    validation.checkIsProper(userID, 'string', 'User ID');
+    validation.checkId(userID, 'User Id');
+    userID = userID.trim();
 
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({_id: ObjectId(newId), user_id: ObjectId(newUserId)});
-    if(!stockPort) throw `Error: This user doesn't have a stock portfolio!`;
+    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
+    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
-    stockPort._id = newId;
-    stockPort.user_id = newUserId;
+    stockPort._id = portID;
+    stockPort.user_id = userID;
     return stockPort;
 }
 
@@ -359,7 +359,7 @@ const changePortSettings = async function changeMutableSettings(portID, minAccBa
     validation.checkNumOfArgs(arguments, 3, 3);
 
     //Checking id field
-    validation.checkId(portID, "P ID");
+    validation.checkId(portID, "Port ID");
     portID = portID.trim();
 
     validation.checkIsProper(IFOption, 'boolean', "Insufficient funds option");

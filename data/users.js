@@ -159,6 +159,7 @@ const getUserIdFromUsername = async function getUserIdFromUsername(username) {
     // Get the user_id
     const user = await userCollection.findOne({ username: username }, { _id: 1 });
     if (!user) throw `Error: User could not be found!`;
+    user._id = user._id.toString();
 
     return user._id;
 }
