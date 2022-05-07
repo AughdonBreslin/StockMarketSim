@@ -503,18 +503,17 @@ async function autoTrade() {
 }
 
 /**
- * Given a list of transaction_ids, 
- *      return a list of transaction objects, where each _id corresponds to its object.
- * @param transaction_ids 
+ * Given a list of ids, return a list of transaction objects, where each _id corresponds to its object.
+ * @param ids 
  * @returns list of transaction objects
  */
-const getTranactionObjects = async function getTranactionObjects(transaction_ids) {
-    // implement me
-
+async function getTransactions(ids) {
+    return ids.map(id => await transactions().findOne({ _id: id }))
 }
 
 module.exports = {
     buy,
     sell,
-    priorities
+    priorities,
+    getTransactions
 }
