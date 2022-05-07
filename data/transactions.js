@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongodb');
 const mongoCollections = require('../config/mongoCollections')
 const portfolios = mongoCollections.portfolios
 const autoBuys = mongoCollections.autoBuys
@@ -6,6 +7,7 @@ const transactions = mongoCollections.transactions
 const validation = require('../validation')
 const api = require('./api')
 const autoInterval = 15 // possible to set from stockmarketsettings
+
 
 let awaiting = false
 
@@ -508,7 +510,51 @@ async function autoTrade() {
  * @returns list of transaction objects
  */
 async function getTransactions(ids) {
-    return ids.map( async (id) => { await transactions().findOne({ _id: id }) } )
+    // return ids.map( async (id) => { await transactions().findOne({ _id: id }) } )
+    /* above way is inefficient bc its awaiting at querying/awaiting the collection for every id. */
+
+    // Christian fix pls: -- this throws an error
+    // const all_transactions = await transactions();
+    // if (!all_transactions) throw `Error: Could not find transactions collection`;
+
+    // let trans_obj_list = [];
+
+    // for (let id of ids) {
+    //     const trans_obj = await all_transactions.findOne({ _id: ObjectId(id) });
+    //     if (!trans_obj) throw `Error: Transaction could not be found!`;
+    //     trans_obj_list.push(trans_obj);
+    // }
+    // return trans_obj_list;
+
+
+    const sample_trans_list = [
+        {
+            "_id": "507f1f77bcf86cd799439011",
+
+            "portfolio_id": "507f1f77bcf86cd799439011", /* Each transaction must correspond to a stock-portfolio document */
+
+            "type": "purchase", /* "purchase" or "sell" */
+            "ticker": "GOOG",
+            "quantity": 1, /* min: 1.  max: Number.MAX_SAFE_INTEGER - 1 */
+            "amount": 900 /* positive number */,
+            "date": new Date(2021, 11, 09) /* store as new Date Object */
+        },
+        {
+            "_id": "507f1f77bcf86cd799439012",
+
+            "portfolio_id": "507f1f77bcf86cd799439011", /* Each transaction must correspond to a stock-portfolio document */
+
+            "type": "sell", /* "purchase" or "sell" */
+            "ticker": "AAPL",
+            "quantity": 12, /* min: 1.  max: Number.MAX_SAFE_INTEGER - 1 */
+            "amount": 500 /* positive number */,
+            "date": new Date(2022, 1, 14) /* Month is 0-indexed. ie: 1 = February */
+        }
+    ];
+
+
+    return sample_trans_list;
+
 }
 
 module.exports = {
