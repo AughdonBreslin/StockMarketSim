@@ -8,21 +8,30 @@ const userData = data.users;
 router.get('/', async (req, res) => {
     if (req.session.username) {
 
-        /* Get user_id from their username */
-        /* username must be unique */
-        const userId = await data.users.getUserIdFromUsername(req.session.username);
+        try {
+            // console.log("activities");
 
-        // uncomment this
-        // const stk_prt = await data.stockPortfolio.getSP(userId);
+            /* Get user_id from their username */
+            /* username must be unique */
+            const userId = await data.users.getUserIdFromUsername(req.session.username);
 
-        // const transaction_ids = stk_prt.transactions;
-        // For testing comment this later:
-        const transaction_ids = ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"];
+            // uncomment this
+            // const stk_prt = await data.stockPortfolio.getSP(userId);
 
-        const allUserTransactions = data.transactions.getTransactionObjects(transaction_ids);
+            // const transaction_ids = stk_prt.transactions;
+            // For testing comment this later:
+            const transaction_ids = ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"];
 
-        res.render('homePages/activity.handlebars',
-            { title: 'Activity', user: 'TODO', transactions: allUserTransactions });
+            const allUserTransactions = await data.transactions.getTransactions(transaction_ids); /* list of objects */
+            // console.log(JSON.stringify(allUserTransactions));
+
+            res.render('homePages/activity.handlebars',
+                { title: 'Activity', user: 'TODO', transactions: allUserTransactions });
+
+        } catch (error) {
+            // What do i do if there's an error? Display an error page?
+        }
+
     } else {
         res.redirect('/login');
     }
