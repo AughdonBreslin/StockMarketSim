@@ -502,5 +502,6 @@ async function autoTrade() {
 
 module.exports = {
     buy,
-    sell
+    sell,
+    priorities
 }
