@@ -62,16 +62,12 @@
         {
             "_id": "507f1f77bcf86cd799439011",
         
-            "stockPortfolio_id": "507f1f77bcf86cd799439011", /* Each deposit must correspond to a stock-portfolio document */
-        
             "deposit-amount": 400, /* min: 1 and max: Number.MAX_SAFE_INTEGER - 1 */
             "manual-or-automated": true, /* false=automated deposite, true=manual */
             "deposit-date": "<YYYY-mm-dd>" /* store as new Date Object */
         },
         {
             "_id": "507f1f77bcf86cd799439011",
-        
-            "stockPortfolio_id": "507f1f77bcf86cd799439011", /* Each deposit must correspond to a stock-portfolio document */
         
             "deposit-amount": 400, /* min: 1 and max: Number.MAX_SAFE_INTEGER - 1 */
             "manual-or-automated": true, /* false=automated deposite, true=manual */
