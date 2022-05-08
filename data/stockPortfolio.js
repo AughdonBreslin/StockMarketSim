@@ -51,7 +51,7 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
 
     let newStockPort = {
         user_id: ObjectId(tUserId),
-        value: 0,
+        value: tInitialDepo,
         balance: tInitialDepo,
         stocks: {},
         depositHistory: [],

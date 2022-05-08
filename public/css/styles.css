@@ -11,6 +11,33 @@ canvas {
   height: 400px;
   width: 400px;
 }
+a {
+  background-color: green;
+  display: inline-block;
+  color: white;
+  box-shadow: 0 1px 1px 0 black;
+
+  padding: 8px 8px;
+  text-decoration: none;
+  align-self: center;
+  margin: 8px 0px;
+}
+a:hover {
+  background-color:#009000;
+}
+button {
+  display: inline-block;
+  background-color: green;
+  color: white;
+  box-shadow: 0 1px 1px 0 black;
+  border:none;
+  border-radius: 0px;
+  padding: 4px;
+  cursor: pointer;
+}
+button:hover {
+  background-color:#009000;
+}
 nav {
   background-color: green;
   position: sticky;
@@ -24,13 +51,13 @@ nav a {
   color: white;
   padding: 8px 16px;
   text-decoration: none;
+  box-shadow: 0 0px 0px 0;
 }
 nav a:hover {
   background-color:#009000;
 }
 
 a.idkuser {
-
   text-decoration: none;
   color: white;
 }
@@ -39,7 +66,7 @@ a.idkuser:hover {
   text-decoration: underline;
 }
 
-input, button {
+input {
   background: #fffafa;
   border-radius: 5px;
   border-color: rgb(75, 75, 75);
@@ -69,20 +96,10 @@ input, button {
 #continueButton {
   display:none;
 }
+
 #logoutButton {
-  display: inline-block;
   position: fixed;
   right: 5px;
-  background-color: green;
-  color: white;
-  box-shadow: 0 1px 1px 0 black;
-  border:none;
-  border-radius: 0px;
-  padding: 4px;
-  cursor: pointer;
-}
-#logoutButton:hover {
-  background-color:#009000;
 }
 
 .logoutPopup {
@@ -102,32 +119,7 @@ input, button {
 }
 
 .logoutPopup a {
-  background-color: green;
-  display: block;
-  color: white;
-  box-shadow: 0 1px 1px 0 black;
-
-  padding: 8px 8px;
-  text-decoration: none;
-  align-self: center;
   margin: 4px 4px;
-}
-
-.logoutPopup a:hover {
-  background-color:#009000;
-}
-
-.fakeButton {
-  background-color: white;
-  border: none;
-  border-radius: 5px;
-  color: black;
-  padding: 4px 4px;
-  text-align: center;
-  text-decoration: none;
-  display: none;
-  margin: 4px 2px;
-  cursor: pointer;
 }
 
 footer {
