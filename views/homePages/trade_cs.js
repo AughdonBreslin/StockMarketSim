@@ -1,5 +1,5 @@
 $(function () {
-    console.log("This is my test statement!"); /* fires immediately after page loads */
+    // console.log("This is my test statement!"); /* fires immediately after page loads */
 
     // If user wants to make an automated trade, ask for threshold. And if 'buying' ask for priority level.
     $('#automated').on('change', function () {
@@ -77,10 +77,69 @@ $(function () {
 
         // Check all the inputs here:
 
+        const ticker = $('#ticker_input').val().trim();
+        console.log("ticker=" + ticker);
+        if (typeof ticker !== 'string' || ticker.length < 1) {
+            alert('Enter a valid stock ticker!');
+            return;
+        }
+        // Check if this is a valid stock ticker
+
+
+        const quantity = parseInt($('#quantity').val());
+        console.log("quantity=" + quantity);
+        if (typeof quantity !== 'number' || isNaN(quantity) || quantity < 1) {
+            alert('Quantity must provide be a positive number!');
+            return;
+        }
+
+        const trans_opt = $("input[name='trans-option']:checked").val().trim();
+        console.log("trans_opt=" + trans_opt);  /* is either 'buy' or 'sell' */
+        if (typeof trans_opt !== 'string' || trans_opt.length < 1) {
+            alert('Transaction option must be either buy or sell!');
+            return;
+        }
+
+        const trans_mode = $("input[name='trans-mode']:checked").val().trim();
+        console.log("trans_mode=" + trans_mode);  /* is either 'automated' or 'manual' */
+        if (typeof trans_mode !== 'string' || trans_mode.length < 1) {
+            alert('Transaction mode must be either automated or manual!');
+            return;
+        }
+
+        let threshold;
+        let priority;
+
+        if (trans_mode == 'manual') {
+            threshold = -1;
+            priority = -1;
+        } else { /* automatic - check transaction option */
+
+            threshold = parseInt($('#threshold').val().trim());
+            console.log("threshold=" + threshold);
+            if (typeof threshold !== 'number' || isNaN(threshold) || threshold < 1) {
+                alert('Threshold must provide be a positive number!');
+                return;
+            }
+
+            if (trans_opt == 'sell') {
+                priority = -1;
+            } else {
+                priority = parseInt($('#priority').val().trim());
+                console.log("priority=" + priority);
+                if (typeof priority !== 'number' || isNaN(priority) || priority < 1) {
+                    alert('Priority must provide be a positive number!');
+                    return;
+                }
+            }
+        }
+
+        console.log("Finished validating input!");
+        // Send the ajax request:
+        // Send the request to the server
 
 
 
-        console.log("form button clicked!");
     });
 
 

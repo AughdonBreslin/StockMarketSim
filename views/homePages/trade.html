@@ -26,10 +26,10 @@
 
 
             <label for="buy"> Buy </label>
-            <input type="radio" id="buy" name="trans-option" required>
+            <input type="radio" id="buy" name="trans-option" value="buy" required>
 
             <label for="sell"> Sell </label>
-            <input type="radio" id="sell" name="trans-option">
+            <input type="radio" id="sell" name="trans-option" value="sell">
             <!-- 
                 if sell: quantity owned must be >= than quantity selected
                 if buy: check if the user can afford to buy.
@@ -38,10 +38,10 @@
 
 
             <label for="automated"> Automated </label>
-            <input type="radio" id="automated" name="type-option" required>
+            <input type="radio" id="automated" name="trans-mode" value="automated" required>
 
             <label for="manual"> Manual </label>
-            <input type="radio" id="manual" name="type-option" checked="checked">
+            <input type="radio" id="manual" name="trans-mode" value="manual" checked="checked">
             <!-- 
                 if automated: ask for threshold. And if 'buying' ask for priority level
                 if manual: User allow the user to submit the form
