@@ -7,23 +7,21 @@ const autoInterval = 15 // possible to set from stockmarketsettings
 
 let awaiting = false
 
-/**TODO
- * - Adjust functions to account for new price per share (for transactions, autoBuys, autoSells)
- * - Adjust functions to account for new database schema (no separate collections for transactions, autoBuys, and autoSells. All are now subdocs of portfolios)
- * - Fix getTransactions function
- * - Create function to get awaitingTrades
- */
-
 // getDate
+/*
 function getDate() {
+    // get date object in "America/New_York" timezone without using timezoneoffset
     let date = new Date()
-    date = date.toLocaleString('en-US', { timeZone: 'America/New_York' })
+    // date = date.toLocaleString('en-US', {timeZone: 'America/New_York'})
+
     return date
 }
+*/
 
 // duringTradingHours
 function duringTradingHours() {
-    const date = getDate()
+    const date = new Date()
+
     if (date.getDay() > 0 && date.getDay() < 6) { // weekday
         if ((date.getHours() == 9 && date.getMinutes() >= 30) || (date.getHours() > 9 && date.getHours() < 16)) { // Between 9:30 AM and 4:00 PM
             return true
@@ -37,8 +35,38 @@ function timeToOpen() {
     let hours = 0
     let minutes = 0
     let seconds = 0
-    const date = getDate()
+    const date = new Date()
 
+    // if stock market is open, return 0
+    if (duringTradingHours()) return 0
+    
+    // find time to 9
+    // get time to hour first
+    minutes = 60 - date.getMinutes()
+    if (date.getSeconds() != 0) {
+        minutes--
+        seconds = 60 - date.getSeconds()
+    }
+
+    // check if hour is before/after 9
+    if (date.getHours() > 9) {
+        hours = 24 - date.getHours() + 9
+    } else {
+        hours = 9 - date.getHours()
+    }
+
+    // adjust for minutes
+    if (!(minutes == 0 && seconds == 0)) {
+        hours--
+    }
+
+    // add 30 min only if it's not 9
+    if (date.getHours() != 9) {
+        minutes += 30
+    } else {
+        minutes -= 30
+    }
+    /*
     if (duringTradingHours()) return 0
 
     if (date.getHours() >= 16) {
@@ -74,6 +102,7 @@ function timeToOpen() {
             minutes -= 30
         }
     }
+    */
 
     return ((hours * 60 * 60) + (minutes * 60) + seconds) * 1000
 }
@@ -89,7 +118,7 @@ async function getAutoBuysSorted(id) {
     if (!portfolio) throw "Stock Portfolio not found"
 
     // check to see if portfolio has any awaitingTrades
-    if (!portfolio["awaitingTrades"]) throw "No awaitingTrades found" // may just return an empty object instead of throwing an error
+    if (!portfolio["awaitingTrades"]) return [] // may just return an empty object instead of throwing an error
     // check to see if any of the awaitingTrades are autoBuys
     let autoBuys = portfolio["awaitingTrades"].filter(x => x["type"] == "autoBuy")
     if(!autoBuys) throw "No autoBuys found"
@@ -134,6 +163,9 @@ async function updatePriorities(id, priority) {
     // call getAutoBuysSorted
     let autoBuys = await getAutoBuysSorted(id)
 
+    // check if there are any autoBuys
+    if (!autoBuys) return 1
+
     // check to see if priority is in range of autoBuys
     if (priority <= autoBuys.length) {
         // increment all priorities in autoBuys after priority
@@ -160,13 +192,14 @@ async function updatePriorities(id, priority) {
 }
 
 // buy
-async function buy(id, ticker, quant, threshold = -1, priority = -1, auto = false, interval = "1min") {
+async function buy(id, ticker, quant, bypass = false, threshold = -1, priority = -1, auto = false, interval = "1min") {
     id = validation.checkId(id, "Stock Portfolio ID")
     ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
-    quant = validation.checkInt(quant, "Quantity")
-    threshold = validation.checkInt(threshold, "Threshold")
-    priority = validation.checkInt(priority, "Priority")
-    auto = validation.checkIsProper(auto, 'boolean', "Auto Flag")
+    validation.checkInt(quant, "Quantity")
+    bypass = validation.checkBool(bypass, "Bypass Flag")
+    validation.checkInt(threshold, "Threshold")
+    validation.checkInt(priority, "Priority")
+    auto = validation.checkBool(auto, "Auto Flag")
     interval = validation.checkString(interval, 1, "Interval", true, false)
     if (ticker.length > 5) throw "Invalid Ticker" // May want to change 5 if there are longer tickers
     if (interval != "1min" && interval != "5min" && interval != "15min" && interval != "30min" && interval != "60min") throw "Invalid Interval"
@@ -175,7 +208,7 @@ async function buy(id, ticker, quant, threshold = -1, priority = -1, auto = fals
 
     // determine if during trading hours (9:30am - 4:00pm on weekdays)
     // if auto, don't throw an error, add to awaitingTrades subCollection, set awaiting to true 
-    if (!duringTradingHours()) {
+    if (!duringTradingHours() && !bypass) {
         if (auto) {
             autoFlag = true
             // updatePriorities(id, priority)
@@ -234,7 +267,7 @@ async function buy(id, ticker, quant, threshold = -1, priority = -1, auto = fals
         // update the portfolio
         portfolio["balance"] -= (price * quant)
         const tickers = portfolio["stocks"].map(x => x[0])
-        if (tickers.include(ticker)) {
+        if (tickers.includes(ticker)) {
             portfolio["stocks"][tickers.indexOf(ticker)][1] += quant
         } else {
             portfolio["stocks"].push([ticker, quant])
@@ -244,7 +277,7 @@ async function buy(id, ticker, quant, threshold = -1, priority = -1, auto = fals
             "ticker": ticker,
             "quantity": quant,
             "pps": price,
-            "date": getDate()
+            "date": new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})
         })
     } else { // if autoFlag, update awaitingTrades field only
         if (priority < 1) throw "Priority not set properly"
@@ -267,14 +300,14 @@ async function buy(id, ticker, quant, threshold = -1, priority = -1, auto = fals
     // return `Bought ${quant} stocks of ${ticker}.`;
     // return retId
 }
-
 // sell
-async function sell(id, ticker, quant, threshold = -1, auto = false, interval = "1min") {
+async function sell(id, ticker, quant, bypass = false,  threshold = -1, auto = false, interval = "1min") {
     id = validation.checkId(id, "Stock Portfolio ID")
     ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
-    quant = validation.checkInt(quant, "Quantity")
-    threshold = validation.checkInt(threshold, "Threshold")
-    auto = validation.checkIsProper(auto, 'boolean', "Auto Flag")
+    validation.checkInt(quant, "Quantity")
+    bypass = validation.checkBool(bypass, "Bypass Flag")
+    validation.checkInt(threshold, "Threshold")
+    auto = validation.checkBool(auto, "Auto Flag")
     interval = validation.checkString(interval, 1, "Interval", true, false)
     if (ticker.length > 5) throw "Invalid Ticker" // May want to change 5 if there are longer tickers
     if (interval != "1min" && interval != "5min" && interval != "15min" && interval != "30min" && interval != "60min") throw "Invalid Interval"
@@ -283,7 +316,7 @@ async function sell(id, ticker, quant, threshold = -1, auto = false, interval = 
 
     // determine if during trading hours (9:30am - 4:00pm on weekdays)
     // if auto, don't throw an error, add to autoBuys collection, set awaiting to true 
-    if (!duringTradingHours()) {
+    if (!duringTradingHours() && !bypass) {
         if (auto) {
             autoFlag = true
             if (!awaiting) {
@@ -298,12 +331,13 @@ async function sell(id, ticker, quant, threshold = -1, auto = false, interval = 
     // may want to add this to an awaiting trades collection (use setTimeout)
 
     // find portfolio using id
-    let portfolio = await portfolioCollection.findOne({ _id: id })
+    const portfolioCollection = await portfolios()
+    let portfolio = await portfolioCollection.findOne({"_id": ObjectId(id)})
     if (!portfolio) throw "Stock Portfolio not found"
 
     // determine if holding ticker and enough shares
-    const tickers = portfolio["stocks"].map(x => x[0])
-    if (!tickers.include(ticker)) throw "Not holding ticker"
+    let tickers = portfolio["stocks"].map(x => x[0])
+    if (!tickers.includes(ticker)) throw "Not holding ticker"
     if (portfolio["stocks"][tickers.indexOf(ticker)][1] < quant) throw `Not holding enough of ${ticker}`
 
     // get the stock price from the api
@@ -336,7 +370,7 @@ async function sell(id, ticker, quant, threshold = -1, auto = false, interval = 
             "ticker": ticker,
             "quantity": quant,
             "pps": price,
-            "date": getDate()
+            "date": new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})
         })
     } else { // if autoFlag, update awaitingTrades field only
         portfolio["awaitingTrades"].push({
@@ -349,7 +383,7 @@ async function sell(id, ticker, quant, threshold = -1, auto = false, interval = 
     }
 
     // update in portfolio database
-    const updateInfo = await portfolioCollection.updateOne({ _id: id }, { $set: portfolio })
+    const updateInfo = await portfolioCollection.updateOne({ "_id": ObjectId(id) }, { $set: portfolio })
     if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "portfolio was not updated"
 
     // unsure what to return
@@ -418,8 +452,6 @@ void async function autoTrade() {
         awaiting = false
     }
 }
-
-// req.session.stockPortId
 
 // getTransactions
 async function getTransactions(id) {

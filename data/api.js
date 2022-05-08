@@ -26,8 +26,17 @@ async function price(ticker, interval) {
     const mostRecent = prices[Object.keys(prices)[0]]
     
     // return the price
-    console.log(`${ticker}: `+Number(mostRecent["4. close"])) // debugging purposes only
+    // console.log(`${ticker}: `+Number(mostRecent["4. close"])) // debugging purposes only
     return Number(mostRecent["4. close"])
+}
+
+// history(ticker, interval)
+async function dailyHistory(ticker) {
+    ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
+    const {data} = await axios.get(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${key}`)
+    if(data["Error Message"]) throw "Invalid Ticker"
+    if(data["Meta Data"]["2. Symbol"] !== ticker) throw "Ticker Mismatch"
+    return data
 }
 
 // pval(stocks)
@@ -49,5 +58,6 @@ async function pval(stocks) {
 
 module.exports = {
     price,
+    dailyHistory,
     pval
 }

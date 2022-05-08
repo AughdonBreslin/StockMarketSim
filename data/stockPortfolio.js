@@ -53,13 +53,12 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
         user_id: ObjectId(tUserId),
         value: tInitialDepo,
         balance: tInitialDepo,
-        stocks: {},
-        depositHistory: [],
-        autoBuys: [],
-        autoSells: [],
-        transactions: [],
+        stocks: [],
         dailyValues: [],
-        settings: stockSet
+        settings: stockSet,
+        depositHistory: [],
+        awaitingTrades: [],
+        transactions: []        
     }
 
     const insertInfo = await stockPortCollection.insertOne(newStockPort);
@@ -295,7 +294,7 @@ const removePortfolio = async function removePortfolio(portID, userID) {
 
     //Checking id
     validation.checkId(portID, 'Stock Portfolio ID');
-    portId = portID.trim();
+    portID = portID.trim();
 
     //Checking userID
     validation.checkId(userID, 'User Id');
