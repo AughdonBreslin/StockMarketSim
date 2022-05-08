@@ -1,9 +1,6 @@
 const { ObjectId } = require('mongodb')
 const mongoCollections = require('../config/mongoCollections')
 const portfolios = mongoCollections.portfolios
-// const autoBuys = mongoCollections.autoBuys
-// const autoSells = mongoCollections.autoSells
-// const transactions = mongoCollections.transactions
 const validation = require('../validation')
 const api = require('./api')
 const autoInterval = 15 // possible to set from stockmarketsettings
@@ -420,52 +417,19 @@ void async function autoTrade() {
 
 // req.session.stockPortId
 
-/**
- * Given a list of ids, return a list of transaction objects, where each _id corresponds to its object.
- * @param ids 
- * @returns list of transaction objects
- */
-async function getTransactions(ids) {
+// getTransactions
+async function getTransactions(id) {
     // validate ids
-    ids = validation.checkArray(ids, "string", "ids")
-    for(let i=0; i<ids.length; i++) {
-        if(!ObjectId.isValid(ids[i])) throw "Invalid id"
-    }
+    id = validation.checkId(id, "Stock Portfolio ID")
 
     // get portfolio using session id
-    let portfolio = await portfolios().findOne({ _id: req.session.stockPortId })
+    let portfolio = await portfolios().findOne({"_id": id})
     if (!portfolio) throw "Stock Portfolio not found"
 
     // get transactions from portfolio
-    let transactions = portfolio["transactions"]
-
-    // filter transactions by ids
-    transactions = transactions.filter(x => ids.includes(x["_id"]))
-
-    // check if all ids are found
-    if(transactions.length != ids.length) throw "One or more ids not found"
-
-    // return transactions
-    return transactions
+    return portfolio["transactions"]
 
     /*
-    // return ids.map( async (id) => { await transactions().findOne({ _id: id }) } )
-    // above way is inefficient bc its awaiting at querying/awaiting the collection for every id. 
-
-    // Christian fix pls: -- this throws an error
-    // const all_transactions = await transactions();
-    // if (!all_transactions) throw `Error: Could not find transactions collection`;
-
-    // let trans_obj_list = [];
-
-    // for (let id of ids) {
-    //     const trans_obj = await all_transactions.findOne({ _id: ObjectId(id) });
-    //     if (!trans_obj) throw `Error: Transaction could not be found!`;
-    //     trans_obj_list.push(trans_obj);
-    // }
-    // return trans_obj_list;
-
-
     const sample_trans_list = [
         {
             "_id": "507f1f77bcf86cd799439011",
