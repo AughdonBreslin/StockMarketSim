@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
                 }
             );
         } catch (error) {
-            res.render('homePages/error.handlebars',
+            res.render('additional/error.handlebars',
                 {
                     title: 'Error', errorMessage: error.toString()
                 }
