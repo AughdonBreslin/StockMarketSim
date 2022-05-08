@@ -1,4 +1,4 @@
-<div class='userInfo' data-error="{{error}}">
+<div class='userInfo' id="signup-div" data-error="{{error}}">
     <form action='/signup' id='signup-form' method='POST'>
         <label for='fullname'> Full Name: </label><br>
         <input id='fullname' name='fullname'/><br><br>
@@ -9,21 +9,22 @@
         <label for='password'>Password:</label><br>
         <input id='password' name='password' type='password'><br><br>
         <div>
-            <h3> I want email updates...</h3>
-            <label for='none'> None </label>
-            <input type='checkbox' id='none' name='emailUpdates' class='emailUpdates' value='none' onclick = "checkboxClicked(this, 'emailUpdates')" checked/>
-            <label for='hourly'> Hourly </label>
-            <input type='checkbox' id='hourly' name='emailUpdates' class='emailUpdates' value='hourly' onclick = "checkboxClicked(this, 'emailUpdates')"/>
+            <h3> I want portfolio updates...</h3>
+            <label for='none'> Never </label>
+            <input type='checkbox' id='none' name='portUpdates' class='portUpdates' value='none' onclick = "checkboxClicked(this, 'portUpdates')" checked/>
             <label for='daily'> Daily </label>
-            <input type='checkbox' id='daily' name='emailUpdates' class='emailUpdates' value='daily' onclick = "checkboxClicked(this, 'emailUpdates')"/>
+            <input type='checkbox' id='daily' name='portUpdates' class='portUpdates' value='daily' onclick = "checkboxClicked(this, 'portUpdates')"/>
             <label for='weekly'> Monthly </label>
-            <input type='checkbox' id='weekly' name='emailUpdates' class='emailUpdates' value='weekly' onclick = "checkboxClicked(this, 'emailUpdates')"/>
+            <input type='checkbox' id='weekly' name='portUpdates' class='portUpdates' value='weekly' onclick = "checkboxClicked(this, 'portUpdates')"/>
             <label for='monthly'> Weekly </label>
-            <input type='checkbox' id='monthly' name='emailUpdates' class='emailUpdates' value='monthly' onclick = "checkboxClicked(this, 'emailUpdates')"/><br><br>
+            <input type='checkbox' id='monthly' name='portUpdates' class='portUpdates' value='monthly' onclick = "checkboxClicked(this, 'portUpdates')"/><br><br>
         </div>
         <button type='submit'>Submit</button>
     </form>
 </div>
 <div>
     <a class='idkuser' href='/login'>Already have an account? Click here to log-in</a>
+</div>
+<div id='signup-error' hidden>
+
 </div>

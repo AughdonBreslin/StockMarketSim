@@ -21,7 +21,6 @@
     form.submit(function (event) {
         event.preventDefault();
         let portBal = parseInt(portBalance.html());
-        alert(portBal)
         let quantVal = parseInt(quantity.val());
         if(quantVal <= 0) {
             alert("Quantity must be greater than zero.");
@@ -43,7 +42,6 @@
                 })
             };
             $.ajax(requestConfig).then(function (responseMessage) {
-                alert("In AJAX")
                 console.log(responseMessage);
             });
         }

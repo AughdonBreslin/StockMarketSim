@@ -11,7 +11,6 @@ const users = require('../../data/users');
 
 // POST /database page
 router.post('/', async (req, res) => {
-    console.log("made it to post")
     let portBal = req.body.portBal;
     let portfolio = {}
     try {
