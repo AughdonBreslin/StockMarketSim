@@ -1,6 +1,6 @@
 const { ObjectId } = require('mongodb')
 const mongoCollections = require('../config/mongoCollections')
-const portfolios = mongoCollections.portfolios
+const portfolioCollection = mongoCollections.portfolios
 const validation = require('../validation')
 const api = require('./api')
 const autoInterval = 15 // possible to set from stockmarketsettings
@@ -84,7 +84,7 @@ async function getAutoBuysSorted(id) {
     id = validation.checkId(id, "Stock Portfolio ID")
 
     // find portfolio using id
-    let portfolio = await portfolios().findOne({ _id: id })
+    let portfolio = await portfolioCollection.findOne({ _id: id })
     if (!portfolio) throw "Stock Portfolio not found"
 
     // check to see if portfolio has any awaitingTrades
@@ -118,7 +118,7 @@ async function getAutoBuysSorted(id) {
     awaitingTrades = awaitingTrades.concat(autoBuys)
 
     // update portfolio
-    const updateInfo = await portfolios().updateOne({ _id: id }, { $set: {"awaitingTrades": awaitingTrades} })
+    const updateInfo = await portfolioCollection.updateOne({ _id: id }, { $set: {"awaitingTrades": awaitingTrades} })
     if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "Portfolio was not updated"
 
     return autoBuys
@@ -141,7 +141,7 @@ async function updatePriorities(id, priority) {
         }
 
         // get portfolio using id
-        let portfolio = await portfolios().findOne({ _id: id })
+        let portfolio = await portfolioCollection.findOne({ _id: id })
         if (!portfolio) throw "Stock Portfolio not found"
 
         // update awaitingTrades
@@ -149,7 +149,7 @@ async function updatePriorities(id, priority) {
         awaitingTrades = awaitingTrades.concat(autoBuys)
 
         // update portfolio
-        const updateInfo = await portfolios().updateOne({ _id: id }, { $set: {"awaitingTrades": awaitingTrades} })
+        const updateInfo = await portfolioCollection.updateOne({ _id: id }, { $set: {"awaitingTrades": awaitingTrades} })
         if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "Portfolio was not updated"
     } else {
         return autoBuys.length+1
@@ -189,7 +189,7 @@ async function buy(id, ticker, quant, threshold = -1, priority = -1, auto = fals
     // may want to add this to an awaiting trades collection (use setTimeout)
 
     // find portfolio using id
-    let portfolio = await portfolios().findOne({ _id: id })
+    let portfolio = await portfolioCollection.findOne({ _id: id })
     if (!portfolio) throw "Stock Portfolio not found"
 
     // get the stock price from the api
@@ -256,7 +256,7 @@ async function buy(id, ticker, quant, threshold = -1, priority = -1, auto = fals
     }
 
     // update in portfolio database
-    const updateInfo = await portfolios().updateOne({ _id: id }, { $set: portfolio })
+    const updateInfo = await portfolioCollection.updateOne({ _id: id }, { $set: portfolio })
     if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "portfolio was not updated"
 
     // unsure what to return
@@ -295,7 +295,7 @@ async function sell(id, ticker, quant, threshold = -1, auto = false, interval = 
     // may want to add this to an awaiting trades collection (use setTimeout)
 
     // find portfolio using id
-    let portfolio = await portfolios().findOne({ _id: id })
+    let portfolio = await portfolioCollection.findOne({ _id: id })
     if (!portfolio) throw "Stock Portfolio not found"
 
     // determine if holding ticker and enough shares
@@ -346,7 +346,7 @@ async function sell(id, ticker, quant, threshold = -1, auto = false, interval = 
     }
 
     // update in portfolio database
-    const updateInfo = await portfolios().updateOne({ _id: id }, { $set: portfolio })
+    const updateInfo = await portfolioCollection.updateOne({ _id: id }, { $set: portfolio })
     if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "portfolio was not updated"
 
     // unsure what to return
@@ -363,7 +363,7 @@ void async function autoTrade() {
     }
 
     // get all portfolios that do not have awaitingTrades = [] and project id and awaiting trades only
-    const ports = await portfolios().find({ "awaitingTrades": { $ne: [] } }).project({ _id: 1, awaitingTrades: 1 }).toArray()
+    const ports = await portfolios.find({ "awaitingTrades": { $ne: [] } }).project({ _id: 1, awaitingTrades: 1 }).toArray()
     // check if there are any awaiting trades
     let leftover = false
     if (ports.length) {
@@ -403,7 +403,7 @@ void async function autoTrade() {
                 awaitingTrades.splice(buys[j][0], 1)
             }
             // update portfolio
-            await portfolios().updateOne({ _id: portfolio["_id"] }, { $set: { "awaitingTrades": awaitingTrades } })
+            await portfolioCollection.updateOne({ _id: portfolio["_id"] }, { $set: { "awaitingTrades": awaitingTrades } })
         }
     }
 
@@ -422,8 +422,8 @@ async function getTransactions(id) {
     // validate ids
     id = validation.checkId(id, "Stock Portfolio ID")
 
-    // get portfolio using session id
-    let portfolio = await portfolios().findOne({"_id": id})
+    // get portfolio using id
+    let portfolio = await portfolioCollection.findOne({ _id: id })
     if (!portfolio) throw "Stock Portfolio not found"
 
     // get transactions from portfolio
