@@ -56,8 +56,11 @@ const constructorMethod = (app) => {
 
 
     // User is logged in and is not having it
-    app.get('/logout', (req, res) => {
+    app.get('/logout', async (req, res) => {
         if(req.session.username) {
+            userID = await users.getUserIdFromUsername(req.session.username);
+            userID = userID.toString();
+            console.log(`User ${userID} logged out.`);
             req.session.destroy(function (err) {
                 res.render('account/login.handlebars', {title: "You've been logged out."});
             });
