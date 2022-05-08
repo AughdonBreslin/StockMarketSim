@@ -37,6 +37,13 @@ const checkInt = function checkInteger(num, numName) {
   checkIsProper(num, 'number', numName);
   if (isNaN(num) || !Number.isInteger(num)) throw `Error: ${numName} must be a valid integer.`;
 }
+
+const checkBool = function checkBool(bool, varName) {
+  if (!bool && bool !== false) throw `Error: ${varName} is not defined.`;
+  if (typeof bool !== 'boolean') throw `Error: ${varName} must be a boolean.`;
+  return bool;
+}
+
 const checkWithinBounds = function checkWithinBounds(num, lower, upper) {
   if (num < lower || num > upper) throw `Error: ${numName} must be within [${lower}, ${upper}].`;
 }
@@ -188,6 +195,7 @@ const checkDate = function checkDate(date) {
 module.exports = {
   checkId,
   checkInt,
+  checkBool,
   checkWithinBounds,
   checkString,
   checkNumOfArgs,

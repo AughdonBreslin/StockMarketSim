@@ -53,13 +53,12 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
         user_id: ObjectId(tUserId),
         value: 0,
         balance: tInitialDepo,
-        stocks: {},
-        depositHistory: [],
-        autoBuys: [],
-        autoSells: [],
-        transactions: [],
+        stocks: [],
         dailyValues: [],
-        settings: stockSet
+        settings: stockSet,
+        depositHistory: [],
+        awaitingTrades: [],
+        transactions: []        
     }
 
     const insertInfo = await stockPortCollection.insertOne(newStockPort);
