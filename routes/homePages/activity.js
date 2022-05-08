@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const validation = require('../../validation');
 const data = require('../../data');
-const userData = data.users;
 
 // GET /activity
 router.get('/', async (req, res) => {
@@ -71,7 +70,7 @@ router.get('/', async (req, res) => {
             );
 
         } catch (error) {
-            res.render('homePages/error.handlebars',
+            res.render('additional/error.handlebars',
                 {
                     title: 'Error', errorMessage: error.toString()
                 }
