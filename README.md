@@ -1,13 +1,12 @@
-# MyMarketSim
+# StockMarketSim
 CS546 Final Project
+
 ## Members:
 
 Ella Crabtree, Aughdon Breslin, Christian Bautista, Ankit Patel
 
-
-## Project Name: StockMarketSim
-
-## GitHub URL: [https://github.com/AughdonBreslin/StockMarketSim](https://github.com/AughdonBreslin/StockMarketSim)
+## GitHub URL:
+[https://github.com/AughdonBreslin/StockMarketSim](https://github.com/AughdonBreslin/StockMarketSim)
 
 ## Setup
 Our project uses a number of dependencies, listed below. In order to start the project, do `npm i <package>` for every package listed below.
