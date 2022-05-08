@@ -3,7 +3,7 @@ const validation = require('../validation')
 const key = "FN6CRSE4MHKTRH4X"
 
 // price(ticker)
-async function price(ticker, interval) {
+async function price(ticker, interval="1min") {
     // validate ticker and interval
     ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
     interval = validation.checkString(interval, 1, "Interval", true, false)

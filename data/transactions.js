@@ -120,8 +120,8 @@ async function getAutoBuysSorted(id) {
     // check to see if portfolio has any awaitingTrades
     if (!portfolio["awaitingTrades"]) return [] // may just return an empty object instead of throwing an error
     // check to see if any of the awaitingTrades are autoBuys
-    let autoBuys = portfolio["awaitingTrades"].filter(x => x["type"] == "autoBuy")
-    if (!autoBuys) throw "No autoBuys found"
+    let autoBuys = portfolio["awaitingTrades"].filter(x => x["type"] == "buy")
+    if(!autoBuys) throw "No autoBuys found"
 
     // get all priorities from autoBuys
     let priorities = autoBuys.map(x => x["priority"])
@@ -144,12 +144,12 @@ async function getAutoBuysSorted(id) {
     }
 
     // update awaitingTrades
-    let awaitingTrades = portfolio["awaitingTrades"].filter(x => x["type"] != "autoBuy")
+    let awaitingTrades = portfolio["awaitingTrades"].filter(x => x["type"] != "buy")
     awaitingTrades = awaitingTrades.concat(autoBuys)
 
     // update portfolio
-    const updateInfo = await portfolioCollection.updateOne({ "_id": ObjectId(id) }, { $set: { "awaitingTrades": awaitingTrades } })
-    if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "Portfolio was not updated"
+    const updateInfo = await portfolioCollection.updateOne({"_id": ObjectId(id)}, { $set: {"awaitingTrades": awaitingTrades} })
+    if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"]) throw "Portfolio was not updated"
 
     return autoBuys
 }
@@ -158,18 +158,16 @@ async function getAutoBuysSorted(id) {
 async function updatePriorities(id, priority) {
     // validate id and priority
     id = validation.checkId(id, "Stock Portfolio ID")
-    priority = validation.checkInt(priority, "Priority")
+    validation.checkInt(priority, "Priority")
 
     // call getAutoBuysSorted
     let autoBuys = await getAutoBuysSorted(id)
-
-    // check if there are any autoBuys
-    if (!autoBuys) return 1
+    if (!autoBuys) throw "No autoBuys found"
 
     // check to see if priority is in range of autoBuys
     if (priority <= autoBuys.length) {
         // increment all priorities in autoBuys after priority
-        for (let i = priority; i < autoBuys.length; i++) {
+        for (let i = priority-1; i < autoBuys.length; i++) {
             autoBuys[i]["priority"]++
         }
 
@@ -179,12 +177,12 @@ async function updatePriorities(id, priority) {
         if (!portfolio) throw "Stock Portfolio not found"
 
         // update awaitingTrades
-        let awaitingTrades = portfolio["awaitingTrades"].filter(x => x["type"] != "autoBuy")
+        let awaitingTrades = portfolio["awaitingTrades"].filter(x => x["type"] != "buy")
         awaitingTrades = awaitingTrades.concat(autoBuys)
 
         // update portfolio
-        const updateInfo = await portfolioCollection.updateOne({ "_id": ObjectId(id) }, { $set: { "awaitingTrades": awaitingTrades } })
-        if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "Portfolio was not updated"
+        const updateInfo = await portfolioCollection.updateOne({"_id": ObjectId(id)}, { $set: {"awaitingTrades": awaitingTrades} })
+        if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"]) throw "Portfolio was not updated"
     } else {
         return autoBuys.length + 1
     }
@@ -215,7 +213,7 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
             // retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
             if (!awaiting) {
                 awaiting = true
-                setTimeout(autoTrade(), timeToOpen())
+                setTimeout(function() {autoTrade()}, timeToOpen())
             }
         } else {
             throw "Unable to buy outside of trading hours"
@@ -239,7 +237,7 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
             // retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
             if (!awaiting) {
                 awaiting = true
-                setTimeout(autoTrade(), (autoInterval * 60 * 1000))
+                setTimeout(function() {autoTrade()}, (autoInterval * 60 * 1000))
             }
         } else {
             throw "Insufficient Funds"
@@ -254,9 +252,9 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
             // retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
             if (!awaiting) {
                 awaiting = true
-                setTimeout(autoTrade(), (autoInterval * 60 * 1000))
+                setTimeout(function() {autoTrade()}, (autoInterval * 60 * 1000))
             }
-        } else {
+        } else if (!auto) {
             throw "Threshold not met"
         }
     }
@@ -281,7 +279,8 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
         })
     } else { // if autoFlag, update awaitingTrades field only
         if (priority < 1) throw "Priority not set properly"
-        updatePriorities(id, priority)
+        priority = await updatePriorities(id, priority)
+        portfolio = await portfolioCollection.findOne({"_id": ObjectId(id)})
         portfolio["awaitingTrades"].push({
             "type": "buy",
             "ticker": ticker,
@@ -321,7 +320,7 @@ async function sell(id, ticker, quant, bypass = false, threshold = -1, auto = fa
             autoFlag = true
             if (!awaiting) {
                 awaiting = true
-                setTimeout(autoTrade(), timeToOpen())
+                setTimeout(function() {autoTrade()}, timeToOpen())
             }
             // retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
         } else {
@@ -351,9 +350,9 @@ async function sell(id, ticker, quant, bypass = false, threshold = -1, auto = fa
             // retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
             if (!awaiting) {
                 awaiting = true
-                setTimeout(autoTrade(), (autoInterval * 60 * 1000))
+                setTimeout(function() {autoTrade()}, (autoInterval * 60 * 1000))
             }
-        } else {
+        } else if (!auto) {
             throw "Threshold not met"
         }
     }
@@ -392,10 +391,10 @@ async function sell(id, ticker, quant, bypass = false, threshold = -1, auto = fa
 }
 
 // autoTrade
-void async function autoTrade() {
+async function autoTrade() {
     // check if during trading hours
     if (!duringTradingHours()) {
-        setTimeout(autoTrade(), timeToOpen())
+        setTimeout(function() {autoTrade()}, timeToOpen())
         return
     }
 
@@ -447,7 +446,7 @@ void async function autoTrade() {
 
     // if there are leftover awaiting trades, set timeout
     if (leftover) {
-        setTimeout(autoTrade(), (autoInterval * 60 * 1000))
+        setTimeout(function() {autoTrade()}, (autoInterval * 60 * 1000))
     } else {
         awaiting = false
     }
