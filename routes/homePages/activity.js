@@ -17,34 +17,34 @@ router.get('/', async (req, res) => {
             console.log(`User ${userID} went to home page.`);
             let portfolio = await stockPortfolio.getSP(req.session.stockPortId, userID);
             let depHist = portfolio.depositHistory;
-            // const allUserTransactions = await transactions.getTransactions(req.session.stockPortId); /* list of objects */
-            // console.log(JSON.stringify(allUserTransactions));
+            let transHist = portfolio.transactions;
+            let autoTradeHist = portfolio.awaitingTrades;
 
             // Get a list of the automated purchase/sell orders:
             // get awaitingTrades list
             // const automated_orders = await data.
-            const automated_orders = [
-                {
-                    "_id": "507f1f77bcf86cd799439011",
-                    "type": "buy", // Possible Values: ["buy", "sell"]
-                    "ticker": "GOOG",
-                    "quantity": 10,
-                    "pps_threshold": 50.42,
-                    "priority": 4 // Any positive number > 0
-                },
-                {
-                    "_id": "507f1f77bcf86cd799439011",
-                    "type": "sell", // Possible Values: ["buy", "sell"]
-                    "ticker": "GOOG",
-                    "quantity": 10,
-                    "pps_threshold": 50.42,
-                    "priority": -1 // Should always be -1 for sells
-                }
-            ];
+            // const automated_orders = [
+            //     {
+            //         "_id": "507f1f77bcf86cd799439011",
+            //         "type": "buy", // Possible Values: ["buy", "sell"]
+            //         "ticker": "GOOG",
+            //         "quantity": 10,
+            //         "pps_threshold": 50.42,
+            //         "priority": 4 // Any positive number > 0
+            //     },
+            //     {
+            //         "_id": "507f1f77bcf86cd799439011",
+            //         "type": "sell", // Possible Values: ["buy", "sell"]
+            //         "ticker": "GOOG",
+            //         "quantity": 10,
+            //         "pps_threshold": 50.42,
+            //         "priority": -1 // Should always be -1 for sells
+            //     }
+            // ];
             // const automated_orders = [];
 
             res.render('homePages/activity.handlebars',
-                { title: 'Activity', user: 'TODO', transactions: 0, deposits: depHist, awaitingTrades: automated_orders }
+                { title: 'Activity', user: 'TODO', transactions: transHist, deposits: depHist, awaitingTrades: autoTradeHist }
 
             );
 
