@@ -58,7 +58,7 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
         settings: stockSet,
         depositHistory: [],
         awaitingTrades: [],
-        transactions: []        
+        transactions: []
     }
 
     const insertInfo = await stockPortCollection.insertOne(newStockPort);
@@ -96,6 +96,8 @@ const setAutoDeposit = async function setAutoDeposit(portId, userId, depFreq) {
     //Check depFreq
     depFreq = validation.checkAutoDepFreq(depFreq);
 
+    let task;
+
     if (depFreq !== 'none') {
         depAmt = validation.checkMoneyAmt(depAmt, 'Deposit Amount', false);
         // let second, minute, hour, dayOfWeek, dayOfMonth;
@@ -109,42 +111,48 @@ const setAutoDeposit = async function setAutoDeposit(portId, userId, depFreq) {
 
         if (depFreq === 'daily') {
 
-            setTimeout(async function () {
+            task = cron.scheduleJob('* * * */1 * *', async () => {
                 const sp = await getSP(portId, userId);
-                let newBal = sp.currBal + sp.settings.autoDepAmt;
+                let newBal = sp.balance + sp.settings.automated_deposit_amount;
+                console.log(newBal);
                 await updateCurrentBal(portId, userId, newBal);
-            }, 24*60*60*1000);
+                
+            });
+
+            // setTimeout(async function () {
+            //     const sp = await getSP(portId, userId);
+            //     let newBal = sp.currBal + sp.settings.autoDepAmt;
+            //     await updateCurrentBal(portId, userId, newBal);
+            // }, 24*60*60*1000);
 
         } else if (depFreq === 'weekly') {
-            
+            task = cron.scheduleJob('* * * * * */1', async () => {
+                const sp = await getSP(portId, userId);
+                let newBal = sp.balance + sp.settings.automated_deposit_amount;
+                console.log(newBal);
+                await updateCurrentBal(portId, userId, newBal);
+                
+            });
 
         } else if (depFreq === 'monthly') {
             //This may pose a problem for leap years
-            
+            task = cron.scheduleJob('* * * * */1 *', async () => {
+                const sp = await getSP(portId, userId);
+                let newBal = sp.balance + sp.settings.automated_deposit_amount;
+                console.log(newBal);
+                await updateCurrentBal(portId, userId, newBal);
+                
+            });
         }
     } else {
-        cron.scheduleJob('*/5 * * * * *', async () => {
-        const sp = await getSP(portId, userId);
-        console.log(sp);
-        let newBal = sp.balance + sp.settings.automated_deposit_amount;
-        // let newBal = Number(sp.currBal) + Number(sp.settings.autoDepAmt);
-        console.log(newBal);
-        await updateCurrentBal(portId, userId, newBal);
-            // console.log('hiya');
-        });
-        // setTimeout( async () => {
-        //     const sp = await getSP(portId, userId);
-        //     let newBal = sp.balance + sp.settings.automated_deposit_amount;
-        //     await updateCurrentBal(portId, userId, newBal);
-        // }, 2000);
-    }
-    console.log('job set');
+        task = cron.scheduleJob('*/5 * * * * *', async () => {
+            const sp = await getSP(portId, userId);
+            let newBal = sp.balance + sp.settings.automated_deposit_amount;
+            console.log(newBal);
+            await updateCurrentBal(portId, userId, newBal);
 
-    // setTimeout(async function () {
-    //     const sp = await getSP(portId, userId);
-    //     let newBal = sp.currBal + sp.settings.autoDepAmt;
-    //     await updateCurrentBal(portId, userId, newBal);
-    // }, 1000);
+        });
+    }
 }
 
 //Updates portfolio-value field with the current stock portfolio value
@@ -287,7 +295,7 @@ const addToAutoPurchases = async function addToAutoPurchases(portID, userID, aut
 
     //Checking userID
     validation.checkId(userID, 'User Id');
-    userId = userID.trim();
+    userID = userID.trim();
 
     //Checking depHistEntry
     validation.checkId(autoPurchaseEntry, 'Auto Purchase ID');
@@ -399,10 +407,14 @@ const removePortfolio = async function removePortfolio(portID, userID) {
     const portCollection = await portfolios();
     if (!portCollection) throw `Error: Could not find port collection`;
 
-    const stockPort = await portCollection.findOneAndDelete({_id: ObjectId(portID), user_id: ObjectId(userID)});
+    let stockPort = await portCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
+    stockPort.settings.autoDepoJob.cancelJob();
+
+    stockPort = await portCollection.findOneAndDelete({_id: ObjectId(portID), user_id: ObjectId(userID)});
     if(!stockPort.value) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     //scheduledDepTask.destroy();
+    cron.gracefulShutdown();
 
     return `${stockPort.value.name} has been successfully deleted!`;
 }
