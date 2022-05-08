@@ -135,7 +135,28 @@ $(function () {
         }
 
         console.log("Finished validating input!");
+
         // Send the ajax request:
+        var requestConfig = {
+            method: 'POST',
+            url: '/trade',
+            contentType: 'application/json',
+            body: JSON.stringify({
+                ticker: ticker,
+                quantity: quantity,
+                trans_opt: trans_opt,
+                trans_mode: trans_mode,
+                threshold: threshold,
+                priority: priority
+            })
+        };
+
+        $.ajax(requestConfig).then(function (responseMessage) {
+            console.log("response received!");
+            console.log(responseMessage);
+        });
+
+
         // Send the request to the server
 
 
