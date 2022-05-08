@@ -52,7 +52,6 @@ if (signUpForm) {
     signUpForm.addEventListener('submit', (event) => {
         event.preventDefault();
 
-        console.log('hello')
         const errorDiv = document.getElementById('signup-error');
         const fullName = document.getElementById('fullname');
         const email = document.getElementById('email');
@@ -86,8 +85,6 @@ if (signUpForm) {
             email.focus();
             return;
         }
-
-        console.log('hello Again');
 
         try {
             if (!username.value) throw `Username must be provided!`;

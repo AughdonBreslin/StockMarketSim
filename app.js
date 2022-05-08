@@ -46,6 +46,25 @@ const handlebarsInstance = exphbs.create({
       return isManDep ? "manually" : "automatically";
     },
 
+    trade_conf_msg: (trade_info_obj) => {
+      let str = ``;
+      if (trade_info_obj.auth) {
+        str += `Successfully `;
+
+        if (trade_info_obj.mode == 'manual') {
+          str += `executed trade`;
+        } else {
+          str += `created trade order`;
+
+        }
+        str += ` to ${trade_info_obj.type} ${trade_info_obj.quantity} shares of ${trade_info_obj.ticker}. Transaction amount: $${trade_info_obj.cost}.`;
+
+      } else {
+        str = `Error: Failed to make/create a trade. Please try again!`;
+      }
+      return str;
+    },
+
     isDeposit: (isDep) => {
       return (isDep == "Deposit") ? "deposited" : "withdrawn";
     }

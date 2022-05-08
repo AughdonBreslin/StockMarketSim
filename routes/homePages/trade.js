@@ -5,6 +5,7 @@ const data = require('../../data');
 const userData = data.users;
 const transactionsData = data.transactions;
 const xss = require('xss');
+const transactions = require('../../data/transactions');
 
 // GET /trade page
 router.get('/', (req, res) => {
@@ -63,10 +64,19 @@ router.post('/', async (req, res) => {
 
             console.log("ticker=" + ticker);
             console.log("quantity=" + quantity);
+            console.log("trans_opt=" + trans_opt);
             console.log("trans_mode=" + trans_mode);
+
+            let retval;
 
             if (trans_mode == 'manual') {
                 // make the manual trade call HERE
+
+                if (trans_opt == "buy") {
+                    // retval = await transactions.buy(req.session.stockPortId, ticker, quantity);
+                } else {
+                    // retval = await transactions.sell(req.session.stockPortId, ticker, quantity);
+                }
 
             } else { /* automated - check transaction option */
                 // if trans_mode == "automated", parse threshold
@@ -90,10 +100,28 @@ router.post('/', async (req, res) => {
 
                 // make the automated trade call HERE
 
+                if (trans_opt == "buy") {
+                    // retval = await transactions.buy(req.session.stockPortId, ticker, quantity, false, threshold, priority, true);
+                } else {
+                    // retval = await transactions.sell(req.session.stockPortId, ticker, quantity, false, threshold, true);
+                }
             }
 
+            // check if trade was successful. 
+
+            // then, update the activities page? -- this might already be done actually
+
+            retval = {
+                auth: true,
+                ticker: "aapl",
+                type: "sell",
+                quantity: 100,
+                cost: 5000,
+                mode: "manual"
+            };
+
             res.render('homePages/trade.handlebars',
-                { title: 'Trade', user: 'TODO' });
+                { title: 'Trade', user: 'TODO', trade_info: retval });
 
         } catch (error) {
             console.log(error);

@@ -39,7 +39,7 @@ function timeToOpen() {
 
     // if stock market is open, return 0
     if (duringTradingHours()) return 0
-    
+
     // find time to 9
     // get time to hour first
     minutes = 60 - date.getMinutes()
@@ -114,14 +114,14 @@ async function getAutoBuysSorted(id) {
 
     // find portfolio using id
     const portfolioCollection = await portfolios()
-    let portfolio = await portfolioCollection.findOne({"_id": ObjectId(id)})
+    let portfolio = await portfolioCollection.findOne({ "_id": ObjectId(id) })
     if (!portfolio) throw "Stock Portfolio not found"
 
     // check to see if portfolio has any awaitingTrades
     if (!portfolio["awaitingTrades"]) return [] // may just return an empty object instead of throwing an error
     // check to see if any of the awaitingTrades are autoBuys
     let autoBuys = portfolio["awaitingTrades"].filter(x => x["type"] == "autoBuy")
-    if(!autoBuys) throw "No autoBuys found"
+    if (!autoBuys) throw "No autoBuys found"
 
     // get all priorities from autoBuys
     let priorities = autoBuys.map(x => x["priority"])
@@ -148,7 +148,7 @@ async function getAutoBuysSorted(id) {
     awaitingTrades = awaitingTrades.concat(autoBuys)
 
     // update portfolio
-    const updateInfo = await portfolioCollection.updateOne({"_id": ObjectId(id)}, { $set: {"awaitingTrades": awaitingTrades} })
+    const updateInfo = await portfolioCollection.updateOne({ "_id": ObjectId(id) }, { $set: { "awaitingTrades": awaitingTrades } })
     if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "Portfolio was not updated"
 
     return autoBuys
@@ -175,7 +175,7 @@ async function updatePriorities(id, priority) {
 
         // get portfolio using id
         const portfolioCollection = await portfolios()
-        let portfolio = await portfolioCollection.findOne({"_id": ObjectId(id)})
+        let portfolio = await portfolioCollection.findOne({ "_id": ObjectId(id) })
         if (!portfolio) throw "Stock Portfolio not found"
 
         // update awaitingTrades
@@ -183,10 +183,10 @@ async function updatePriorities(id, priority) {
         awaitingTrades = awaitingTrades.concat(autoBuys)
 
         // update portfolio
-        const updateInfo = await portfolioCollection.updateOne({"_id": ObjectId(id)}, { $set: {"awaitingTrades": awaitingTrades} })
+        const updateInfo = await portfolioCollection.updateOne({ "_id": ObjectId(id) }, { $set: { "awaitingTrades": awaitingTrades } })
         if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "Portfolio was not updated"
     } else {
-        return autoBuys.length+1
+        return autoBuys.length + 1
     }
     return priority
 }
@@ -225,7 +225,7 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
 
     // find portfolio using id
     const portfolioCollection = await portfolios()
-    let portfolio = await portfolioCollection.findOne({"_id": ObjectId(id)})
+    let portfolio = await portfolioCollection.findOne({ "_id": ObjectId(id) })
     if (!portfolio) throw "Stock Portfolio not found"
 
     // get the stock price from the api
@@ -277,7 +277,7 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
             "ticker": ticker,
             "quantity": quant,
             "pps": price,
-            "date": new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})
+            "date": new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
         })
     } else { // if autoFlag, update awaitingTrades field only
         if (priority < 1) throw "Priority not set properly"
@@ -292,7 +292,7 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
     }
 
     // update in portfolio database
-    const updateInfo = await portfolioCollection.updateOne({"_id": ObjectId(id)}, { $set: portfolio })
+    const updateInfo = await portfolioCollection.updateOne({ "_id": ObjectId(id) }, { $set: portfolio })
     if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "portfolio was not updated"
 
     // unsure what to return
@@ -301,7 +301,7 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
     // return retId
 }
 // sell
-async function sell(id, ticker, quant, bypass = false,  threshold = -1, auto = false, interval = "1min") {
+async function sell(id, ticker, quant, bypass = false, threshold = -1, auto = false, interval = "1min") {
     id = validation.checkId(id, "Stock Portfolio ID")
     ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
     validation.checkInt(quant, "Quantity")
@@ -332,7 +332,7 @@ async function sell(id, ticker, quant, bypass = false,  threshold = -1, auto = f
 
     // find portfolio using id
     const portfolioCollection = await portfolios()
-    let portfolio = await portfolioCollection.findOne({"_id": ObjectId(id)})
+    let portfolio = await portfolioCollection.findOne({ "_id": ObjectId(id) })
     if (!portfolio) throw "Stock Portfolio not found"
 
     // determine if holding ticker and enough shares
@@ -370,7 +370,7 @@ async function sell(id, ticker, quant, bypass = false,  threshold = -1, auto = f
             "ticker": ticker,
             "quantity": quant,
             "pps": price,
-            "date": new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})
+            "date": new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
         })
     } else { // if autoFlag, update awaitingTrades field only
         portfolio["awaitingTrades"].push({
@@ -387,7 +387,7 @@ async function sell(id, ticker, quant, bypass = false,  threshold = -1, auto = f
     if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "portfolio was not updated"
 
     // unsure what to return
-    return {"authenticated": true}
+    return { "authenticated": true }
     // return retId 
 }
 
@@ -460,7 +460,7 @@ async function getTransactions(id) {
 
     // get portfolio using id
     const portfolioCollection = await portfolios()
-    let portfolio = await portfolioCollection.findOne({"_id": ObjectId(id)})
+    let portfolio = await portfolioCollection.findOne({ "_id": ObjectId(id) })
     if (!portfolio) throw "Stock Portfolio not found"
 
     // get transactions from portfolio
