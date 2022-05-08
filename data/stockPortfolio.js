@@ -67,7 +67,7 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
     // Return acknowledgement
     let stockPortId = insertInfo.insertedId;
     const stockPortAdded = this.getSP(stockPortId.toString().trim(), tUserId);
-    //await setAutoDeposit(stockPortId.toString().trim(), tUserId, tAutoDepFreq);
+    await setAutoDeposit(stockPortId.toString().trim(), tUserId, tAutoDepFreq);
     // let date = new Date();
     // console.log(date.getSeconds());
     // console.log(date.getMinutes());
@@ -80,78 +80,72 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
 
 }
 
-// const setAutoDeposit = async function setAutoDeposit(portId, userId, depFreq) {
+const setAutoDeposit = async function setAutoDeposit(portId, userId, depFreq) {
     
-//     //Check Arguments
-//     validation.checkNumOfArgs(arguments, 3, 3);
+    //Check Arguments
+    validation.checkNumOfArgs(arguments, 3, 3);
 
-//     //Check stockId
-//     validation.checkId(portId, 'Stock Portfolio ID');
-//     portId = portId.toString().trim();
+    //Check stockId
+    validation.checkId(portId, 'Stock Portfolio ID');
+    portId = portId.toString().trim();
 
-//     //Check userId
-//     validation.checkId(userId, 'User ID');
-//     userId = userId.toString().trim();
+    //Check userId
+    validation.checkId(userId, 'User ID');
+    userId = userId.toString().trim();
 
-//     //Check depFreq
-//     depFreq = validation.checkAutoDepFreq(depFreq);
+    //Check depFreq
+    depFreq = validation.checkAutoDepFreq(depFreq);
 
-//     if (depFreq !== 'none') {
-//         depAmt = validation.checkMoneyAmt(depAmt, 'Deposit Amount', false);
-//         // let second, minute, hour, dayOfWeek, dayOfMonth;
+    if (depFreq !== 'none') {
+        depAmt = validation.checkMoneyAmt(depAmt, 'Deposit Amount', false);
+        // let second, minute, hour, dayOfWeek, dayOfMonth;
 
-//         let day = new Date();
-//         let second = day.getSeconds();
-//         let minute = day.getMinutes();
-//         let hour = day.getHours();
-//         let dayOfWeek = day.getDay();
-//         let dayOfMonth = day.getDate();
+        let day = new Date();
+        let second = day.getSeconds();
+        let minute = day.getMinutes();
+        let hour = day.getHours();
+        let dayOfWeek = day.getDay();
+        let dayOfMonth = day.getDate();
 
-//         if (depFreq === 'daily') {
+        if (depFreq === 'daily') {
 
-//             // setTimeout(function () {
-//             //     const sp = await getSP(portId, userId);
-//             //     let newBal = sp.currBal + sp.settings.autoDepAmt;
-//             //     await updateCurrentBal(portId, userId, newBal);
-//             // }, )
+            setTimeout(async function () {
+                const sp = await getSP(portId, userId);
+                let newBal = sp.currBal + sp.settings.autoDepAmt;
+                await updateCurrentBal(portId, userId, newBal);
+            }, 24*60*60*1000);
 
-//             scheduledDepTask = cron.schedule(`${second} ${minute} ${hour} * * *`, async function() {
-//                 const sp = await getSP(portId, userId);
-//                 let newBal = sp.currBal + sp.settings.autoDepAmt;
-//                 await updateCurrentBal(portId, userId, newBal);
-//             });
-//         } else if (depFreq === 'weekly') {
-//             scheduledDepTask = cron.schedule(`${second} ${minute} ${hour} * * ${dayOfWeek}`, async function() {
-//                 const sp = await getSP(portId, userId);
-//                 let newBal = sp.currBal + sp.settings.autoDepAmt;
-//                 await updateCurrentBal(portId, userId, newBal);
-//             });
+        } else if (depFreq === 'weekly') {
+            
 
-//         } else if (depFreq === 'monthly') {
-//             //This may pose a problem for leap years
-//             scheduledDepTask = cron.schedule(`${second} ${minute} ${hour} ${dayOfMonth} * *`, async function() {
-//                 const sp = await getSP(portId, userId);
-//                 let newBal = sp.currBal + sp.settings.autoDepAmt;
-//                 await updateCurrentBal(portId, userId, newBal);
-//             });
-//         }
-//     } else {
-//         let scheduledDepTask = cron.scheduleJob('59 * * * * *', async() => {
+        } else if (depFreq === 'monthly') {
+            //This may pose a problem for leap years
+            
+        }
+    } else {
+        cron.scheduleJob('*/5 * * * * *', async () => {
+        const sp = await getSP(portId, userId);
+        console.log(sp);
+        let newBal = sp.balance + sp.settings.automated_deposit_amount;
+        // let newBal = Number(sp.currBal) + Number(sp.settings.autoDepAmt);
+        console.log(newBal);
+        await updateCurrentBal(portId, userId, newBal);
+            // console.log('hiya');
+        });
+        // setTimeout( async () => {
+        //     const sp = await getSP(portId, userId);
+        //     let newBal = sp.balance + sp.settings.automated_deposit_amount;
+        //     await updateCurrentBal(portId, userId, newBal);
+        // }, 2000);
+    }
+    console.log('job set');
 
-//             try {
-//                 console.log('helloAgain');
-//                 const sp = await getSP(portId, userId);
-//                 let newBal = sp.currBal + sp.settings.autoDepAmt;
-//                 await updateCurrentBal(portId, userId, newBal);
-//                 console.log('helloagainagain');
-//             } catch (error) {
-//                 console.log(error);
-//             }
-//         })
-//     }
-//     console.log('job set');
-
-// }
+    // setTimeout(async function () {
+    //     const sp = await getSP(portId, userId);
+    //     let newBal = sp.currBal + sp.settings.autoDepAmt;
+    //     await updateCurrentBal(portId, userId, newBal);
+    // }, 1000);
+}
 
 //Updates portfolio-value field with the current stock portfolio value
 //Adds old PVal to PValHistory array
@@ -221,7 +215,7 @@ const updateCurrentBal = async function updateCurrentBal(portID, userID, currBal
     if (!update.matchedCount && !update.modifiedCount)
        throw 'Updating current portfolio balance failed';
 
-    const stockPortAdded = this.getSP(portID, userID);
+    const stockPortAdded = getSP(portID, userID);
     return stockPortAdded;
 }
 
