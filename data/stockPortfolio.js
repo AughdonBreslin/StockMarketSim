@@ -143,6 +143,30 @@ const updateCurrentBal = async function updateCurrentBal(portID, userID, currBal
     return stockPortAdded;
 }
 
+const getDepositsOfUser = async function (portID) {
+    // error checking
+    validation.checkNumOfArgs(arguments, 1, 1);
+    console.log(portID);
+
+    // Check if stockPortfolio_id is valid input
+    if (!ObjectId.isValid(portID)) throw `Error: Invalid stock portfolio ID provided.`;
+
+    // get collection
+    const stockPortCollection = await portfolios();
+    if (!stockPortCollection) throw `Error: Could not find portfoliosCollection.`;
+
+    // MongoDB Query -- get all deposits associated w/ the portID
+    const stkport_depHist = await stockPortCollection.findOne({ _id: portID }, { depositHistory: 1 });
+
+    // Check if query returned a valid value    
+    // If query returns [] (ie: no deposits associated w/ a portID, then error bc this should not happen) else, return an array of depositHistory_ids
+
+    if (stkport_depHist.toArray().length === 0) throw `Error: The stock portfolio has no deposits associated with it. This should NOT happen!`;
+
+    return stkport_depHist.toArray();
+
+}
+
 //Adds despoitHistory document id to array in stockPortfolio
 const addToDepHist = async function addToDepHist(portID, userID, depHistEntry) {
 
@@ -156,10 +180,6 @@ const addToDepHist = async function addToDepHist(portID, userID, depHistEntry) {
     //Checking userID
     validation.checkId(userID, 'User Id');
     userID = userID.trim();
-
-    //Checking depHistEntry
-    validation.checkId(depHistEntry, 'Deposit History ID');
-    depHistEntry = depHistEntry.trim();
 
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
@@ -391,6 +411,7 @@ module.exports = {
     createPortfolio,
     updatePVal,
     updateCurrentBal,
+    getDepositsOfUser,
     addToDepHist,
     addToAutoPurchases,
     addToAutoSell,
