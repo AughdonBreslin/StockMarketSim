@@ -67,7 +67,7 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
     // Return acknowledgement
     let stockPortId = insertInfo.insertedId;
     const stockPortAdded = this.getSP(stockPortId.toString().trim(), tUserId);
-    await setAutoDeposit(stockPortId.toString().trim(), tUserId, tAutoDepFreq);
+    await setAutoDeposit(stockPortId.toString().trim(), tUserId);
     // let date = new Date();
     // console.log(date.getSeconds());
     // console.log(date.getMinutes());
@@ -80,10 +80,10 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
 
 }
 
-const setAutoDeposit = async function setAutoDeposit(portId, userId, depFreq) {
+const setAutoDeposit = async function setAutoDeposit(portId, userId) {
     
     //Check Arguments
-    validation.checkNumOfArgs(arguments, 3, 3);
+    validation.checkNumOfArgs(arguments, 2, 2);
 
     //Check stockId
     validation.checkId(portId, 'Stock Portfolio ID');
@@ -93,22 +93,19 @@ const setAutoDeposit = async function setAutoDeposit(portId, userId, depFreq) {
     validation.checkId(userId, 'User ID');
     userId = userId.toString().trim();
 
-    //Check depFreq
-    depFreq = validation.checkAutoDepFreq(depFreq);
+    const stockPortCollection = await portfolios();
+    if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
+
+    console.log(portId);
+    console.log(userId);
+    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portId), user_id: ObjectId(userId)});
+    if (!stockPort) throw `Error: This user doesn't have a stock portfolio set!`;
+
+    const depFreq = stockPort.settings.automated_deposit_freq;
 
     let task;
 
     if (depFreq !== 'none') {
-        depAmt = validation.checkMoneyAmt(depAmt, 'Deposit Amount', false);
-        // let second, minute, hour, dayOfWeek, dayOfMonth;
-
-        let day = new Date();
-        let second = day.getSeconds();
-        let minute = day.getMinutes();
-        let hour = day.getHours();
-        let dayOfWeek = day.getDay();
-        let dayOfMonth = day.getDate();
-
         if (depFreq === 'daily') {
 
             task = cron.scheduleJob('* * * */1 * *', async () => {
@@ -407,9 +404,6 @@ const removePortfolio = async function removePortfolio(portID, userID) {
     const portCollection = await portfolios();
     if (!portCollection) throw `Error: Could not find port collection`;
 
-    let stockPort = await portCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
-    stockPort.settings.autoDepoJob.cancelJob();
-
     stockPort = await portCollection.findOneAndDelete({_id: ObjectId(portID), user_id: ObjectId(userID)});
     if(!stockPort.value) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
@@ -441,7 +435,6 @@ const checkStockPortExists = async function checkStockPortExists(userID) {
 
 const getSP = async function getSP(portID, userID) {
 
-    console.log('hello');
     //Checking num of arguments
     validation.checkNumOfArgs(arguments, 2, 2);
 
@@ -510,5 +503,6 @@ module.exports = {
     checkStockPortExists,
     getSP,
     changePortSettings,
-    removePortfolio
+    removePortfolio,
+    setAutoDeposit
 }

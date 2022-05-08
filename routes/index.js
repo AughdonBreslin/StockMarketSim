@@ -10,6 +10,7 @@ const databaseRoutes = require('./additional/database');
 
 const stockPortfolio = require('../data/stockPortfolio');
 const users = require('../data/users');
+const cron = require('node-schedule');
 
 const constructorMethod = (app) => {
     // Home Page
@@ -58,6 +59,7 @@ const constructorMethod = (app) => {
     // User is logged in and is not having it
     app.get('/logout', async (req, res) => {
         if(req.session.username) {
+            cron.gracefulShutdown();
             userID = await users.getUserIdFromUsername(req.session.username);
             userID = userID.toString();
             console.log(`User ${userID} logged out.`);
