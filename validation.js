@@ -175,6 +175,11 @@ const checkInsufficientFundOption = function checkInsufficientFundOption(option)
   if (option === 'false') return false;
 };
 
+const checkDate = function checkDate(date) {
+  if(!date) throw `Error: Date is null or undefined!`;
+  if(!(date instanceof Date)) throw `Error: Date must be a Date object!`;
+  return date;
+}
 
 module.exports = {
   checkId,
@@ -185,6 +190,7 @@ module.exports = {
   checkIsProper,
   checkArray,
   checkWebsite,
+  checkDate,
   checkYear,
   trimArray,
   checkEmail,
