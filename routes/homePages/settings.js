@@ -4,6 +4,7 @@ const validation = require('../../validation');
 const data = require('../../data');
 const userData = data.users;
 const stockPortData = data.stockPortfolio;
+const xss = require('xss');
 
 router.get('/', async (req, res) => {
     res.render('homePages/settings.handlebars',
@@ -12,7 +13,9 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
 
-    let {changedPortUpdates, minActBal, insufficientFunds} = req.body;
+    let changedPortUpdates = xss(req.body.changedPortUpdates);
+    let minActBal = xss(req.body.minActBal);
+    let insufficientFunds = xss(req.body.insufficientFunds);
 
     try {
 

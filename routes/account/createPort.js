@@ -4,6 +4,7 @@ const validation = require('../../validation');
 const data = require('../../data');
 const userData = data.users;
 const stockPortData = data.stockPortfolio;
+const xss = require('xss');
 
 router.get('/', async (req, res) => {
     res.render('account/createPort.handlebars',
@@ -11,7 +12,11 @@ router.get('/', async (req, res) => {
   });
   
 router.post('/', async (req, res) => {
-    const {initialDeposit, autoDepFreq, autoDepAmt, minActBal, insufficientFunds} = req.body;
+  const initialDeposit = xss(req.body.initialDeposit);
+  const autoDepFreq = xss(req.body.autoDepFreq);
+  const autoDepAmt = xss(req.body.autoDepAmt);
+  const minActBal = xss(req.body.minActBal);
+  const insufficientFunds = xss(req.body.insufficientFunds);
     let error = '';
     let user = null;
     let status = null;

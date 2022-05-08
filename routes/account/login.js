@@ -4,6 +4,7 @@ const validation = require('../../validation');
 const data = require('../../data');
 const userData = data.users;
 const stockPortData = data.stockPortfolio;
+const xss = require('xss');
 
 // GET /login
 router.get('/', async (req, res) => {
@@ -14,7 +15,9 @@ router.get('/', async (req, res) => {
 
 // POST /login
 router.post('/', async (req, res) => {
-    const {username, password} = req.body;
+  const username = xss(req.body.username);
+  const password = xss(req.body.password);
+    // const {username, password} = req.body;
     let status = {user: null, authenticated: false};
     let error = '';
 
