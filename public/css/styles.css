@@ -6,6 +6,11 @@ body {
 h1 {
   display: inline-block;
 }
+canvas {
+  display: block;
+  height: 400px;
+  width: 400px;
+}
 nav {
   background-color: green;
   position: sticky;

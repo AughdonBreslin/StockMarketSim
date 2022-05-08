@@ -3,6 +3,38 @@ let createPortForm = document.getElementById('create-portfolio-form');
 let changeSettingsForm = document.getElementById('change-settings-form');
 let resetFirstPrompt = document.getElementById('reset-portfolio');
 let resetSecondPrompt = document.getElementById('reset-reset-portfolio-id');
+let chart = document.getElementById('myChart');
+
+/* For Chart generation*/
+// const labels = [
+//     'January',
+//     'February',
+//     'March',
+//     'April',
+//     'May',
+//     'June',
+//   ];
+
+//   const data = {
+//     labels: labels,
+//     datasets: [{
+//       label: 'My First dataset',
+//       backgroundColor: 'rgb(255, 99, 132)',
+//       borderColor: 'rgb(255, 99, 132)',
+//       data: [0, 10, 5, 2, 20, 30, 45],
+//     }]
+//   };
+
+//   const config = {
+//     type: 'line',
+//     data: data,
+//     options: {}
+//   };
+
+//   const myChart = new Chart(
+//     document.getElementById('myChart'),
+//     config
+//   );
 
 function checkboxClicked(checkBox, className) {
     let checkBoxes = document.getElementsByClassName(className);
@@ -63,3 +95,5 @@ if (resetSecondPrompt) {
         event.target.submit();
     });
 }
+
+
