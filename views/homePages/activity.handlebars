@@ -62,7 +62,7 @@
       {{#each deposits}}
           <article>
             <p>
-              On {{this.deposit-date}}, ${{deposit-amount}} was deposited into your account. This was {{isManual this.manual-or-automated}} deposit.
+              On {{this.deposit_date}}, ${{deposit_amount}} was {{isDeposit option}} into your account. This was done {{isManual this.manual}}.
             </p>
           </article>
       {{/each}}

@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const validation = require('../../validation');
-const data = require('../../data');
+const stockPortfolio = require('../../data/stockPortfolio');
+const users = require('../../data/users');
+const transactions = require('../../data/transactions');
 
 // GET /activity
 router.get('/', async (req, res) => {
@@ -10,36 +12,13 @@ router.get('/', async (req, res) => {
         try {
             /* Get user_id from their username */
             /* username must be unique */
-            const userId = await data.users.getUserIdFromUsername(req.session.username);
-            
-            // These comments can be deleted:
-            // const stk_prt = await data.stockPortfolio.getSP(userId);
-            // const transaction_ids = stk_prt.transactions;
-            // For testing comment this later:
-            // const transaction_ids = ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"];
-
-            const allUserTransactions = await data.transactions.getTransactions(req.session.stockPortId); /* list of objects */
+            let userID = await users.getUserIdFromUsername(req.session.username);
+            userID = userID.toString();
+            console.log(`User ${userID} went to home page.`);
+            let portfolio = await stockPortfolio.getSP(req.session.stockPortId, userID);
+            let depHist = portfolio.depositHistory;
+            // const allUserTransactions = await transactions.getTransactions(req.session.stockPortId); /* list of objects */
             // console.log(JSON.stringify(allUserTransactions));
-
-            // Get the deposit history - list of objs
-            // const dep_hist = await data.depHist.getDepositsOfUser(req.session.stockPortId);
-            // dep_hist = [];
-            dep_hist = [
-                {
-                    "_id": "507f1f77bcf86cd799439011",
-
-                    "deposit-amount": 400, /* min: 1 and max: Number.MAX_SAFE_INTEGER - 1 */
-                    "manual-or-automated": true, /* false=automated deposite, true=manual */
-                    "deposit-date": new Date(2021, 6, 12) /* store as new Date Object */
-                },
-                {
-                    "_id": "507f1f77bcf86cd799439011",
-
-                    "deposit-amount": 400, /* min: 1 and max: Number.MAX_SAFE_INTEGER - 1 */
-                    "manual-or-automated": false, /* false=automated deposite, true=manual */
-                    "deposit-date": new Date(2022, 2, 22) /* store as new Date Object */
-                }
-            ];
 
             // Get a list of the automated purchase/sell orders:
             // get awaitingTrades list
@@ -65,7 +44,7 @@ router.get('/', async (req, res) => {
             // const automated_orders = [];
 
             res.render('homePages/activity.handlebars',
-                { title: 'Activity', user: 'TODO', transactions: allUserTransactions, deposits: dep_hist, awaitingTrades: automated_orders }
+                { title: 'Activity', user: 'TODO', transactions: 0, deposits: depHist, awaitingTrades: automated_orders }
 
             );
 
