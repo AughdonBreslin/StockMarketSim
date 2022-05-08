@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
             /* Get user_id from their username */
             /* username must be unique */
             const userId = await data.users.getUserIdFromUsername(req.session.username);
-
+            
             // These comments can be deleted:
             // const stk_prt = await data.stockPortfolio.getSP(userId);
             // const transaction_ids = stk_prt.transactions;

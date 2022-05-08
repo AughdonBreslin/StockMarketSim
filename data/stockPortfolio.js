@@ -295,7 +295,7 @@ const removePortfolio = async function removePortfolio(portID, userID) {
 
     //Checking id
     validation.checkId(portID, 'Stock Portfolio ID');
-    portId = portID.trim();
+    portID = portID.trim();
 
     //Checking userID
     validation.checkId(userID, 'User Id');
