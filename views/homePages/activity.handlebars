@@ -12,11 +12,11 @@
   {{#if awaitingTrades}}
     <ul class="awaitingTrades_list">
       {{#each awaitingTrades}}
-          <a>
+          <article>
             <p>
               You have an automated order to {{this.type}} {{this.quantity}} {{plural this.quantity "share" "shares"}} of {{this.ticker}} once its share price {{direction this.type}} ${{this.pps_threshold}} per share. {{prio_msg this.type this.priority}}
             </p>
-          </a>
+          </article>
       {{/each}}
     </ul>
   {{else}}
@@ -34,11 +34,11 @@
   {{#if transactions}}
     <ul class="transactions_list">
       {{#each transactions}}
-          <a>
+          <article>
             <p>
               On {{this.date}}, you {{action this.type}} {{this.quantity}} {{plural this.quantity "share" "shares"}} of {{this.ticker}} for ${{this.amount}} each, for a total transaction amount of ${{multiply this.amount this.quantity}}.
             </p>
-          </a>
+          </article>
       {{/each}}
     </ul>
   {{else}}
@@ -54,11 +54,11 @@
   {{#if deposits}}
     <ul class="deposits_list">
       {{#each deposits}}
-          <a>
+          <article>
             <p>
               On {{this.deposit-date}}, ${{deposit-amount}} was deposited into your account. This was {{isManual this.manual-or-automated}} deposit.
             </p>
-          </a>
+          </article>
       {{/each}}
     </ul>
   {{else}}
