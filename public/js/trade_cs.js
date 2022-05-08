@@ -141,7 +141,7 @@ $(function () {
             method: 'POST',
             url: '/trade',
             contentType: 'application/json',
-            body: JSON.stringify({
+            data: JSON.stringify({
                 ticker: ticker,
                 quantity: quantity,
                 trans_opt: trans_opt,
