@@ -72,9 +72,12 @@ input, button {
   color: white;
   box-shadow: 0 1px 1px 0 black;
   border:none;
-  /* border-radius: 0; */
+  border-radius: 0px;
   padding: 4px;
   cursor: pointer;
+}
+#logoutButton:hover {
+  background-color:#009000;
 }
 
 .logoutPopup {

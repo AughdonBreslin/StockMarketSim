@@ -159,6 +159,7 @@ const getUserIdFromUsername = async function getUserIdFromUsername(username) {
     // Get the user_id
     const user = await userCollection.findOne({ username: username }, { _id: 1 });
     if (!user) throw `Error: User could not be found!`;
+    user._id = user._id.toString();
 
     return user._id;
 }
@@ -188,8 +189,8 @@ const changePortUpdate = async function changePortUpdate(userId, updateOption) {
     if (!user) throw `Error: User could not be found!`;
 
     const updatedUser = await userCollection.findOneAndUpdate({_id: ObjectId(newUserId)}, {$set: {profileUpdates: updateOption}});
-    updatedUser._id = updatedUser._id.toString();
-    return updatedUser;
+    
+    return this.getUser(newUserId);
 }
 
 module.exports = {

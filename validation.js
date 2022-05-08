@@ -148,6 +148,7 @@ const checkString = function checkString(strVal, length, varName, alphanumeric =
   return strVal;
 };
 
+
 /** Returns the auto deposit frequency if input is valid. Otherwise, throws error */
 const checkAutoDepFreq = function checkAutoDepFreq(freq) {
   if (freq == null || freq == undefined) throw `Error: frequency is null or undefined, but must be a string!`;
@@ -166,7 +167,10 @@ const checkAutoDepFreq = function checkAutoDepFreq(freq) {
 
 const checkInsufficientFundOption = function checkInsufficientFundOption(option) {
   if (option == null || option == undefined) throw `Error: Insufficient Fund option is null or undefined!`;
-  if (typeof option !== 'string') throw `Error: Insufficient Funds Option must be a string!`;
+
+  if (typeof option === 'boolean') return option;
+
+  if (typeof option !== 'string') throw `Error: Insufficient Funds Option must be either a string or a boolean!`;
   option = option.trim().toLowerCase();
 
   if (option.length == 0) throw `Error: Insufficient Funds Option cannot be an empty string`;
@@ -193,6 +197,9 @@ module.exports = {
   checkDate,
   checkYear,
   trimArray,
+  // checkRating,
+  // checkRelease,
+  // checkTracks,
   checkEmail,
   checkMoneyAmt,
   checkAutoDepFreq,

@@ -32,12 +32,13 @@ router.post('/', async (req, res) => {
             //Indicates to keep original number and to not update it
             numMinActBal = null;
         } else {
-            numMinActBal = validation.checkMoneyAmt(numMinActBal);
+            numMinActBal = validation.checkMoneyAmt(minActBal, 'Minimum Account Balance', false);
         }
 
         const IFbool = validation.checkInsufficientFundOption(insufficientFunds);
 
         const userId = await userData.getUserIdFromUsername(req.session.username);
+
         const updatedUser = await userData.changePortUpdate(userId, changedPortUpdates);
         if (!updatedUser) throw `Error: Portfolio Updates couldn't be changed!`;
 

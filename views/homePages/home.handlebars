@@ -13,6 +13,22 @@
         <a href='/activity'>Activity</a>
         <a href='/settings'>Portfolio Settings </a>
     </nav>
-    <h2>Welcome {{username}}, your portfolio has changed by TODO percent!</h2>
-    
+    <h2>Welcome {{username}}, your portfolio has changed by {{percentChange}} percent!</h2>
+    <h3>Total Value:</h3>
+    <p id="value" value={{value}}>{{value}}</p>
+    <div class="formContainer">
+        <form id="dwForm" >
+            <label for="dw">Do you want to deposit or withdraw?</label>
+            <select id="dw" name="dw">
+                <option value="Deposit">Deposit</option>
+                <option value="Withdraw">Withdraw</option>
+            </select>
+            <label for="quantity">Quantity:</label>
+            <input id = "quantity" name="quantity" type="number"></input>
+            <button id="confirmButton" type="submit">Submit</button>
+        </form>
+    </div>
+    <h3></h3>
 </main>
+<script src="public/js/form.js"></script>
+
