@@ -28,4 +28,4 @@ Our project uses a number of dependencies, listed below. In order to start the p
 }
 ```
 
-After this, simply do `npm start` to launch the server, and then navigate to localhost:3000/ on your web browser.
+After this, simply do `npm start` to launch the server, and then navigate to `http://localhost:3000/` on your web browser.
