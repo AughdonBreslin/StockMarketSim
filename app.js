@@ -43,7 +43,7 @@ const handlebarsInstance = exphbs.create({
 
     /* true=manual deposit, false=automated deposit*/
     isManual: (isManDep) => {
-      return isManDep ? "a manual" : "an automated";
+      return isManDep ? "manually" : "automatically";
     },
 
     trade_conf_msg: (trade_info_obj) => {
@@ -63,6 +63,10 @@ const handlebarsInstance = exphbs.create({
         str = `Error: Failed to make/create a trade. Please try again!`;
       }
       return str;
+    },
+
+    isDeposit: (isDep) => {
+      return (isDep == "Deposit") ? "deposited" : "withdrawn";
     }
 
   }

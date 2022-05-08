@@ -27,7 +27,7 @@
     </ul>
   {{else}}
     <p class="noAwaitingTrades"> 
-      &emsp;You haven't set up any automated trades. Go to the 'Trade' tab to set one up!
+      &emsp;You haven't set up any automated trades yet. Go to the 'Trade' tab to set one up!
     </p>
   {{/if}}
 
@@ -62,14 +62,14 @@
       {{#each deposits}}
           <article>
             <p>
-              On {{this.deposit-date}}, ${{deposit-amount}} was deposited into your account. This was {{isManual this.manual-or-automated}} deposit.
+              On {{this.deposit_date}}, ${{deposit_amount}} was {{isDeposit option}} into your account. This was done {{isManual this.manual}}.
             </p>
           </article>
       {{/each}}
     </ul>
   {{else}}
     <p class="noDeposits"> 
-      &emsp;You haven't made any deposits yet. Go to the 'Deposits' tab to deposit money into your account!
+      &emsp;You haven't made any deposits yet. Go to the 'Home' tab to deposit money into your account!
     </p>
   {{/if}}
 
