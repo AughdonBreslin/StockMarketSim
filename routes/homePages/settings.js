@@ -4,6 +4,7 @@ const validation = require('../../validation');
 const data = require('../../data');
 const userData = data.users;
 const stockPortData = data.stockPortfolio;
+const xss = require('xss');
 
 router.get('/', async (req, res) => {
     res.render('homePages/settings.handlebars',
@@ -12,7 +13,9 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
 
-    let {changedPortUpdates, minActBal, insufficientFunds} = req.body;
+    let changedPortUpdates = xss(req.body.changedPortUpdates);
+    let minActBal = xss(req.body.minActBal);
+    let insufficientFunds = xss(req.body.insufficientFunds);
 
     try {
 
@@ -59,22 +62,27 @@ router.post('/', async (req, res) => {
 });
 
 router.get('/reset', async (req, res) => {
-    res.render('homePages/reset.handlebars',
+    res.render('additional/reset.handlebars',
     {title: 'Reset Portfolio', error: ''});
 });
 
 
-router.post('/reset', async (req, res) => {
-
+router.get('/confirm', async (req, res) => {
     //Delete portfolio - reset()
-    req.session.stockPortId = null;
-
-    try {
+    if(req.session.username && req.session.stockPortId) {
+        try {
+            userID = await userData.getUserIdFromUsername(req.session.username);
+            userID = userID.toString();
+            console.log(`User ${userID} reset their portfolio.`);
+            deletedportfolio = await stockPortData.removePortfolio(req.session.stockPortId, userID);
+            req.session.stockPortId = null;
+        } catch(e) {
+            console.log(e);
+        }
         return res.redirect('/createPortfolio');
-    } catch (e) {
+    } else {
         return res.status(500).json({error: 'Internal Server Error'});   
     }
-    
 });
 
 module.exports = router;

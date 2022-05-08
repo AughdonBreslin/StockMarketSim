@@ -7,8 +7,6 @@ const userData = data.users;
 // GET /positions
 router.get('/', async (req, res) => {
     if (req.session.username) {
-
-
         try {
             /* Get user_id from their username */
             /* username must be unique */
@@ -33,7 +31,7 @@ router.get('/', async (req, res) => {
                 }
             );
         } catch (error) {
-            res.render('homePages/error.handlebars',
+            res.render('additional/error.handlebars',
                 {
                     title: 'Error', errorMessage: error.toString()
                 }

@@ -9,8 +9,13 @@ async function test() {
     // } catch(e) {
     //     console.log(e)
     // }
+    // try {
+    //     const result = await transactions.sell("6278298ba1eb25c069188944", "GOOG", 1, true)
+    // } catch(e) {
+    //     console.log(e)
+    // }
     try {
-        const result = await transactions.sell("6278298ba1eb25c069188944", "GOOG", 1, true)
+        const result = await transactions.buy("6278298ba1eb25c069188944", "GOOG", 1, )
     } catch(e) {
         console.log(e)
     }

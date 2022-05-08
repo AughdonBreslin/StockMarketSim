@@ -1,3 +1,5 @@
+// const validation = require('clientvalidation');
+
 let signUpForm = document.getElementById('signup-form');
 let createPortForm = document.getElementById('create-portfolio-form');
 let changeSettingsForm = document.getElementById('change-settings-form');
@@ -49,6 +51,98 @@ function checkboxClicked(checkBox, className) {
 if (signUpForm) {
     signUpForm.addEventListener('submit', (event) => {
         event.preventDefault();
+
+        console.log('hello')
+        const errorDiv = document.getElementById('signup-error');
+        const fullName = document.getElementById('fullname');
+        const email = document.getElementById('email');
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+        const checkBoxes = document.getElementsByClassName('portUpdates');
+        const checkBoxClicked = Array.from(checkBoxes).filter((item) => item.checked === true);
+
+        try {
+            if (!fullName.value) throw `Fullname must be provided!`;
+            checkIsProper(fullName.value, 'string', 'Full name');
+
+        } catch (e) {
+            errorDiv.innerHTML = e;
+            errorDiv.hidden = false;
+            fullName.value = '';
+            fullName.focus();
+            return;
+            
+        }
+
+        try {
+            if (!email.value) throw  `Email must be provided!`;
+            checkIsProper(email.value, 'string', 'Email');
+            checkEmail(email.value.trim().toLowerCase());
+
+        } catch (e) {
+            errorDiv.innerHTML = e;
+            errorDiv.hidden = false;
+            email.value = '';
+            email.focus();
+            return;
+        }
+
+        console.log('hello Again');
+
+        try {
+            if (!username.value) throw `Username must be provided!`;
+            checkIsProper(username.value, 'string', 'Username');
+            checkString(username.value.trim(), 4, 'Username', true, false);
+        } catch (e) {
+            errorDiv.innerHTML = e;
+            errorDiv.hidden = false;
+            username.value = '';
+            username.focus();
+            return;
+        }
+
+        try {
+            if (!password.value) throw `Password must be provided!`;
+            checkIsProper(password.value, 'string', 'password');
+            checkString(password.value.trim(), 6, 'password', false, false);
+        } catch (e) {
+            errorDiv.innerHTML = e;
+            errorDiv.hidden = false;
+            password.value = '';
+            password.focus();
+            return;
+        }
+
+        try {
+            if (!checkBoxClicked[0]) throw `No checkbox clicked`;
+            const portUpdateVal = checkBoxClicked[0].value.trim().toLowerCase();
+            if (portUpdateVal !== 'none' && portUpdateVal !== 'hourly' && portUpdateVal !== 'daily' && portUpdateVal !== 'weekly' && portUpdateVal !== 'monthly') {
+                throw `Not a valid email update option!`;
+            }
+        } catch (e) {
+            errorDiv.innerHTML = e;
+            errorDiv.hidden = false;
+            checkBoxClicked[0].focus();
+            return;
+        }
+
+
+        // if (fullName.value.trim().length == 0) {
+        //     fullName.value = '';
+        //     errorDiv.hidden = false;
+        //     errorDiv.innerHTML = 'Invalid full name input!'
+        //     fullName.focus();
+        // }
+
+        // if (email.value.trim().length === 0) {
+        //     email.value = '';
+        //     errorDiv.hidden = false;
+        //     errorDiv.innerHTML = ''
+
+        //     validation
+
+        // }
+
 
         //Error checking here
         
