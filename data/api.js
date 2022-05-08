@@ -58,5 +58,6 @@ async function pval(stocks) {
 
 module.exports = {
     price,
+    dailyHistory,
     pval
 }
