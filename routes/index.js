@@ -6,6 +6,7 @@ const activityRoutes = require('./homePages/activity');
 const positionsRoutes = require('./homePages/positions');
 const tradeRoutes = require('./homePages/trade');
 const settingsRoutes = require('./homePages/settings');
+const databaseRoutes = require('./additional/database');
 
 const stockPortfolio = require('../data/stockPortfolio');
 const users = require('../data/users');
@@ -29,7 +30,8 @@ const constructorMethod = (app) => {
                     title: 'My Market Simulator',
                     username: req.session.username,
                     percentChange: "TODO",
-                    value: portfolio.balance
+                    balance: portfolio.balance,
+                    value: "TODO"
                 });
         } else if (req.session.username) {
             res.redirect('/createPortfolio');
@@ -50,12 +52,13 @@ const constructorMethod = (app) => {
     app.use('/settings', settingsRoutes);
     // etc
 
+    app.use('/database', databaseRoutes);
+
 
     // User is logged in and is not having it
     app.get('/logout', (req, res) => {
         if(req.session.username) {
             req.session.destroy(function (err) {
-
                 res.render('account/login.handlebars', {title: "You've been logged out."});
             });
         } else {
