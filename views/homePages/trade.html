@@ -5,11 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-     <script src="jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript" src="trade_cs.js"></script>
 </head>
 <body>
 
-        <form id="searchForm" action="" >
+        <form id="tradeForm" action="">
             <label for="search_term"> Stock Symbol/Ticker: </label>
             <input id="ticker_input" type="text" required> 
             <!-- no space. capital letters. must be a valid ticker -->
@@ -40,7 +41,7 @@
             <input type="radio" id="automated" name="type-option" required>
 
             <label for="manual"> Manual </label>
-            <input type="radio" id="manual" name="type-option">
+            <input type="radio" id="manual" name="type-option" checked="checked">
             <!-- 
                 if automated: ask for threshold. And if 'buying' ask for priority level
                 if manual: User allow the user to submit the form
@@ -48,17 +49,18 @@
             <br>
 
 
-            <label for="priority"> Priority Level </label>
-            <input type="number" id="priority" name="priority-name" step="1">
-            <!-- disable AND Hide this if not an automated purchase. 
-                If automated purchase, make this input required.
+            <label for="threshold" id="threshold_lbl" hidden> Share Price Threshold </label>
+            <input type="number" id="threshold" name="threshold-name" step="0.01" hidden>
+            <!-- disable AND Hide this is not automated.
+                If automated (purchase or sell), then make this input required.
             -->
             <br>
 
-            <label for="threshold"> Threshold amount </label>
-            <input type="number" id="threshold" name="threshold-name" step="0.01">
-            <!-- disable AND Hide this is not automated.
-                If automated (purchase or sell), then make this input required.
+
+            <label for="priority" id="priority_lbl" hidden> Priority Level </label>
+            <input type="number" id="priority" name="priority-name" step="1" hidden>
+            <!-- disable AND Hide this if not an automated purchase. 
+                If automated purchase, make this input required.
             -->
 
             <br>
