@@ -4,6 +4,7 @@ const validation = require('../../validation');
 const data = require('../../data');
 const userData = data.users;
 const transactionsData = data.transactions;
+const xss = require('xss');
 
 // GET /trade page
 router.get('/', (req, res) => {
@@ -22,7 +23,7 @@ router.get('/', (req, res) => {
 router.post('/', async (req, res) => {
     if (req.session.username) {
         // Check if user wants to sell or buy stocks.
-        const act = req.body.buy || req.body.sell; /* true = buy and false = sell. */
+        const act = xss(req.body.buy) || xss(req.body.sell); /* true = buy and false = sell. */
 
 
         // Parse rest of the inputs:
@@ -30,8 +31,8 @@ router.post('/', async (req, res) => {
         // sell(id, ticker, quant)
 
         const stkport_id = 0;
-        const ticker = req.body.ticker;
-        const quant = req.body.quant;
+        const ticker = xss(req.body.ticker);
+        const quant = xss(req.body.quant);
 
         let trade_ack;
 

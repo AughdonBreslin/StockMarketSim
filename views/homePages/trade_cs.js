@@ -1,67 +1,87 @@
+$(function () {
+    console.log("This is my test statement!"); /* fires immediately after page loads */
 
-(function ($) {
+    // If user wants to make an automated trade, ask for threshold. And if 'buying' ask for priority level.
+    $('#automated').on('change', function () {
 
-    $(window).on("load", (function (event) {
-        // console.log("window load");
-
-        /* Add the event listeners to hide/disable certain parts of the form */
-
-    }));
+        $('#threshold').show();
+        $('#threshold').prop("disabled", false);
+        $('#threshold').prop("required", true);
+        $('#threshold_lbl').show();
 
 
-    /* Form submission */
-    $('#searchForm').on("submit", function (event) {
-        // console.log("form submit");
-
-        event.preventDefault();
-
-        let user_input = $('#search_term').val().trim();    /* Trim input */
-
-        // console.log("Search term: " + user_input + '.');
-
-        if (user_input) { /* valid input */
-            $('#showList').empty();    /* Empty the showList elem */
-            $('#showList').show();     /* Disply showList */
-
-            /* Make a AJAX request */
-            const requestConfig = {
-                url: `http://api.tvmaze.com/search/shows?q=${user_input}`,
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                method: 'GET'
-            };
-
-            $.ajax(requestConfig).then(function (shows_list) {
-                // console.log("printing from ajax request form submission");
-                // console.log(JSON.stringify(shows_list));
-                // console.log("# search results = " + shows_list.length);
-
-                if (shows_list.length == 0) {
-                    alert("No search results found!");
-                } else {
-                    shows_list.forEach(show => {
-                        let a = `<a class="showLink" href=${show.show._links.self.href}> ${show.show.name} </a>`;
-
-                        /* Create the <li> elem and append it to showList*/
-                        $('#showList').append(`<li class="showLiElem"> ${a} </li>`);
-                        $('.showLiElem').show(); /* Might be unneccessary */
-                    });
-                    bindShowLink($("#showList"));
-                    $("#showList").show();
-                    // console.log("# of List items in showList: " + $('#showList').children().length);
-                }
-            });
-        } else {    /* invalid input */
-            alert("Enter a valid search term!");
+        if ($('#buy').is(':checked')) {
+            $('#priority').show();
+            $('#priority').prop("disabled", false);
+            $('#priority').prop("required", true);
+            $('#priority_lbl').show();
         }
-        $('#show').hide();                  /* hide 'show' elem (redundant) */
-        $('#homeLink').show();              /* show homeLink */
-        $('#searchForm').trigger('reset');
-        $('#search_term').focus();
-        $('#search_term').value = '';
 
     });
 
+    // If user wants to make an manual trade, hide and disable threshold and priority level.
+    $('#manual').on('change', function () {
+        $('#threshold').hide();
+        $('#threshold').prop("disabled", true);
+        $('#threshold').prop("required", false);
+        $('#threshold_lbl').hide();
 
-})(window.jQuery);
+        $('#priority').hide();
+        $('#priority').prop("disabled", true);
+        $('#priority').prop("required", false);
+        $('#priority_lbl').hide();
+    });
+
+    // If user wants to buy and automated is checked, show priority and show threshold.
+    $('#buy').on('change', function () {
+        // If user wants to make an manual trade, hide and disable threshold and priority level.
+        if ($('#automated').is(':checked')) {
+            $('#threshold').show();
+            $('#threshold').prop("disabled", false);
+            $('#threshold').prop("required", true);
+            $('#threshold_lbl').show();
+
+            $('#priority').show();
+            $('#priority').prop("disabled", false);
+            $('#priority').prop("required", true);
+            $('#priority_lbl').show();
+        }
+
+    });
+
+    // If user wants to sell, show threshold if automated.
+    $('#sell').on('change', function () {
+        // If user wants to make an manual trade, hide and disable threshold and priority level.
+
+        $('#priority').hide();
+        $('#priority').prop("disabled", true);
+        $('#priority').prop("required", false);
+        $('#priority_lbl').hide();
+
+        if ($('#automated').is(':checked')) {
+            $('#threshold').show();
+            $('#threshold').prop("disabled", false);
+            $('#threshold').prop("required", true);
+            $('#threshold_lbl').show();
+        } else {
+            $('#threshold').hide();
+            $('#threshold').prop("disabled", true);
+            $('#threshold').prop("required", false);
+            $('#threshold_lbl').hide();
+        }
+
+    });
+
+    $('#tradeForm').on('submit', function (e) {
+        e.preventDefault();
+
+        // Check all the inputs here:
+
+
+
+
+        console.log("form button clicked!");
+    });
+
+
+});
