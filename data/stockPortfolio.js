@@ -94,7 +94,7 @@ const updatePVal = async function updatePVal(portID, userID, pVal) {
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({id: ObjectId(portID), user_id: ObjectId(userID)});
+    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
     if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
@@ -129,7 +129,7 @@ const updateCurrentBal = async function updateCurrentBal(portID, userID, currBal
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({id: ObjectId(portID), user_id: ObjectId(userID)});
+    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
     if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
@@ -165,7 +165,7 @@ const addToDepHist = async function addToDepHist(portID, userID, depHistEntry) {
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({id: ObjectId(portID), user_id: ObjectId(userID)});
+    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
     if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
@@ -201,7 +201,7 @@ const addToAutoPurchases = async function addToAutoPurchases(portID, userID, aut
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({id: ObjectId(portID), user_id: ObjectId(userID)});
+    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
     if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
@@ -237,7 +237,7 @@ const addToAutoSell = async function addToAutoSell(portID, userID, autoSellEntry
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({id: ObjectId(portID), user_id: ObjectId(userID)});
+    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
     if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
@@ -272,7 +272,7 @@ const addToTransactionLog = async function addToTransactionLog(portID, userID, l
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({id: ObjectId(portID), user_id: ObjectId(userID)});
+    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
     if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
@@ -304,7 +304,7 @@ const removePortfolio = async function removePortfolio(portID, userID) {
     const portCollection = await portfolios();
     if (!portCollection) throw `Error: Could not find port collection`;
 
-    const stockPort = await portCollection.findOneAndDelete({id: ObjectId(portID), user_id: ObjectId(userID)});
+    const stockPort = await portCollection.findOneAndDelete({_id: ObjectId(portID), user_id: ObjectId(userID)});
     if(!stockPort.value) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     return `${stockPort.value.name} has been successfully deleted!`;

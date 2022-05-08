@@ -3,6 +3,7 @@ const router = express.Router();
 const validation = require('../../validation');
 const data = require('../../data');
 const userData = data.users;
+const xss = require('xss');
 
 // GET /signup
 router.get('/', async (req, res) => {
@@ -13,7 +14,13 @@ router.get('/', async (req, res) => {
 // POST /signup
 router.post('/', async (req, res) => {
   console.log('I got to post');
-    const {fullname, email, username, password, portUpdates} = req.body;
+    const fullname = xss(req.body.fullname);
+    const email = xss(req.body.email);
+    const username = xss(req.body.username);
+    const password = xss(req.body.password);
+    const portUpdates = xss(req.body.portUpdates);
+    // const {fullname, email, username, password, portUpdates} =
+    // { xss(req.body.fullname), };
     let status = {userInserted: false};
     let error = '';
     
@@ -31,7 +38,7 @@ router.post('/', async (req, res) => {
       validation.checkIsProper(email, 'string', 'Email');
       validation.checkIsProper(username, 'string', 'username');
       validation.checkIsProper(password, 'string', 'password');
-      validation.checkIsProper(portUpdates, 'string', 'Email updates');
+      validation.checkIsProper(portUpdates, 'string', 'Portfolio updates');
 
       //Trim strings + toLowerCase - Formatting
       let tFullName = fullname.trim();
@@ -61,7 +68,7 @@ router.post('/', async (req, res) => {
       //Check if email is a valid address (throw errors if otherwise)
       validation.checkEmail(tEmail);
       
-      status = await userData.createUser(tFullName, tEmail, tUsername, tPassword, tEmailUpdates);
+      status = await userData.createUser(tFullName, tEmail, tUsername, tPassword, tPortUpdates);
     } catch (e) {
       error = e;
       //  Render the sign-up screen once again, and this time showing an error message (along with an HTTP 400 status code) to the user explaining what they had entered incorrectly.
