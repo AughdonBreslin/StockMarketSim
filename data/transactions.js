@@ -81,7 +81,60 @@ function timeToOpen() {
     return ((hours * 60 * 60) + (minutes * 60) + seconds) * 1000
 }
 
-// getPriorities
+// Transaction
+async function Transaction(id, type, ticker, quant, amount, date) {
+    // validate all inputs
+
+    const transaction = {
+        "portfolio_id": id,
+        "type": type,
+        "ticker": ticker,
+        "quantity": quant,
+        "amount": amount,
+        "date": date
+    }
+    const insertInfo = await transactions().insertOne(transaction)
+    if (!insertInfo["acknowledged"] || !insertInfo["insertedId"]) throw "transaction was not inserted"
+    id = insertInfo["insertedId"].toString()
+    return id
+}
+
+// AwaitingTrade
+async function AwaitingTrade(id, type, ticker, quant, threshold, priority = -1) {
+    //validate all inputs
+    id = validation.checkId(id, "Stock Portfolio ID")
+    type = validation.checkString(type, 1, "Type", true, false)
+    ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
+    quant = validation.checkInt(quant, "Quantity")
+    threshold = validation.checkInt(threshold, "Threshold")
+    priority = validation.checkInt(priority, "Priority")
+
+    const awaitingTrade = {
+        "portfolio_id": id,
+        "ticker": ticker,
+        "quantity": quant,
+        "threshold": threshold
+    }
+    let insertInfo = ""
+    if (type == "buy") {
+        awaitingTrade["priority"] = priority
+        insertInfo = await autoBuys().insertOne(awaitingTrade)
+    } else if (type == "sell") {
+        insertInfo = await autoSells().insertOne(awaitingTrade)
+    } else {
+        throw "Invalid trade type"
+    }
+    if (!insertInfo["acknowledged"] || !insertInfo["insertedId"]) throw "awaiting trade was not inserted"
+    id = insertInfo["insertedId"].toString()
+    return id
+}
+
+// priorities
+/**
+ * 
+ * @param id 
+ * @returns list of dictionaries. key = id and value = auto-buy object
+ */
 async function getPriorities(id) {
     // validate id
     id = validation.checkId(id, "Stock Portfolio ID")
@@ -129,7 +182,7 @@ async function updatePriorities(id, priority) {
     if (!portfolio["awaitingTrades"]) throw "No awaitingTrades found" // may just return an empty object instead of throwing an error
     // check to see if any of the awaitingTrades are autoBuys
     let autoBuys = portfolio["awaitingTrades"].filter(x => x["type"] == "autoBuy")
-    if(!autoBuys) throw "No autoBuys found"
+    if (!autoBuys) throw "No autoBuys found"
 
     // get all priorities from autoBuys
     let priorities = []
@@ -232,7 +285,7 @@ async function buy(id, ticker, quant, threshold = -1, priority = 0, auto = false
     }
 
     // check if the price is lte threshold, otherwise, don't buy
-    if(price > threshold && threshold != -1) {
+    if (price > threshold && threshold != -1) {
         if (auto && !autoFlag) {
             autoFlag = true
             // updatePriorities(id, priority)
@@ -294,7 +347,7 @@ async function buy(id, ticker, quant, threshold = -1, priority = 0, auto = false
     if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "portfolio was not updated"
 
     // unsure what to return
-    return {"authenticated": true}
+    return { "authenticated": true }
     // return `Bought ${quant} stocks of ${ticker}.`;
     // return retId
 }
@@ -341,7 +394,7 @@ async function sell(id, ticker, quant, threshold = -1, auto = false, interval = 
     const price = await api.price(ticker, interval)
 
     // if auto, check if price is less than threshold
-    if(price < threshold && threshold != -1) {
+    if (price < threshold && threshold != -1) {
         if (auto && !autoFlag) {
             autoFlag = true
             // updatePriorities(id, priority)
@@ -407,16 +460,16 @@ void async function autoTrade() {
     const ports = await portfolios().find({ "awaitingTrades": { $ne: [] } }).project({ _id: 1, awaitingTrades: 1 }).toArray()
     // check if there are any awaiting trades
     let leftover = false
-    if(ports.length) {
+    if (ports.length) {
         // go through each portfolio
         const buys = []
-        for(let i=0; i<ports.length; i++) {
+        for (let i = 0; i < ports.length; i++) {
             // go through each awaiting trade
             let portfolio = ports[i]
             let awaitingTrades = portfolio["awaitingTrades"]
-            for(let j=0; j<awaitingTrades.length; j++) {
+            for (let j = 0; j < awaitingTrades.length; j++) {
                 // check for type
-                if(awaitingTrades[j]["type"]=="sell") { // attempt to execute immediately
+                if (awaitingTrades[j]["type"] == "sell") { // attempt to execute immediately
                     try {
                         await sell(portfolio["_id"], awaitingTrades[j]["ticker"], awaitingTrades[j]["quantity"], threshold = awaitingTrades[j]["pps_threshold"], auto = false)
                     } catch { // unable to sell
@@ -427,12 +480,12 @@ void async function autoTrade() {
                     awaitingTrades = awaitingTrades.splice(j, 1)
                 } else { // store in buys based on priority
                     let k = 0
-                    while(k<buys.length && buys[k]["priority"]<awaitingTrades[j]["priority"]) k++
+                    while (k < buys.length && buys[k]["priority"] < awaitingTrades[j]["priority"]) k++
                     buys.splice(k, 0, [j, awaitingTrades[j]])
                 }
             }
             // execute all buys
-            for(let j=0; j<buys.length; j++) {
+            for (let j = 0; j < buys.length; j++) {
                 let buyTrade = buys[j][1]
                 try {
                     await buy(portfolio["_id"], buyTrade["ticker"], buyTrade["quantity"], threshold = buyTrade["pps_threshold"], auto = false)
@@ -444,12 +497,12 @@ void async function autoTrade() {
                 awaitingTrades.splice(buys[j][0], 1)
             }
             // update portfolio
-            await portfolios().updateOne({ _id: portfolio["_id"] }, { $set: {"awaitingTrades": awaitingTrades}})
+            await portfolios().updateOne({ _id: portfolio["_id"] }, { $set: { "awaitingTrades": awaitingTrades } })
         }
     }
 
     // if there are leftover awaiting trades, set timeout
-    if(leftover) {
+    if (leftover) {
         setTimeout(autoTrade(), (autoInterval * 60 * 1000))
     } else {
         awaiting = false
