@@ -71,5 +71,18 @@
         <button id="submit_trade_btn" type="submit"> Submit Trade </button>
     </form>
 
-    
+    {{#if trade_info}}
+        <p class="trade_confirmation">
+            {{trade_conf_msg trade_info}}
+        </p>
+    {{/if}}
+    <p> THIS IS A TEST! </p>
+
+{{!-- auth: true,
+ticker: "aapl",
+type: "sell",
+quantity: 100,
+cost: 5000, --}}
+{{!-- mode: "manual" --}}
+
 </main>
