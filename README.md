@@ -10,10 +10,11 @@ Ella Crabtree, Aughdon Breslin, Christian Bautista, Ankit Patel
 ## GitHub URL: [https://github.com/AughdonBreslin/StockMarketSim](https://github.com/AughdonBreslin/StockMarketSim)
 
 ## Setup
-Our project uses a number of dependencies, listed below. In order to start the project, first do 'npm i <package>'.
+Our project uses a number of dependencies, listed below. In order to start the project, do `npm i <package>` for every package listed below.
 
 "dependencies": {
     "axios": "^0.26.1",
+    
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
     "chart.js": "^3.7.1",
