@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const validation = require('../../validation');
 const data = require('../../data');
-const userData = data.users;
+
+const stockPortfolio = require('../../data/stockPortfolio');
+const users = require('../../data/users');
 
 // GET /positions
 router.get('/', async (req, res) => {
@@ -10,30 +12,34 @@ router.get('/', async (req, res) => {
         try {
             /* Get user_id from their username */
             /* username must be unique */
-            const userId = await data.users.getUserIdFromUsername(req.session.username);
-
-            // uncomment this 
-            // const stk_prt = await data.stockPortfolio.getSP(userId);
-            // const stocks = stk_prt.stocks;
+            let userID = await users.getUserIdFromUsername(req.session.username);
+            userID = userID.toString();
+            console.log(`User ${userID} went to home page.`);
+            portfolio = await stockPortfolio.getSP(req.session.stockPortId, userID);
+            let stocks = portfolio.stocks;
 
             // For testing comment this later:
-            const stocks = [ /* store stocks as nested array */
-                ["GOOG", 10], /* min: 0. max: Number.MAX_SAFE_INTEGER - 1 */
-                ["TSLA", 5],
-                ["AAPL", 1],
-                ["AMZN", 100]
-            ];
+
+            // [ /* store stocks as nested array */
+            //     ["GOOG", 10], /* min: 0. max: Number.MAX_SAFE_INTEGER - 1 */
+            //     ["TSLA", 5],
+            //     ["AAPL", 1],
+            //     ["AMZN", 100]
+            // ];
 
             // throw "test message";
             res.render('../views/homePages/positions.handlebars',
                 {
-                    title: 'Positions', user: 'TODO', stocks: stocks
+                    title: 'Positions',
+                    user: req.session.username,
+                    stocks: stocks
                 }
             );
         } catch (error) {
             res.render('additional/error.handlebars',
                 {
-                    title: 'Error', errorMessage: error.toString()
+                    title: 'Error',
+                    errorMessage: error.toString()
                 }
             );
         }
