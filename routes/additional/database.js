@@ -1,17 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const validation = require('../../validation');
-const data = require('../../data');
 const { response } = require('express');
-const userData = data.users;
-const portData = data.portfolios;
+const xss = require('xss');
 
 const stockPortfolio = require('../../data/stockPortfolio');
 const users = require('../../data/users');
 
 // POST /database page
 router.post('/', async (req, res) => {
-    let portBal = req.body.portBal;
+    let portBal = xss(req.body.portBal);
     let portfolio = {}
     try {
         userID = await users.getUserIdFromUsername(req.session.username);

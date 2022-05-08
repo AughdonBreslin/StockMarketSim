@@ -62,7 +62,7 @@ router.post('/', async (req, res) => {
 });
 
 router.get('/reset', async (req, res) => {
-    res.render('homePages/reset.handlebars',
+    res.render('additional/reset.handlebars',
     {title: 'Reset Portfolio', error: ''});
 });
 

@@ -2,7 +2,7 @@
 <div class='logoutPopup' id="logoutCheck">
     <h1>Are you sure?</h1>
     <a href='/logout' id="continueButton">Continue</a>
-    <a href='/' id="cancelButton">Cancel</a>
+    <a href='/trade' id="cancelButton">Cancel</a>
 </div>
 <main>
     <nav>
@@ -14,6 +14,62 @@
     </nav>
     <p>Make a Trade:</p>
 
+    <form id="tradeForm" action="">
+        <label for="ticker_input"> Stock Symbol/Ticker: </label>
+        <input id="ticker_input" type="text" required> 
+        <!-- no space. capital letters. must be a valid ticker -->
+        <br>
+
+        <label for="quantity"> Quantity: </label>
+        <input type="number" id="quantity" name="quantity" min="1" step="1" required>
+        <!-- 
+            if sell: quantity owned must be >= than quantity selected
+            if buy: check if the user can afford to buy.
+        -->
+        <br>
+
+
+        <label for="buy"> Buy </label>
+        <input type="radio" id="buy" name="trans-option" value="buy" required>
+
+        <label for="sell"> Sell </label>
+        <input type="radio" id="sell" name="trans-option" value="sell">
+        <!-- 
+            if sell: quantity owned must be >= than quantity selected
+            if buy: check if the user can afford to buy.
+        -->
+        <br>
+
+
+        <label for="automated"> Automated </label>
+        <input type="radio" id="automated" name="trans-mode" value="automated" required>
+
+        <label for="manual"> Manual </label>
+        <input type="radio" id="manual" name="trans-mode" value="manual" checked="checked">
+        <!-- 
+            if automated: ask for threshold. And if 'buying' ask for priority level
+            if manual: User allow the user to submit the form
+        -->
+        <br>
+
+
+        <label for="threshold" id="threshold_lbl" hidden> Share Price Threshold </label>
+        <input type="number" id="threshold" name="threshold-name" step="0.01" hidden>
+        <!-- disable AND Hide this is not automated.
+            If automated (purchase or sell), then make this input required.
+        -->
+        <br>
+
+
+        <label for="priority" id="priority_lbl" hidden> Priority Level </label>
+        <input type="number" id="priority" name="priority-name" step="1" hidden>
+        <!-- disable AND Hide this if not an automated purchase. 
+            If automated purchase, make this input required.
+        -->
+
+        <br>
+        <button id="submit_trade_btn" type="submit"> Submit Trade </button>
+    </form>
 
     
 </main>
