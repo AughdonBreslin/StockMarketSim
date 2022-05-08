@@ -73,9 +73,9 @@ router.post('/', async (req, res) => {
                 // make the manual trade call HERE
 
                 if (trans_opt == "buy") {
-                    // retval = await transactions.buy(req.session.stockPortId, ticker, quantity);
+                    retval = await transactions.buy(req.session.stockPortId, ticker, quantity, true);
                 } else {
-                    // retval = await transactions.sell(req.session.stockPortId, ticker, quantity);
+                    retval = await transactions.sell(req.session.stockPortId, ticker, quantity, true);
                 }
 
             } else { /* automated - check transaction option */
@@ -101,9 +101,9 @@ router.post('/', async (req, res) => {
                 // make the automated trade call HERE
 
                 if (trans_opt == "buy") {
-                    // retval = await transactions.buy(req.session.stockPortId, ticker, quantity, false, threshold, priority, true);
+                    retval = await transactions.buy(req.session.stockPortId, ticker, quantity, false, threshold, priority, true);
                 } else {
-                    // retval = await transactions.sell(req.session.stockPortId, ticker, quantity, false, threshold, true);
+                    retval = await transactions.sell(req.session.stockPortId, ticker, quantity, false, threshold, true);
                 }
             }
 
@@ -111,14 +111,14 @@ router.post('/', async (req, res) => {
 
             // then, update the activities page? -- this might already be done actually
 
-            retval = {
-                auth: true,
-                ticker: "aapl",
-                type: "sell",
-                quantity: 100,
-                cost: 5000,
-                mode: "manual"
-            };
+            // retval = {
+            //     auth: true,
+            //     ticker: "aapl",
+            //     type: "sell",
+            //     quantity: 100,
+            //     cost: 5000,
+            //     mode: "manual"
+            // };
 
             res.render('homePages/trade.handlebars',
                 { title: 'Trade', user: 'TODO', trade_info: retval });
