@@ -3,7 +3,7 @@ const portfolios = mongoCollections.portfolios;
 const users = mongoCollections.users
 const {ObjectId} = require('mongodb');
 const validation = require('../validation');
-
+const cron = require('node-schedule');
 
 //Create stock portfolio for a user when a user signs up
 /*
@@ -58,7 +58,7 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
         settings: stockSet,
         depositHistory: [],
         awaitingTrades: [],
-        transactions: []        
+        transactions: []
     }
 
     const insertInfo = await stockPortCollection.insertOne(newStockPort);
@@ -67,9 +67,92 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
     // Return acknowledgement
     let stockPortId = insertInfo.insertedId;
     const stockPortAdded = this.getSP(stockPortId.toString().trim(), tUserId);
+    await setAutoDeposit(stockPortId.toString().trim(), tUserId, tAutoDepFreq);
+    // let date = new Date();
+    // console.log(date.getSeconds());
+    // console.log(date.getMinutes());
+    // console.log(date.getHours());
+    // console.log(date.getDay());
+    // console.log(date.getDate());
+
 
     return stockPortAdded;
 
+}
+
+const setAutoDeposit = async function setAutoDeposit(portId, userId, depFreq) {
+    
+    //Check Arguments
+    validation.checkNumOfArgs(arguments, 3, 3);
+
+    //Check stockId
+    validation.checkId(portId, 'Stock Portfolio ID');
+    portId = portId.toString().trim();
+
+    //Check userId
+    validation.checkId(userId, 'User ID');
+    userId = userId.toString().trim();
+
+    //Check depFreq
+    depFreq = validation.checkAutoDepFreq(depFreq);
+
+    let task;
+
+    if (depFreq !== 'none') {
+        depAmt = validation.checkMoneyAmt(depAmt, 'Deposit Amount', false);
+        // let second, minute, hour, dayOfWeek, dayOfMonth;
+
+        let day = new Date();
+        let second = day.getSeconds();
+        let minute = day.getMinutes();
+        let hour = day.getHours();
+        let dayOfWeek = day.getDay();
+        let dayOfMonth = day.getDate();
+
+        if (depFreq === 'daily') {
+
+            task = cron.scheduleJob('* * * */1 * *', async () => {
+                const sp = await getSP(portId, userId);
+                let newBal = sp.balance + sp.settings.automated_deposit_amount;
+                console.log(newBal);
+                await updateCurrentBal(portId, userId, newBal);
+                
+            });
+
+            // setTimeout(async function () {
+            //     const sp = await getSP(portId, userId);
+            //     let newBal = sp.currBal + sp.settings.autoDepAmt;
+            //     await updateCurrentBal(portId, userId, newBal);
+            // }, 24*60*60*1000);
+
+        } else if (depFreq === 'weekly') {
+            task = cron.scheduleJob('* * * * * */1', async () => {
+                const sp = await getSP(portId, userId);
+                let newBal = sp.balance + sp.settings.automated_deposit_amount;
+                console.log(newBal);
+                await updateCurrentBal(portId, userId, newBal);
+                
+            });
+
+        } else if (depFreq === 'monthly') {
+            //This may pose a problem for leap years
+            task = cron.scheduleJob('* * * * */1 *', async () => {
+                const sp = await getSP(portId, userId);
+                let newBal = sp.balance + sp.settings.automated_deposit_amount;
+                console.log(newBal);
+                await updateCurrentBal(portId, userId, newBal);
+                
+            });
+        }
+    } else {
+        task = cron.scheduleJob('*/5 * * * * *', async () => {
+            const sp = await getSP(portId, userId);
+            let newBal = sp.balance + sp.settings.automated_deposit_amount;
+            console.log(newBal);
+            await updateCurrentBal(portId, userId, newBal);
+
+        });
+    }
 }
 
 //Updates portfolio-value field with the current stock portfolio value
@@ -123,6 +206,7 @@ const updateCurrentBal = async function updateCurrentBal(portID, userID, currBal
     userID = userID.trim();
 
     //Checking currBal
+    console.log(currBal);
     currBal = validation.checkMoneyAmt(currBal, "Current Balance", false);
 
     const stockPortCollection = await portfolios();
@@ -139,7 +223,7 @@ const updateCurrentBal = async function updateCurrentBal(portID, userID, currBal
     if (!update.matchedCount && !update.modifiedCount)
        throw 'Updating current portfolio balance failed';
 
-    const stockPortAdded = this.getSP(portID, userID);
+    const stockPortAdded = getSP(portID, userID);
     return stockPortAdded;
 }
 
@@ -211,7 +295,7 @@ const addToAutoPurchases = async function addToAutoPurchases(portID, userID, aut
 
     //Checking userID
     validation.checkId(userID, 'User Id');
-    userId = userID.trim();
+    userID = userID.trim();
 
     //Checking depHistEntry
     validation.checkId(autoPurchaseEntry, 'Auto Purchase ID');
@@ -323,8 +407,14 @@ const removePortfolio = async function removePortfolio(portID, userID) {
     const portCollection = await portfolios();
     if (!portCollection) throw `Error: Could not find port collection`;
 
-    const stockPort = await portCollection.findOneAndDelete({_id: ObjectId(portID), user_id: ObjectId(userID)});
+    let stockPort = await portCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
+    stockPort.settings.autoDepoJob.cancelJob();
+
+    stockPort = await portCollection.findOneAndDelete({_id: ObjectId(portID), user_id: ObjectId(userID)});
     if(!stockPort.value) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
+
+    //scheduledDepTask.destroy();
+    cron.gracefulShutdown();
 
     return `${stockPort.value.name} has been successfully deleted!`;
 }
@@ -351,6 +441,7 @@ const checkStockPortExists = async function checkStockPortExists(userID) {
 
 const getSP = async function getSP(portID, userID) {
 
+    console.log('hello');
     //Checking num of arguments
     validation.checkNumOfArgs(arguments, 2, 2);
 

@@ -71,7 +71,9 @@ const getDepositsOfUser = async function (stockPortfolio_id) {
 
 
 /** add a dep hist elem for a user (fires when $ is deposited into a user's account)
-Note: The function adds only a record of a deposit. It does not change the actual account balance. To change the account balance (stockPortfolio.current-balance), a seperate function should be called in the stockPortfolio subdoc. Return the added deposit record. */
+Note: The function adds only a record of a deposit. It does not change the actual account balance. 
+To change the account balance (stockPortfolio.current-balance), 
+a seperate function should be called in the stockPortfolio subdoc. Return the added deposit record. */
 const addDepositRecord = async function (stockPortfolio_id, dep_amnt, man_or_aut) {
     // error checking
     validation.checkNumOfArgs(arguments, 3, 3);
