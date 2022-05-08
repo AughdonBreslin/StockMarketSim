@@ -31,7 +31,7 @@ const constructorMethod = (app) => {
                     username: req.session.username,
                     percentChange: "TODO",
                     balance: portfolio.balance,
-                    value: "TODO"
+                    value: portfolio.value
                 });
         } else if (req.session.username) {
             res.redirect('/createPortfolio');
