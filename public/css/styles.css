@@ -2,6 +2,12 @@ body {
   font-family: sans-serif;
   background-color: rgb(75, 75, 75);
   color: white;
+  position: relative;
+  min-height: 97.5vh;
+}
+#pageContainer {
+  padding-bottom: 2.5rem;
+
 }
 h1 {
   display: inline-block;
@@ -100,14 +106,15 @@ input {
 #logoutButton {
   position: fixed;
   right: 5px;
+  top: 5px;
 }
 
 .logoutPopup {
   background-color:rgb(75, 75, 75);
   display: none;
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 3px;
+  right: 3px;
   border: 3px solid white;
 }
 
@@ -129,6 +136,7 @@ footer {
   width: 95%;
   padding: 4px 4px;
   border-top: 1px groove white;
+  height: 2.5rem;
 }
 
 

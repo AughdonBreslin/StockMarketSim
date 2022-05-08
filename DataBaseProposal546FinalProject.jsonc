@@ -62,15 +62,15 @@
         {
             "_id": "507f1f77bcf86cd799439011",
         
-            "deposit-amount": 400, /* min: 1 and max: Number.MAX_SAFE_INTEGER - 1 */
-            "manual-or-automated": true, /* false=automated deposite, true=manual */
-            "deposit-date": "<2021-06-12>" /* store as new Date Object */
+            "deposit_amount": 400, /* min: 1 and max: Number.MAX_SAFE_INTEGER - 1 */
+            "manual": true, /* false=automated deposite, true=manual */
+            "deposit_date": "<2021-06-12>" /* store as new Date Object */
         },
         {
             "_id": "507f1f77bcf86cd799439011",
         
             "deposit-amount": 400, /* min: 1 and max: Number.MAX_SAFE_INTEGER - 1 */
-            "manual-or-automated": false, /* false=automated deposite, true=manual */
+            "manual": false, /* false=automated deposite, true=manual */
             "deposit-date": "<2022-02-22>" /* store as new Date Object */
         }
     ],
