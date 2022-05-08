@@ -12,7 +12,8 @@ router.get('/', async (req, res) => {
 
 // POST /signup
 router.post('/', async (req, res) => {
-    const {fullname, email, username, password, emailUpdates} = req.body;
+  console.log('I got to post');
+    const {fullname, email, username, password, portUpdates} = req.body;
     let status = {userInserted: false};
     let error = '';
     
@@ -23,14 +24,14 @@ router.post('/', async (req, res) => {
       if (!fullname) throw `Error: Full name not specified!`
       if (!email) throw `Error: Email address not specified!`
       if (!username || !password) throw `Error: Username and/or password not specified!`
-      if (!emailUpdates) throw `Error: Email Update setting not specified!`
+      if (!portUpdates) throw `Error: Email Update setting not specified!`
 
       //Checking if arguments are of appropriate type
       validation.checkIsProper(fullname, 'string', 'First name');
       validation.checkIsProper(email, 'string', 'Email');
       validation.checkIsProper(username, 'string', 'username');
       validation.checkIsProper(password, 'string', 'password');
-      validation.checkIsProper(emailUpdates, 'string', 'Email updates');
+      validation.checkIsProper(portUpdates, 'string', 'Email updates');
 
       //Trim strings + toLowerCase - Formatting
       let tFullName = fullname.trim();
@@ -43,11 +44,11 @@ router.post('/', async (req, res) => {
 
       let tPassword = password.trim();
     
-      let tEmailUpdates = emailUpdates.trim();
-      tEmailUpdates = tEmailUpdates.toLowerCase();
+      let tPortUpdates = portUpdates.trim();
+      tPortUpdates = tPortUpdates.toLowerCase();
 
       //Check if email update selection is a valid selection
-      if (tEmailUpdates !== 'none' && tEmailUpdates !== 'hourly' && tEmailUpdates !== 'daily' && tEmailUpdates !== 'weekly' && tEmailUpdates !== 'monthly') {
+      if (tPortUpdates !== 'none' && tPortUpdates !== 'daily' && tPortUpdates !== 'weekly' && tPortUpdates !== 'monthly') {
           throw `Error: Not a valid email update option!`;
       }
 
