@@ -3,7 +3,8 @@ const portfolios = mongoCollections.portfolios;
 const users = mongoCollections.users
 const {ObjectId} = require('mongodb');
 const validation = require('../validation');
-
+// const cron = require('node-cron');
+// const { schedule } = require('node-cron');
 
 //Create stock portfolio for a user when a user signs up
 /*
@@ -68,8 +69,76 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
     // Return acknowledgement
     let stockPortId = insertInfo.insertedId;
     const stockPortAdded = this.getSP(stockPortId.toString().trim(), tUserId);
+    await setAutoDeposit(stockPortId.toString().trim(), tUserId, tAutoDepFreq);
+    let date = new Date();
+    console.log(date.getSeconds());
+    console.log(date.getMinutes());
+    console.log(date.getHours());
+    console.log(date.getDay());
+    console.log(date.getDate());
+
 
     return stockPortAdded;
+
+}
+
+const setAutoDeposit = async function setAutoDeposit(portId, userId, depFreq) {
+    
+    //Check Arguments
+    validation.checkNumOfArgs(arguments, 3, 3);
+
+    //Check stockId
+    validation.checkId(portId, 'Stock Portfolio ID');
+    portId = portId.toString().trim();
+
+    //Check userId
+    validation.checkId(userId, 'User ID');
+    userId = userId.toString().trim();
+
+    //Check depFreq
+    depFreq = validation.checkAutoDepFreq(depFreq);
+
+    if (depFreq !== 'none') {
+        depAmt = validation.checkMoneyAmt(depAmt, 'Deposit Amount', false);
+        // let second, minute, hour, dayOfWeek, dayOfMonth;
+
+        let day = new Date();
+        let second = day.getSeconds();
+        let minute = day.getMinutes();
+        let hour = day.getHours();
+        let dayOfWeek = day.getDay();
+        let dayOfMonth = day.getDate();
+
+        if (depFreq === 'daily') {
+            // scheduledDepTask = cron.schedule(`${second} ${minute} ${hour} * * *`, async function() {
+            //     const sp = await getSP(portId, userId);
+            //     let newBal = sp.currBal + sp.settings.autoDepAmt;
+            //     await updateCurrentBal(portId, userId, newBal);
+            // });
+        } else if (depFreq === 'weekly') {
+            // scheduledDepTask = cron.schedule(`${second} ${minute} ${hour} * * ${dayOfWeek}`, async function() {
+            //     const sp = await getSP(portId, userId);
+            //     let newBal = sp.currBal + sp.settings.autoDepAmt;
+            //     await updateCurrentBal(portId, userId, newBal);
+            // });
+
+        } else if (depFreq === 'monthly') {
+            //This may pose a problem for leap years
+            // scheduledDepTask = cron.schedule(`${second} ${minute} ${hour} ${dayOfMonth} * *`, async function() {
+            //     const sp = await getSP(portId, userId);
+            //     let newBal = sp.currBal + sp.settings.autoDepAmt;
+            //     await updateCurrentBal(portId, userId, newBal);
+            // });
+        }
+    } else {
+        // scheduledDepTask = cron.schedule('3 * * * * *', async function() {
+        //     console.log('hello');
+        //     const sp = await getSP(portId, userId);
+        //     let newBal = sp.currBal + sp.settings.autoDepAmt;
+        //     await updateCurrentBal(portId, userId, newBal);
+        //     console.log('hello');
+        // })
+    }
 
 }
 
@@ -295,7 +364,7 @@ const removePortfolio = async function removePortfolio(portID, userID) {
 
     //Checking id
     validation.checkId(portID, 'Stock Portfolio ID');
-    portId = portID.trim();
+    portID = portID.trim();
 
     //Checking userID
     validation.checkId(userID, 'User Id');
@@ -306,6 +375,8 @@ const removePortfolio = async function removePortfolio(portID, userID) {
 
     const stockPort = await portCollection.findOneAndDelete({_id: ObjectId(portID), user_id: ObjectId(userID)});
     if(!stockPort.value) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
+
+    //scheduledDepTask.destroy();
 
     return `${stockPort.value.name} has been successfully deleted!`;
 }
