@@ -1,4 +1,4 @@
-const { ObjectId } = require('mongodb');
+const { ObjectId } = require('mongodb')
 const mongoCollections = require('../config/mongoCollections')
 const portfolios = mongoCollections.portfolios
 // const autoBuys = mongoCollections.autoBuys
@@ -81,45 +81,10 @@ function timeToOpen() {
     return ((hours * 60 * 60) + (minutes * 60) + seconds) * 1000
 }
 
-// getPriorities
-async function getPriorities(id) {
+// getAutoBuySorted
+async function getAutoBuysSorted(id) {
     // validate id
     id = validation.checkId(id, "Stock Portfolio ID")
-
-    // find portfolio using id
-    let portfolio = await portfolios().findOne({ _id: id })
-    if (!portfolio) throw "Stock Portfolio not found"
-
-    // check to see if portfolio has any autoBuys
-    if (!portfolio["autoBuys"]) throw "No autoBuys found" // may just return an empty object instead of throwing an error
-
-    // get all autoBuys from the ids in autoBuys
-    let allAutoBuys = {}
-    for (let i = 0; i < portfolio["autoBuys"].length; i++) {
-        let autoBuy = await autoBuys().findOne({ _id: portfolio["autoBuys"][i] })
-        if (!autoBuy) throw "No autoBuy found"
-        allAutoBuys[autoBuy["_id"]] = autoBuy["priority"]
-    }
-
-    return allAutoBuys
-}
-
-// dupes
-function dupes(arr) {
-    for (let i = 0; i < arr.length - 1; i++) {
-        for (let j = i + 1; j < arr.length; j++) {
-            if (arr[i] == arr[j]) return [i, j]
-        }
-    }
-    return false
-}
-
-// updatePriorities
-// NOTE: Assumes, no more than TWO duplicates
-async function updatePriorities(id, priority) {
-    // validate id and priority
-    id = validation.checkId(id, "Stock Portfolio ID")
-    priority = validation.checkInt(priority, "Priority")
 
     // find portfolio using id
     let portfolio = await portfolios().findOne({ _id: id })
@@ -132,54 +97,71 @@ async function updatePriorities(id, priority) {
     if(!autoBuys) throw "No autoBuys found"
 
     // get all priorities from autoBuys
-    let priorities = []
+    let priorities = autoBuys.map(x => x["priority"])
+
+    // create dictionary of priorities and their corresponding autoBuys
+    let priorityIndex = {}
     for (let i = 0; i < autoBuys.length; i++) {
-        priorities.push(autoBuys[i]["priority"])
+        priorityIndex[priorities[i]] = autoBuys[i]
     }
-    // let priorities = portfolio["autoBuys"].map(x => x["priority"])
 
-    // if there are duplicate priorities, increment the duplicate and run until no duplicates
-    let higher = [] // priorities higher than priority
-    let indices = [] // corresponds to indices in priorities
-    let incremented = [] // 0 if not incremented, 1 if incremented
-    for (let i = 0; i < priorities.length; i++) {
-        if (priorities[i] >= priority) {
-            higher.push(higher)
-            indices.push(i)
-            incremented.push(0)
+    // sort priorities from lowest to highest
+    priorities = priorities.sort((a, b) => a - b)
+
+    // map priorities to autoBuys
+    autoBuys = priorities.map(x => priorityIndex[x])
+
+    // adjust priorities to have intervals of 1
+    for (let i = 0; i < autoBuys.length; i++) {
+        autoBuys[i]["priority"] = (i + 1)
+    }
+
+    // update awaitingTrades
+    let awaitingTrades = portfolio["awaitingTrades"].filter(x => x["type"] != "autoBuy")
+    awaitingTrades = awaitingTrades.concat(autoBuys)
+
+    // update portfolio
+    const updateInfo = await portfolios().updateOne({ _id: id }, { $set: {"awaitingTrades": awaitingTrades} })
+    if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "Portfolio was not updated"
+
+    return autoBuys
+}
+
+// updatePriorities
+async function updatePriorities(id, priority) {
+    // validate id and priority
+    id = validation.checkId(id, "Stock Portfolio ID")
+    priority = validation.checkInt(priority, "Priority")
+
+    // call getAutoBuysSorted
+    let autoBuys = await getAutoBuysSorted(id)
+
+    // check to see if priority is in range of autoBuys
+    if (priority <= autoBuys.length) {
+        // increment all priorities in autoBuys after priority
+        for (let i = priority; i < autoBuys.length; i++) {
+            autoBuys[i]["priority"]++
         }
-    }
-    while (higher.includes(priority)) {
-        higher[higher.indexOf(priority)]++
-        incremented[higher.indexOf(priority)]++
-    }
-    let dupeIndices = dupes(higher)
-    while (dupeIndices) {
-        // update the priority of the older duplicate
-        if (incremented[dupeIndices[0]] < incremented[dupeIndices[1]]) {
-            higher[dupeIndices[0]]++
-            incremented[dupeIndices[0]]++
-        } else { //if(incremented[dupeIndices[1]]<incremented[dupeIndices[0]]) {
-            higher[dupeIndices[1]]++
-            incremented[dupeIndices[1]]++
-        }
-        dupeIndices = dupes(higher)
-    }
 
-    // update autoBuys with new priorities
-    for (let i = 0; i < indices.length; i++) {
-        let autoBuy = await autoBuys().findOne({ _id: portfolio["autoBuys"][indices[i]] })
-        if (!autoBuy) throw "No autoBuy found"
-        autoBuy["priority"] = higher[i]
-        const updateInfo = await autoBuys().updateOne({ _id: autoBuy["_id"] }, autoBuy)
-        if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "autoBuy was not updated"
-    }
+        // get portfolio using id
+        let portfolio = await portfolios().findOne({ _id: id })
+        if (!portfolio) throw "Stock Portfolio not found"
 
+        // update awaitingTrades
+        let awaitingTrades = portfolio["awaitingTrades"].filter(x => x["type"] != "autoBuy")
+        awaitingTrades = awaitingTrades.concat(autoBuys)
+
+        // update portfolio
+        const updateInfo = await portfolios().updateOne({ _id: id }, { $set: {"awaitingTrades": awaitingTrades} })
+        if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "Portfolio was not updated"
+    } else {
+        return autoBuys.length+1
+    }
     return priority
 }
 
 // buy
-async function buy(id, ticker, quant, threshold = -1, priority = 0, auto = false, interval = "1min") {
+async function buy(id, ticker, quant, threshold = -1, priority = -1, auto = false, interval = "1min") {
     id = validation.checkId(id, "Stock Portfolio ID")
     ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
     quant = validation.checkInt(quant, "Quantity")
@@ -264,21 +246,8 @@ async function buy(id, ticker, quant, threshold = -1, priority = 0, auto = false
             "pps": price,
             "date": getDate()
         })
-        /*
-        if (!portfolio["stocks"][ticker]) {
-            portfolio["stocks"][ticker] = quant
-        } else {
-            portfolio["stocks"][ticker] += quant
-        }
-        
-        const tickers = portfolio["stocks"].map(stock => Object.keys(stock)[0])
-        if(tickers.includes(ticker)) {
-            portfolio["stocks"][tickers.indexOf(ticker)][ticker]+=quant
-        } else {
-            portfolio["stocks"].push({ticker:quant})
-        }
-        */
     } else { // if autoFlag, update awaitingTrades field only
+        if (priority < 1) throw "Priority not set properly"
         updatePriorities(id, priority)
         portfolio["awaitingTrades"].push({
             "type": "buy",
@@ -362,13 +331,6 @@ async function sell(id, ticker, quant, threshold = -1, auto = false, interval = 
         portfolio["balance"] += (price * quant)
         portfolio["stocks"][tickers.indexOf(ticker)][1] -= quant
         portfolio["stocks"] = portfolio["stocks"].filter(x => x[1] > 0)
-        /*
-        portfolio["stocks"][ticker] -= quant
-        if (portfolio["stocks"][ticker] == 0) delete portfolio["stocks"][ticker]
-        
-        portfolio["stocks"][ticker]-=quant
-        portfolio["stocks"].filter(stock => stock[Object.keys(stock)[0]]>0)
-        */
         portfolio["transactions"].push({
             "type": "sell",
             "ticker": ticker,
@@ -391,8 +353,8 @@ async function sell(id, ticker, quant, threshold = -1, auto = false, interval = 
     if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "portfolio was not updated"
 
     // unsure what to return
-    return `Sold ${quant} stocks of ${ticker}.`;
-    // return retId /* Return an acknowledgement. */
+    return {"authenticated": true}
+    // return retId 
 }
 
 // autoTrade
@@ -454,61 +416,6 @@ void async function autoTrade() {
     } else {
         awaiting = false
     }
-
-    /*
-    let buyCount = await autoBuys().count()
-    let sellCount = await autoSells().count()
-    if ((buyCount + sellCount) > 0) {
-        const buys = await autoBuys().find().toArray()
-        const sells = await autoSells().find().toArray()
-        for (let j = 0; j < sells.length; j++) {
-            const trade = sells[j]
-            try {
-                await sell(trade["id"], trade["ticker"], trade["quant"], trade["threshold"])
-            } catch (e) {
-                continue
-            }
-            await autoSells().deleteOne({ _id: trade["_id"] })
-        }
-        for (let i = 0; i < buys.length; i++) {
-            const trade = buys[i]
-            try {
-                await buy(trade["id"], trade["ticker"], trade["quant"], trade["threshold"])
-            } catch (e) {
-                continue
-            }
-            await autoBuys().deleteOne({ _id: trade["_id"] })
-        }
-        
-        // const trades = buys.concat(sells) // assumes empty collection will result in an empty array
-        // for(let i=0; i<trades.length; i++) {
-        //     const trade = trades[i]
-        //     if(trade["type"]=="buy") {
-        //         try {
-        //             await buy(trade["ticker"], trade["quantity"], trade["portfolio_id"])
-        //         } catch(e) { // unable to buy, do not delete
-        //             continue
-        //         }
-        //     } else if(trade["type"]=="sell") {
-        //         try {
-        //             await sell(trade["ticker"], trade["quantity"], trade["portfolio_id"])
-        //         } catch(e) { // unable to sell, do not delete
-        //             continue
-        //         }
-        //     }
-        //     await awaitingTrades().deleteOne({_id: trade["_id"]})
-        // }
-    }
-
-    buyCount = await autoBuys().count()
-    sellCount = await autoSells().count()
-    if ((buyCount + sellCount) > 0) {
-        setTimeout(autoTrade(), (autoInterval * 60 * 1000))
-    } else {
-        awaiting = false
-    }
-    return
-    */
 }
 
 // req.session.stockPortId
@@ -519,8 +426,31 @@ void async function autoTrade() {
  * @returns list of transaction objects
  */
 async function getTransactions(ids) {
+    // validate ids
+    ids = validation.checkArray(ids, "string", "ids")
+    for(let i=0; i<ids.length; i++) {
+        if(!ObjectId.isValid(ids[i])) throw "Invalid id"
+    }
+
+    // get portfolio using session id
+    let portfolio = await portfolios().findOne({ _id: req.session.stockPortId })
+    if (!portfolio) throw "Stock Portfolio not found"
+
+    // get transactions from portfolio
+    let transactions = portfolio["transactions"]
+
+    // filter transactions by ids
+    transactions = transactions.filter(x => ids.includes(x["_id"]))
+
+    // check if all ids are found
+    if(transactions.length != ids.length) throw "One or more ids not found"
+
+    // return transactions
+    return transactions
+
+    /*
     // return ids.map( async (id) => { await transactions().findOne({ _id: id }) } )
-    /* above way is inefficient bc its awaiting at querying/awaiting the collection for every id. */
+    // above way is inefficient bc its awaiting at querying/awaiting the collection for every id. 
 
     // Christian fix pls: -- this throws an error
     // const all_transactions = await transactions();
@@ -540,34 +470,34 @@ async function getTransactions(ids) {
         {
             "_id": "507f1f77bcf86cd799439011",
 
-            "portfolio_id": "507f1f77bcf86cd799439011", /* Each transaction must correspond to a stock-portfolio document */
+            "portfolio_id": "507f1f77bcf86cd799439011", // Each transaction must correspond to a stock-portfolio document 
 
-            "type": "purchase", /* "purchase" or "sell" */
+            "type": "purchase", // "purchase" or "sell" 
             "ticker": "GOOG",
-            "quantity": 1, /* min: 1.  max: Number.MAX_SAFE_INTEGER - 1 */
-            "amount": 900 /* positive number */,
-            "date": new Date(2021, 11, 09) /* store as new Date Object */
+            "quantity": 1, // min: 1.  max: Number.MAX_SAFE_INTEGER - 1 
+            "amount": 900 // positive number ,
+            "date": new Date(2021, 11, 09) // store as new Date Object 
         },
         {
             "_id": "507f1f77bcf86cd799439012",
 
-            "portfolio_id": "507f1f77bcf86cd799439011", /* Each transaction must correspond to a stock-portfolio document */
+            "portfolio_id": "507f1f77bcf86cd799439011", // Each transaction must correspond to a stock-portfolio document 
 
-            "type": "sell", /* "purchase" or "sell" */
+            "type": "sell", // "purchase" or "sell" 
             "ticker": "AAPL",
-            "quantity": 12, /* min: 1.  max: Number.MAX_SAFE_INTEGER - 1 */
-            "amount": 500 /* positive number */,
-            "date": new Date(2022, 1, 14) /* Month is 0-indexed. ie: 1 = February */
+            "quantity": 12, // min: 1.  max: Number.MAX_SAFE_INTEGER - 1 
+            "amount": 500 // positive number ,
+            "date": new Date(2022, 1, 14) // Month is 0-indexed. ie: 1 = February 
         }
     ];
 
     return sample_trans_list;
-
+    */
 }
 
 module.exports = {
     buy,
     sell,
-    getPriorities,
+    getAutoBuysSorted,
     getTransactions
 }
