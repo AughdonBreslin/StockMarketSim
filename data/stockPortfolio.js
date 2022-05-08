@@ -441,7 +441,6 @@ const checkStockPortExists = async function checkStockPortExists(userID) {
 
 const getSP = async function getSP(portID, userID) {
 
-    console.log('hello');
     //Checking num of arguments
     validation.checkNumOfArgs(arguments, 2, 2);
 
