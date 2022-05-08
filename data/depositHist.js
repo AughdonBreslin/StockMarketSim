@@ -100,7 +100,7 @@ const addDepositRecord = async function (stockPortfolio_id, dep_amnt, man_or_aut
     );
 
     // check if query returned the newly created value. If it did, return the item. else error. 
-    if (Object.keys(newDeposit).length === 0) throw `Error: A${man_or_aut ? " manual" : "n automated"} $${dep_amnt} deposit could not be created for stock portfolio ${stockPortfolio_id}. This should NOT happen!`;
+    if (Object.keys(newDeposit).length === 0) throw `Error: A${man_or_aut ? " manual" : "n automated"} ${dep_amnt} deposit could not be created for stock portfolio ${stockPortfolio_id}. This should NOT happen!`;
 
     return newDeposit;
 

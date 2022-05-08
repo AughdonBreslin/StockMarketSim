@@ -22,6 +22,7 @@
         event.preventDefault();
         let portBal = parseInt(portBalance.html());
         let quantVal = parseInt(quantity.val());
+        let optionVal = option.val();
         if(quantVal <= 0) {
             alert("Quantity must be greater than zero.");
         } else {
@@ -38,7 +39,9 @@
                 url: '/database',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                   portBal: portBal
+                    option: optionVal,
+                    portBal: portBal,
+                    quantVal: quantVal
                 })
             };
             $.ajax(requestConfig).then(function (responseMessage) {

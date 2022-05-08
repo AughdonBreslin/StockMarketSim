@@ -43,7 +43,11 @@ const handlebarsInstance = exphbs.create({
 
     /* true=manual deposit, false=automated deposit*/
     isManual: (isManDep) => {
-      return isManDep ? "a manual" : "an automated";
+      return isManDep ? "manually" : "automatically";
+    },
+
+    isDeposit: (isDep) => {
+      return (isDep == "Deposit") ? "deposited" : "withdrawn";
     }
 
   }
