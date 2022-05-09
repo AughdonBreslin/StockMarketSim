@@ -11,6 +11,24 @@
         cancelButton.style.display = "inline-flex";
     });
 
+    $(document).on('click', '.stockLink', (event) => {
+        event.preventDefault();
+
+        console.log(event.target);
+        let requestConfig = {
+            method: 'GET',
+            url: `/positions/${event.target.val}`
+        };
+
+        $.ajax(requestConfig).then(function (response) {
+
+            let canvas = $("<canvas>");
+
+            if (response) {
+                console.log(response);
+            }
+        })
+    });
 
     /* DEPOSIT / WITHDRAW */
     let portBalance = $('#balance'),
@@ -49,4 +67,5 @@
             });
         }
     });
+
   })(window.jQuery);

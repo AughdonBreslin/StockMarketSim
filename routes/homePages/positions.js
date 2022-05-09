@@ -5,6 +5,9 @@ const data = require('../../data');
 
 const stockPortfolio = require('../../data/stockPortfolio');
 const users = require('../../data/users');
+const api = require('../../data/api');
+const xss = require('xss');
+const { response } = require('express');
 
 // GET /positions
 router.get('/', async (req, res) => {
@@ -27,6 +30,7 @@ router.get('/', async (req, res) => {
             //     ["AMZN", 100]
             // ];
 
+
             // throw "test message";
             res.render('../views/homePages/positions.handlebars',
                 {
@@ -48,6 +52,16 @@ router.get('/', async (req, res) => {
     } else {
         res.redirect('/login');
     }
+});
+
+router.get('/:stock', async (req, res) => {
+    console.log('hello');
+    console.log(req.params.stock);
+    const stockTicker = xss(req.params.stock);
+    console.log(stockTicker);
+    const prices = await api.dailyHistory(stockTicker);
+    console.log('hello');
+    res.json(prices);
 });
 
 module.exports = router;

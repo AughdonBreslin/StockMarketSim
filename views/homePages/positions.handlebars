@@ -22,9 +22,13 @@
             {{#each stocks}}
             {{!-- this.[0] is ticker --}}
             {{!-- this.[1] is quantity --}}
-                <li> 
-                  <a> {{this.[1]}} {{plural this.[1] "share" "shares"}} of {{this.[0]}}</a>
-                </li>
+                
+                <a value={{this.[0]}} class='stockLink'> 
+                    <li name={{this.[0]}}>   
+                        {{this.[1]}} {{plural this.[1] "share" "shares"}} of {{this.[0]}} 
+                    </li>
+                </a>
+                
             {{/each}}
             </ul>
         </section>
