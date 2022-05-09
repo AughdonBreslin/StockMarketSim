@@ -108,7 +108,7 @@ const checkUser = async function checkUser(username, password) {
     try {
         match = await bcrypt.compare(passwordHash, hash);
     } catch (e) {
-
+        throw `Error: Could not compare passwords.`;
     }
     // Failure
     if (!match) throw `Error: Either the username or password is invalid.`;
