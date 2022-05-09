@@ -91,7 +91,7 @@ const checkUser = async function checkUser(username, password) {
 
 
     const tUsername = username.trim().toLowerCase();
-    const tPassword = password.trim();
+    const tPassword = password;
 
     const passwordHash = await bcrypt.hash(tPassword, saltRounds);
 
@@ -106,7 +106,7 @@ const checkUser = async function checkUser(username, password) {
     const hash = user.hashedPassword;
     let match = false;
     try {
-        match = bcrypt.compare(passwordHash, hash);
+        match = await bcrypt.compare(passwordHash, hash);
     } catch (e) {
 
     }
@@ -188,8 +188,8 @@ const changePortUpdate = async function changePortUpdate(userId, updateOption) {
     const user = await userCollection.findOne({ _id: ObjectId(newUserId) });
     if (!user) throw `Error: User could not be found!`;
 
-    const updatedUser = await userCollection.findOneAndUpdate({_id: ObjectId(newUserId)}, {$set: {profileUpdates: updateOption}});
-    
+    const updatedUser = await userCollection.findOneAndUpdate({ _id: ObjectId(newUserId) }, { $set: { profileUpdates: updateOption } });
+
     return this.getUser(newUserId);
 }
 
