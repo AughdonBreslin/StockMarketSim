@@ -29,7 +29,7 @@ const constructorMethod = (app) => {
             }
 
             // get previous days' portfolio value and current portfolio value
-            api.updateDailyValues(req.session.stockPortId);
+            await api.updateDailyValues(req.session.stockPortId);
             let prevPVal = portfolio["value"];
             const currPVal = await api.pval(req.session.stockPortId);
             if(portfolio["dailyValues"].length) {
