@@ -5,6 +5,30 @@ const {ObjectId} = require('mongodb');
 const validation = require('../validation');
 const cron = require('node-schedule');
 
+const getSP = async function getSP(portID, userID) {
+
+    //Checking num of arguments
+    validation.checkNumOfArgs(arguments, 2, 2);
+
+    //Checking ids
+    validation.checkIsProper(portID, 'string', 'Stock Portfolio ID');
+    validation.checkId(portID, 'Stock Portfolio Id');
+    portID = portID.trim();
+    
+    validation.checkIsProper(userID, 'string', 'User ID');
+    validation.checkId(userID, 'User Id');
+    userID = userID.trim();
+
+    const stockPortCollection = await portfolios();
+    if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
+
+    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
+    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
+
+    stockPort._id = portID;
+    stockPort.user_id = userID;
+    return stockPort;
+}
 //Create stock portfolio for a user when a user signs up
 /*
 
@@ -21,25 +45,18 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
 
     //Checking userID
     validation.checkId(userID, 'User Id');
-    const tUserId = userID.trim();
-    
+    userID = userID.trim();
     //Checking value
     const tInitialDepo = validation.checkMoneyAmt(initialDeposit, 'Initial Deposit', false);
     const tAutoDepFreq = validation.checkAutoDepFreq(autoDepFreq);
     const tAutoDepAmt = validation.checkMoneyAmt(autoDepAmt, 'Automatic Deposit Amount', false);
     const tMinActBal = validation.checkMoneyAmt(minActBal, 'Minimum Account Balance', false);
-    let tIFOption;
-    if (typeof IFOption === 'string') {
-        tIFOption = validation.checkInsufficientFundOption(IFOption);
-    } else if (typeof IFOption === 'boolean') {
-        tIFOption = IFOption;
-    } else throw `Error: Insufficient Fund Option not of type string or boolean!`;
+    const tIFOption = validation.checkInsufficientFundOption(IFOption);
 
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({user_id: ObjectId(tUserId)});
-    if (stockPort) throw `Error: This user already has a stock portfolio set!`;
+    console.log("MADE IT HERE");
 
     let stockSet = {
         initial_deposit: tInitialDepo,
@@ -50,7 +67,7 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
     }
 
     let newStockPort = {
-        user_id: ObjectId(tUserId),
+        user_id: ObjectId(userID),
         value: tInitialDepo,
         balance: tInitialDepo,
         stocks: [],
@@ -61,56 +78,7 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
         transactions: []
     }
 
-    const insertInfo = await stockPortCollection.insertOne(newStockPort);
-    if (!insertInfo.acknowledged || !insertInfo.insertedId) throw `Error: Could not add new stock portfolio.`;    
-    
-    // Return acknowledgement
-    let stockPortId = insertInfo.insertedId;
-    const stockPortAdded = this.getSP(stockPortId.toString().trim(), tUserId);
-    
-    
-    // AUTO DEPOSITS
-    // const depFreq = stockPort.settings.automated_deposit_freq;
-
-    // let task;
-
-    // if (depFreq !== 'none') {
-    //     if (depFreq === 'daily') {
-
-    //         task = cron.scheduleJob('* * * */1 * *', async () => {
-    //             const sp = await getSP(portId, userId);
-    //             let newBal = sp.balance + sp.settings.automated_deposit_amount;
-    //             console.log(newBal);
-    //             await updateCurrentBal(portId, userId, newBal);
-                
-    //         });
-
-    //         // setTimeout(async function () {
-    //         //     const sp = await getSP(portId, userId);
-    //         //     let newBal = sp.currBal + sp.settings.autoDepAmt;
-    //         //     await updateCurrentBal(portId, userId, newBal);
-    //         // }, 24*60*60*1000);
-
-    //     } else if (depFreq === 'weekly') {
-    //         task = cron.scheduleJob('* * * * * */1', async () => {
-    //             const sp = await getSP(portId, userId);
-    //             let newBal = sp.balance + sp.settings.automated_deposit_amount;
-    //             console.log(newBal);
-    //             await updateCurrentBal(portId, userId, newBal);
-                
-    //         });
-
-    //     } else if (depFreq === 'monthly') {
-    //         //This may pose a problem for leap years
-    //         task = cron.scheduleJob('* * * * */1 *', async () => {
-    //             const sp = await getSP(portId, userId);
-    //             let newBal = sp.balance + sp.settings.automated_deposit_amount;
-    //             console.log(newBal);
-    //             await updateCurrentBal(portId, userId, newBal);
-                
-    //         });
-    //     }
-    // } else {
+    //  else {
     //     task = cron.scheduleJob('*/5 * * * * *', async () => {
     //         const sp = await getSP(portId, userId);
     //         let newBal = sp.balance + sp.settings.automated_deposit_amount;
@@ -119,88 +87,47 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
 
     //     });
     // }    
-    // let date = new Date();
-    // console.log(date.getSeconds());
-    // console.log(date.getMinutes());
-    // console.log(date.getHours());
-    // console.log(date.getDay());
-    // console.log(date.getDate());
 
 
-    return stockPortAdded;
 
-}
-
-const setAutoDeposit = async function setAutoDeposit(portId, userId) {
+    const insertInfo = await stockPortCollection.insertOne(newStockPort);
+    if (!insertInfo.acknowledged || !insertInfo.insertedId) throw `Error: Could not add new stock portfolio.`;    
     
-    //Check Arguments
-    validation.checkNumOfArgs(arguments, 2, 2);
+    // Return acknowledgement
+    let portId = insertInfo.insertedId.toString().trim();
+    let stockPortAdded = await getSP(portId, userID);
+    if(!stockPortAdded) throw `Error: Stock Portfolio not added.`;
 
-    //Check stockId
-    validation.checkId(portId, 'Stock Portfolio ID');
-    portId = portId.toString().trim();
-
-    //Check userId
-    validation.checkId(userId, 'User ID');
-    userId = userId.toString().trim();
-
-    const stockPortCollection = await portfolios();
-    if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
-
-    console.log(portId);
-    console.log(userId);
-    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portId), user_id: ObjectId(userId)});
-    if (!stockPort) throw `Error: This user doesn't have a stock portfolio set!`;
-
-    const depFreq = stockPort.settings.automated_deposit_freq;
-
+    // AUTO DEPOSITS
     let task;
 
-    if (depFreq !== 'none') {
-        if (depFreq === 'daily') {
-
-            task = cron.scheduleJob('* * * */1 * *', async () => {
-                const sp = await getSP(portId, userId);
-                let newBal = sp.balance + sp.settings.automated_deposit_amount;
+    if (tAutoDepFreq !== 'none') {
+        if (tAutoDepFreq === 'daily') {
+            task = cron.scheduleJob('* * 0 * * *', async () => {
+                let newBal = stockPortAdded.balance + stockPortAdded.settings.automated_deposit_amount;
                 console.log(newBal);
-                await updateCurrentBal(portId, userId, newBal);
-                
+                stockPortAdded = await updateCurrentBal(portId, userID, newBal);
+                newBal = stockPortAdded.balance;
+            });
+        } else if (tAutoDepFreq === 'weekly') {
+            task = cron.scheduleJob('* * * * * 1', async () => {
+                let newBal = stockPortAdded.balance + stockPortAdded.settings.automated_deposit_amount;
+                console.log(newBal);
+                stockPortAdded = await updateCurrentBal(portId, userID, newBal);
+                newBal = stockPortAdded.balance;
             });
 
-            // setTimeout(async function () {
-            //     const sp = await getSP(portId, userId);
-            //     let newBal = sp.currBal + sp.settings.autoDepAmt;
-            //     await updateCurrentBal(portId, userId, newBal);
-            // }, 24*60*60*1000);
-
-        } else if (depFreq === 'weekly') {
-            task = cron.scheduleJob('* * * * * */1', async () => {
-                const sp = await getSP(portId, userId);
-                let newBal = sp.balance + sp.settings.automated_deposit_amount;
-                console.log(newBal);
-                await updateCurrentBal(portId, userId, newBal);
-                
-            });
-
-        } else if (depFreq === 'monthly') {
+        } else if (tAutoDepFreq === 'monthly') {
             //This may pose a problem for leap years
-            task = cron.scheduleJob('* * * * */1 *', async () => {
-                const sp = await getSP(portId, userId);
-                let newBal = sp.balance + sp.settings.automated_deposit_amount;
+            task = cron.scheduleJob('* * * 1 * *', async () => {
+                let newBal = stockPortAdded.balance + stockPortAdded.settings.automated_deposit_amount;
                 console.log(newBal);
-                await updateCurrentBal(portId, userId, newBal);
-                
+                stockPortAdded = await updateCurrentBal(portId, userID, newBal);
+                newBal = stockPortAdded.balance;
             });
         }
-    } else {
-        task = cron.scheduleJob('*/5 * * * * *', async () => {
-            const sp = await getSP(portId, userId);
-            let newBal = sp.balance + sp.settings.automated_deposit_amount;
-            console.log(newBal);
-            await updateCurrentBal(portId, userId, newBal);
-
-        });
     }
+    return stockPortAdded;
 }
 
 //Updates portfolio-value field with the current stock portfolio value
@@ -484,30 +411,7 @@ const checkStockPortExists = async function checkStockPortExists(userID) {
     return port;
 }
 
-const getSP = async function getSP(portID, userID) {
 
-    //Checking num of arguments
-    validation.checkNumOfArgs(arguments, 2, 2);
-
-    //Checking ids
-    validation.checkIsProper(portID, 'string', 'Stock Portfolio ID');
-    validation.checkId(portID, 'Stock Portfolio Id');
-    portID = portID.trim();
-    
-    validation.checkIsProper(userID, 'string', 'User ID');
-    validation.checkId(userID, 'User Id');
-    userID = userID.trim();
-
-    const stockPortCollection = await portfolios();
-    if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
-
-    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
-    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
-
-    stockPort._id = portID;
-    stockPort.user_id = userID;
-    return stockPort;
-}
 
 const changePortSettings = async function changeMutableSettings(portID, minAccBal, IFOption) {
     validation.checkNumOfArgs(arguments, 2, 3);
@@ -554,6 +458,5 @@ module.exports = {
     checkStockPortExists,
     getSP,
     changePortSettings,
-    removePortfolio,
-    setAutoDeposit
+    removePortfolio
 }
