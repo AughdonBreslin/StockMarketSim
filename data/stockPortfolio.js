@@ -1,7 +1,7 @@
 const mongoCollections = require('../config/mongoCollections');
 const portfolios = mongoCollections.portfolios;
 const users = mongoCollections.users
-const {ObjectId} = require('mongodb');
+const { ObjectId } = require('mongodb');
 const validation = require('../validation');
 const cron = require('node-schedule');
 
@@ -14,7 +14,7 @@ const getSP = async function getSP(portID, userID) {
     validation.checkIsProper(portID, 'string', 'Stock Portfolio ID');
     validation.checkId(portID, 'Stock Portfolio Id');
     portID = portID.trim();
-    
+
     validation.checkIsProper(userID, 'string', 'User ID');
     validation.checkId(userID, 'User Id');
     userID = userID.trim();
@@ -22,8 +22,8 @@ const getSP = async function getSP(portID, userID) {
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
-    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
+    const stockPort = await stockPortCollection.findOne({ _id: ObjectId(portID), user_id: ObjectId(userID) });
+    if (!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     stockPort._id = portID;
     stockPort.user_id = userID;
@@ -44,8 +44,8 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
     validation.checkNumOfArgs(arguments, 6, 6);
 
     //Checking userID
-    validation.checkId(userID, 'User Id');
-    userID = userID.trim();
+    userID = validation.checkId(userID, 'User Id');
+
     //Checking value
     const tInitialDepo = validation.checkMoneyAmt(initialDeposit, 'Initial Deposit', false);
     const tAutoDepFreq = validation.checkAutoDepFreq(autoDepFreq);
@@ -91,12 +91,12 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
 
 
     const insertInfo = await stockPortCollection.insertOne(newStockPort);
-    if (!insertInfo.acknowledged || !insertInfo.insertedId) throw `Error: Could not add new stock portfolio.`;    
-    
+    if (!insertInfo.acknowledged || !insertInfo.insertedId) throw `Error: Could not add new stock portfolio.`;
+
     // Return acknowledgement
     let portId = insertInfo.insertedId.toString().trim();
     let stockPortAdded = await getSP(portId, userID);
-    if(!stockPortAdded) throw `Error: Stock Portfolio not added.`;
+    if (!stockPortAdded) throw `Error: Stock Portfolio not added.`;
 
     // AUTO DEPOSITS
     let task;
@@ -151,16 +151,16 @@ const updatePVal = async function updatePVal(portID, userID, pVal) {
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
-    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
+    const stockPort = await stockPortCollection.findOne({ _id: ObjectId(portID), user_id: ObjectId(userID) });
+    if (!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
-        {_id: ObjectId(portID)},
-        { $set: {value: pVal} }
+        { _id: ObjectId(portID) },
+        { $set: { value: pVal } }
     );
 
     if (!update.matchedCount && !update.modifiedCount)
-       throw 'Updating portfolio value failed';
+        throw 'Updating portfolio value failed';
 
     const stockPortAdded = this.getSP(portID, userID);
     return stockPortAdded;
@@ -187,16 +187,16 @@ const updateCurrentBal = async function updateCurrentBal(portID, userID, currBal
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
-    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
+    const stockPort = await stockPortCollection.findOne({ _id: ObjectId(portID), user_id: ObjectId(userID) });
+    if (!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
-        {_id: ObjectId(portID)},
-        { $set: {balance: currBal} }
+        { _id: ObjectId(portID) },
+        { $set: { balance: currBal } }
     );
 
     if (!update.matchedCount && !update.modifiedCount)
-       throw 'Updating current portfolio balance failed';
+        throw 'Updating current portfolio balance failed';
 
     const stockPortAdded = getSP(portID, userID);
     return stockPortAdded;
@@ -243,16 +243,16 @@ const addToDepHist = async function addToDepHist(portID, userID, depHistEntry) {
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
-    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
+    const stockPort = await stockPortCollection.findOne({ _id: ObjectId(portID), user_id: ObjectId(userID) });
+    if (!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
-        {_id: ObjectId(portID)},
+        { _id: ObjectId(portID) },
         { $addToSet: { depositHistory: depHistEntry } }
     );
 
     if (!update.matchedCount && !update.modifiedCount)
-       throw 'Adding deposit history id to array failed!';
+        throw 'Adding deposit history id to array failed!';
 
     const stockPortAdded = this.getSP(portID, userID);
     return stockPortAdded;
@@ -279,16 +279,16 @@ const addToAutoPurchases = async function addToAutoPurchases(portID, userID, aut
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
-    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
+    const stockPort = await stockPortCollection.findOne({ _id: ObjectId(portID), user_id: ObjectId(userID) });
+    if (!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
-        {_id: ObjectId(portID)},
+        { _id: ObjectId(portID) },
         { $addToSet: { autoBuys: autoPurchaseEntry } }
     );
 
     if (!update.matchedCount && !update.modifiedCount)
-       throw 'Adding auto buy id to array failed!';
+        throw 'Adding auto buy id to array failed!';
 
     const stockPortAdded = this.getSP(portID, userID);
     return stockPortAdded;
@@ -315,16 +315,16 @@ const addToAutoSell = async function addToAutoSell(portID, userID, autoSellEntry
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
-    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
+    const stockPort = await stockPortCollection.findOne({ _id: ObjectId(portID), user_id: ObjectId(userID) });
+    if (!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
-        {_id: ObjectId(portID)},
+        { _id: ObjectId(portID) },
         { $addToSet: { autoSells: autoSellEntry } }
     );
 
     if (!update.matchedCount && !update.modifiedCount)
-       throw 'Adding auto sell id to array failed!';
+        throw 'Adding auto sell id to array failed!';
 
     const stockPortAdded = this.getSP(portID, userID);
     return stockPortAdded;
@@ -350,16 +350,16 @@ const addToTransactionLog = async function addToTransactionLog(portID, userID, l
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    const stockPort = await stockPortCollection.findOne({_id: ObjectId(portID), user_id: ObjectId(userID)});
-    if(!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
+    const stockPort = await stockPortCollection.findOne({ _id: ObjectId(portID), user_id: ObjectId(userID) });
+    if (!stockPort) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     const update = await stockPortCollection.updateOne(
-        {_id: ObjectId(portID)},
+        { _id: ObjectId(portID) },
         { $addToSet: { transactions: logEntry } }
     );
 
     if (!update.matchedCount && !update.modifiedCount)
-       throw 'Adding auto sell id to array failed!';
+        throw 'Adding auto sell id to array failed!';
 
     const stockPortAdded = this.getSP(portID, userID);
     return stockPortAdded;
@@ -382,8 +382,8 @@ const removePortfolio = async function removePortfolio(portID, userID) {
     const portCollection = await portfolios();
     if (!portCollection) throw `Error: Could not find port collection`;
 
-    stockPort = await portCollection.findOneAndDelete({_id: ObjectId(portID), user_id: ObjectId(userID)});
-    if(!stockPort.value) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
+    stockPort = await portCollection.findOneAndDelete({ _id: ObjectId(portID), user_id: ObjectId(userID) });
+    if (!stockPort.value) throw `Error: User ${userID} does not have a stock portfolio under portID ${portID}!`;
 
     //scheduledDepTask.destroy();
     cron.gracefulShutdown();
@@ -392,7 +392,7 @@ const removePortfolio = async function removePortfolio(portID, userID) {
 }
 
 const checkStockPortExists = async function checkStockPortExists(userID) {
-    
+
     //Checking num of arguments
     validation.checkNumOfArgs(arguments, 1, 1);
 
@@ -402,9 +402,9 @@ const checkStockPortExists = async function checkStockPortExists(userID) {
 
     const portCollection = await portfolios();
     if (!portCollection) throw `Error: Could not find stock portfolio collection.`;
-    const port = await portCollection.findOne({user_id: ObjectId(userID)});
+    const port = await portCollection.findOne({ user_id: ObjectId(userID) });
 
-    if(!port) return port;
+    if (!port) return port;
 
     port._id = port._id.toString();
     port.user_id = port.user_id.toString();
@@ -432,7 +432,7 @@ const changePortSettings = async function changeMutableSettings(portID, minAccBa
     if (!portfolioCollection) throw `Error: Could not find portfolio collection`;
 
     const portfolio = await portfolioCollection.findOne({ _id: ObjectId(portID) });
-    if(!portfolio) throw `Error: Portfolio not found with ID ${portID}.`;
+    if (!portfolio) throw `Error: Portfolio not found with ID ${portID}.`;
 
     let settings = portfolio.settings;
     if (!settings) throw `Error: No settings?`
@@ -442,7 +442,7 @@ const changePortSettings = async function changeMutableSettings(portID, minAccBa
     }
     settings.insufficient_funds_option = IFOption;
 
-    const newPortfolio = await portfolioCollection.findOneAndUpdate({_id: ObjectId(portID)}, {$set: {settings: settings}});
+    const newPortfolio = await portfolioCollection.findOneAndUpdate({ _id: ObjectId(portID) }, { $set: { settings: settings } });
     return newPortfolio;
 }
 

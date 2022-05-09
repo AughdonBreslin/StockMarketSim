@@ -93,7 +93,7 @@ const checkUser = async function checkUser(username, password) {
     const tUsername = username.trim().toLowerCase();
     const tPassword = password;
 
-    const passwordHash = await bcrypt.hash(tPassword, saltRounds);
+    // const passwordHash = await bcrypt.hash(tPassword, saltRounds);
 
     // Get database
     const userCollection = await users();
@@ -106,7 +106,7 @@ const checkUser = async function checkUser(username, password) {
     const hash = user.hashedPassword;
     let match = false;
     try {
-        match = await bcrypt.compare(passwordHash, hash);
+        match = await bcrypt.compare(tPassword, hash);
     } catch (e) {
         throw `Error: Could not compare passwords.`;
     }
@@ -159,6 +159,7 @@ const getUserIdFromUsername = async function getUserIdFromUsername(username) {
     // Get the user_id
     const user = await userCollection.findOne({ username: username }, { _id: 1 });
     if (!user) throw `Error: User could not be found!`;
+    console.log("hello1111");
     user._id = user._id.toString();
 
     return user._id;
