@@ -1,4 +1,7 @@
 const axios = require('axios')
+const { ObjectId } = require('mongodb')
+const mongoCollections = require('../config/mongoCollections')
+const portfolios = mongoCollections.portfolios
 const validation = require('../validation')
 const key = "FN6CRSE4MHKTRH4X"
 
@@ -38,8 +41,30 @@ async function dailyHistory(ticker) {
     return data
 }
 
-// pval(stocks)
-async function pval(stocks) {
+// pval(id)
+async function pval(id) {
+    // validate id
+    id = validation.checkId(id, "Stock Portfolio ID")
+
+    // get the portfolio
+    const portfolioCollection = await portfolios()
+    const portfolio = await portfolioCollection.findOne({_id: ObjectId(id)})
+    if(!portfolio) throw "Portfolio not found"
+    
+    // calculate total value of stocks
+    let total = 0
+    for(let i=0; i<portfolio["stocks"].length; i++) {
+        total += (await price(portfolio["stocks"][i][0]) * portfolio["stocks"][i][1])
+    }
+
+    // update the portfolio
+    portfolio["value"] = portfolio["balance"]+total
+    const updateInfo = await portfolioCollection.updateOne({"_id": ObjectId(id)}, { $set: portfolio })
+    if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"]) throw "Portfolio was not updated"
+
+    return portfolio["value"]
+
+    /*
     // validate stocks
     if(!stocks) throw "No stocks provided"
     if(typeof stocks !== 'object') throw "Stocks is not an object"
@@ -53,6 +78,7 @@ async function pval(stocks) {
     
     console.log("pval: "+total); // debugging purposes only
     return total
+    */
 }
 
 module.exports = {
