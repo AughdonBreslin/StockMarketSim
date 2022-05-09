@@ -23,6 +23,7 @@
     "user_id": "507f1f77bcf86cd799439011", /* Each stock-portfolio must correspond to a user_id */
     
     "value": 15000, /* Combined value of all owned stocks. min: 0. max: Number.MAX_SAFE_INTEGER - 1*/
+    "previousValue": 10000, /* Previous value of the portfolio. Used to calculate the change in value */
     "balance": 19000, /* amount of $ that can be spent min: 0. max: Number.MAX_SAFE_INTEGER - 1 */
 
     /* Do it this way! */
@@ -42,7 +43,7 @@
 
     // "transactions": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of transaction_id"s */
 
-    "dailyValues": [["<YYYY-mm-dd>", 15000], ["<YYYY-mm-dd>", 15000], ["<YYYY-mm-dd>", 15000], ["<YYYY-mm-dd>", 15000], ["<YYYY-mm-dd>", 15000]], /* tracks portfolio value over time -- updated daily. | min: 0. max: Number.MAX_SAFE_INTEGER - 1 */ 
+    // "dailyValues": [["<YYYY-mm-dd>", 15000], ["<YYYY-mm-dd>", 15000], ["<YYYY-mm-dd>", 15000], ["<YYYY-mm-dd>", 15000], ["<YYYY-mm-dd>", 15000]], /* tracks portfolio value over time -- updated daily. | min: 0. max: Number.MAX_SAFE_INTEGER - 1 */ 
     
     "settings": {
         "_id": "507f1f77bcf86cd799439011",        /* Dont need this either */

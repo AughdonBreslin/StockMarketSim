@@ -56,10 +56,12 @@ async function pval(id) {
     // calculate total value of stocks
     let total = 0
     for(let i=0; i<portfolio["stocks"].length; i++) {
-        total += (await price(portfolio["stocks"][i][0]) * portfolio["stocks"][i][1])
+        let pr = await price(portfolio["stocks"][i][0])
+        total += (pr * portfolio["stocks"][i][1])
     }
 
     // update the portfolio
+    portfolio["previousValue"] = portfolio["value"]
     portfolio["value"] = portfolio["balance"]+total
     const updateInfo = await portfolioCollection.updateOne({"_id": ObjectId(id)}, { $set: portfolio })
     if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"]) throw "Portfolio was not updated"
@@ -83,6 +85,7 @@ async function pval(id) {
     */
 }
 
+/*
 // timeToFour
 function timeToFour() {
     let hours = 0
@@ -136,14 +139,15 @@ async function updateDailyValues(id) {
     }
 
     // update the portfolio
-    portfolio["dailyValues"].push([new Date(), await pval(id)])
+    let val = await pval(id)
+    portfolio["dailyValues"].push([new Date(), val])
     const updateInfo = await portfolioCollection.updateOne({"_id": ObjectId(id)}, { $set: portfolio })
     if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "Portfolio was not updated"
 }
+*/
 
 module.exports = {
     price,
     dailyHistory,
-    pval,
-    updateDailyValues
+    pval
 }
