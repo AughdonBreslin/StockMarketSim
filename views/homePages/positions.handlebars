@@ -23,11 +23,11 @@
             {{!-- this.[0] is ticker --}}
             {{!-- this.[1] is quantity --}}
                 
-                <a value={{this.[0]}} class='stockLink'> 
-                    <li name={{this.[0]}}>   
+                <li name={{this.[0]}}>
+                    <a href={{this.[2]}} class='stockLink'>  
                         {{this.[1]}} {{plural this.[1] "share" "shares"}} of {{this.[0]}} 
-                    </li>
-                </a>
+                    </a>
+                </li>
                 
             {{/each}}
             </ul>
@@ -39,9 +39,9 @@
     {{/if}}
 </div>
 
-{{!-- <div>
+<div>
   <canvas id="myChart"></canvas>
-</div> --}}
+</div>
 
   
 </main>

@@ -14,10 +14,10 @@
     $(document).on('click', '.stockLink', (event) => {
         event.preventDefault();
 
-        console.log(event.target);
+        console.log(event.target.href);
         let requestConfig = {
             method: 'GET',
-            url: `/positions/${event.target.val}`
+            url: event.target.href
         };
 
         $.ajax(requestConfig).then(function (response) {
@@ -25,7 +25,33 @@
             let canvas = $("<canvas>");
 
             if (response) {
-                console.log(response);
+                let labels = Object.keys(response["Time Series (Daily)"]);
+                response = Object.values(response["Time Series (Daily)"]);
+
+                const newArray = response.map(entry => Number(entry['4. close']));
+                console.log(newArray);
+
+                let canvas = document.getElementById('myChart');
+                let data = {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Stock History',
+                        backgroundColor: 'rgb(255, 99, 132)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        data: newArray,
+                    }]
+                };
+                
+                const config = {
+                    type: 'line',
+                    data: data,
+                    options: {}
+                };
+
+                const myChart = new Chart(
+                    canvas,
+                    config
+                  );
             }
         })
     });

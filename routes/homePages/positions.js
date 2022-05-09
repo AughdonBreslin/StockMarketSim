@@ -29,7 +29,9 @@ router.get('/', async (req, res) => {
             //     ["AAPL", 1],
             //     ["AMZN", 100]
             // ];
-
+            stocks.forEach( (event) => {
+                event.push(`/positions/${event[0]}`);
+            })
 
             // throw "test message";
             res.render('../views/homePages/positions.handlebars',
