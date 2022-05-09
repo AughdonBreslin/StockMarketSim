@@ -190,7 +190,7 @@ async function updatePriorities(id, priority) {
 }
 
 // buy
-async function buy(id, ticker, quant, bypass = false, threshold = -1, priority = -1, auto = false, interval = "1min") {
+async function buy(id, ticker, quant, bypass = false, warn = true, threshold = -1, priority = -1, auto = false, interval = "1min") {
     id = validation.checkId(id, "Stock Portfolio ID")
     ticker = (validation.checkString(ticker, 1, "Ticker", true, false)).toUpperCase()
     validation.checkInt(quant, "Quantity")
@@ -268,7 +268,9 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
         // create a new transaction
         // retId = await Transaction(id, "buy", ticker, quant, price * quant, getDate())
         // update the portfolio
+        // check for warning bypass
         portfolio["balance"] -= (price * quant)
+        if (warn && portfolio["balance"] < portfolio["settings"]["minimum-account-balance"]) throw "Warning: Account balance below minimum"
         const tickers = portfolio["stocks"].map(x => x[0])
         if (tickers.includes(ticker)) {
             portfolio["stocks"][tickers.indexOf(ticker)][1] += quant
@@ -302,7 +304,22 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
     if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "portfolio was not updated"
 
     // unsure what to return
-    return { "authenticated": true }
+    /*
+    {
+        type: "sell",
+        ticker: "AAPL",
+        quantity: 100,
+        total: 5000,
+        mode: "manual"
+    }
+    */
+    return {
+        "type": "buy",
+        "ticker": ticker,
+        "quantity": quant,
+        "total": price * quant,
+        "mode": auto ? "auto" : "manual"
+    }
     // return `Bought ${quant} stocks of ${ticker}.`;
     // return retId
 }
@@ -439,7 +456,7 @@ async function autoTrade() {
             // exectue all buys
             for (let j = 0; j < buys.length; j++) {
                 try {
-                    await buy(portfolio["_id"].toString(), buys[j]["ticker"], buys[j]["quantity"], false, buys[j]["pps_threshold"], buys[j]["priority"], false)
+                    await buy(portfolio["_id"].toString(), buys[j]["ticker"], buys[j]["quantity"], false, false, buys[j]["pps_threshold"], buys[j]["priority"], false)
                 } catch(e) { // unable to buy
                     console.log(e)
                     leftover = true
