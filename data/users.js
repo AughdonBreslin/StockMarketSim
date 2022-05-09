@@ -93,7 +93,7 @@ const checkUser = async function checkUser(username, password) {
     const tUsername = username.trim().toLowerCase();
     const tPassword = password;
 
-    const passwordHash = await bcrypt.hash(tPassword, saltRounds);
+    // const passwordHash = await bcrypt.hash(tPassword, saltRounds);
 
     // Get database
     const userCollection = await users();
@@ -106,7 +106,7 @@ const checkUser = async function checkUser(username, password) {
     const hash = user.hashedPassword;
     let match = false;
     try {
-        match = await bcrypt.compare(passwordHash, hash);
+        match = await bcrypt.compare(tPassword, hash);
     } catch (e) {
 
     }
