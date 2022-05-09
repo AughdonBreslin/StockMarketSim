@@ -1,38 +1,16 @@
-
-
 const dbConnection = require('../config/mongoConnection');
-const data = require('../data/');
-// const bands = data.bands;
-// const albums = data.albums;
+const stockPortfolio = require('../data/stockPortfolio');
+const users = require('../data/users');
 
-async function main() {
-
-    console.log('Seeding...');
-    const db = await dbConnection.dbConnection();
+const main = async () => {
+    const db = await dbConnection.connectToDb();
     await db.dropDatabase();
 
-
-    // variables:
-    // let band1;
-
-    // Create band 1
-    // try {
-    //     band1 = await bands.create(
-    //         'Band A',
-    //         ['genre A', 'genre B'],
-    //         'http://www.band1website.com',
-    //         'recordLabel',
-    //         ['Member A', 'Member B', 'Member C'],
-    //         2018
-    //     );
-    //     band1_id = band1._id.toString();
-    // } catch (e) {
-    //     console.log(e);
-    // }
-
-
+    let newUser = await users.createUser("Bebo", "banana@gmail.com", "bebo", "banana", "none");
+    // Don't need to create portfolio, happens upon signup
+    
     console.log('Done seeding database');
     await dbConnection.closeConnection();
-}
+};
 
-main();
+main().catch(console.log);
