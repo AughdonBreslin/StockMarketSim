@@ -270,7 +270,7 @@ async function buy(id, ticker, quant, bypass = false, warn = true, threshold = -
         // update the portfolio
         // check for warning bypass
         portfolio["balance"] -= (price * quant)
-        if (warn && portfolio["balance"] < portfolio["settings"]["minimum-account-balance"]) throw "Warning: Account balance below minimum"
+        if (warn && portfolio["balance"] < portfolio["settings"]["minimum-account-balance"]) return {"warning": true}
         const tickers = portfolio["stocks"].map(x => x[0])
         if (tickers.includes(ticker)) {
             portfolio["stocks"][tickers.indexOf(ticker)][1] += quant
@@ -412,7 +412,13 @@ async function sell(id, ticker, quant, bypass = false, threshold = -1, auto = fa
     if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "portfolio was not updated"
 
     // unsure what to return
-    return { "authenticated": true }
+    return {
+        "type": "sell",
+        "ticker": ticker,
+        "quantity": quant,
+        "total": price * quant,
+        "mode": auto ? "auto" : "manual"
+    }
     // return retId 
 }
 
