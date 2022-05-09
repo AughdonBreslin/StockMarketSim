@@ -123,14 +123,16 @@ async function updateDailyValues(id) {
     const portfolio = await portfolioCollection.findOne({_id: ObjectId(id)})
     if(!portfolio) throw "Portfolio not found"
 
-    // get most recent DailyValue
-    const latest = portfolio["dailyValues"][portfolio["dailyValues"].length-1][0]
-    
-    // check if day, month, and year are the same
-    const date = new Date()
-    if(!awaiting && latest.getDate() === date.getDate() && latest.getMonth() === date.getMonth() && latest.getFullYear() === date.getFullYear()) {
-        awaiting = true
-        setTimeout(function() {updateDailyValues(id)}, timeToFour())
+    if (portfolio["dailyValues"].length) {
+        // get most recent DailyValue
+        const latest = portfolio["dailyValues"][portfolio["dailyValues"].length-1][0]
+        
+        // check if day, month, and year are the same
+        const date = new Date()
+        if(!awaiting && latest.getDate() === date.getDate() && latest.getMonth() === date.getMonth() && latest.getFullYear() === date.getFullYear()) {
+            awaiting = true
+            setTimeout(function() {updateDailyValues(id)}, timeToFour())
+        }
     }
 
     // update the portfolio

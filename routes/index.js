@@ -30,8 +30,11 @@ const constructorMethod = (app) => {
 
             // get previous days' portfolio value and current portfolio value
             api.updateDailyValues(req.session.stockPortId);
-            const prevPVal = portfolio["dailyValues"][portfolio["dailyValues"].length-1][1];
-            const currPVal = api.pval(req.session.stockPortId);
+            let prevPVal = portfolio["value"];
+            const currPVal = await api.pval(req.session.stockPortId);
+            if(portfolio["dailyValues"].length) {
+                prevPVal = portfolio["dailyValues"][portfolio["dailyValues"].length-1][1];
+            }
             let percent = ((currPVal - prevPVal) / prevPVal) * 100;
             percent = percent.toFixed(2);
             
