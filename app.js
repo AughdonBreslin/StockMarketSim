@@ -23,7 +23,7 @@ const handlebarsInstance = exphbs.create({
 
     // map transaction types to words. 'Purchase' = 'bought' and 'sell' = 'sold'
     action: (type) => {
-      return type == "purchase" ? "bought" : "sold";
+      return type == "buy" ? "bought" : "sold";
     },
 
     // If value == 1, return the singular form. Else return the plural form

@@ -67,7 +67,58 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
     // Return acknowledgement
     let stockPortId = insertInfo.insertedId;
     const stockPortAdded = this.getSP(stockPortId.toString().trim(), tUserId);
-    await setAutoDeposit(stockPortId.toString().trim(), tUserId);
+    
+    
+    // AUTO DEPOSITS
+    // const depFreq = stockPort.settings.automated_deposit_freq;
+
+    // let task;
+
+    // if (depFreq !== 'none') {
+    //     if (depFreq === 'daily') {
+
+    //         task = cron.scheduleJob('* * * */1 * *', async () => {
+    //             const sp = await getSP(portId, userId);
+    //             let newBal = sp.balance + sp.settings.automated_deposit_amount;
+    //             console.log(newBal);
+    //             await updateCurrentBal(portId, userId, newBal);
+                
+    //         });
+
+    //         // setTimeout(async function () {
+    //         //     const sp = await getSP(portId, userId);
+    //         //     let newBal = sp.currBal + sp.settings.autoDepAmt;
+    //         //     await updateCurrentBal(portId, userId, newBal);
+    //         // }, 24*60*60*1000);
+
+    //     } else if (depFreq === 'weekly') {
+    //         task = cron.scheduleJob('* * * * * */1', async () => {
+    //             const sp = await getSP(portId, userId);
+    //             let newBal = sp.balance + sp.settings.automated_deposit_amount;
+    //             console.log(newBal);
+    //             await updateCurrentBal(portId, userId, newBal);
+                
+    //         });
+
+    //     } else if (depFreq === 'monthly') {
+    //         //This may pose a problem for leap years
+    //         task = cron.scheduleJob('* * * * */1 *', async () => {
+    //             const sp = await getSP(portId, userId);
+    //             let newBal = sp.balance + sp.settings.automated_deposit_amount;
+    //             console.log(newBal);
+    //             await updateCurrentBal(portId, userId, newBal);
+                
+    //         });
+    //     }
+    // } else {
+    //     task = cron.scheduleJob('*/5 * * * * *', async () => {
+    //         const sp = await getSP(portId, userId);
+    //         let newBal = sp.balance + sp.settings.automated_deposit_amount;
+    //         console.log(newBal);
+    //         await updateCurrentBal(portId, userId, newBal);
+
+    //     });
+    // }    
     // let date = new Date();
     // console.log(date.getSeconds());
     // console.log(date.getMinutes());

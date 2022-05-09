@@ -53,7 +53,6 @@ router.post('/', async (req, res) => {
       status._id = status._id.toString();
       status.user_id = status.user_id.toString();
       req.session.stockPortId = status._id;
-      await stockPortData.setAutoDeposit(status.user_id, status._id);
   
     } catch (e) {
       error = e;
