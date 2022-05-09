@@ -228,23 +228,8 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
 
     // get the stock price from the api
     const price = await api.price(ticker, interval)
-    // check if user has enough money to buy quant amount of stock
-    // if auto, don't throw an error add to awaitingTrades subCollection, set awaiting to true
-    if ((price * quant) > portfolio["balance"]) {
-        if (!autoFlag && auto) {
-            autoFlag = true
-            // updatePriorities(id, priority)
-            // retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
-            if (!awaiting) {
-                awaiting = true
-                setTimeout(function() {autoTrade()}, (autoInterval * 60 * 1000))
-            }
-        } else if (!auto) {
-            throw "Insufficient Funds"
-        }
-    }
 
-    // check if the price is lte threshold, otherwise, don't buy
+    // check if the price is lte threshold, otherwise, don't buy 
     if (price > threshold && threshold != -1) {
         if (auto && !autoFlag) {
             autoFlag = true
@@ -256,6 +241,26 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
             }
         } else if (!auto) {
             throw "Threshold not met"
+        }
+    }
+
+    // check if user has enough money to buy quant amount of stock
+    // if auto, don't throw an error add to awaitingTrades subCollection, set awaiting to true
+    if ((price * quant) > portfolio["balance"]) {
+        // check insufficient-funds-option setting in portfolio settings
+        const opt = portfolio["settings"]["insufficient-funds-option"]
+        if (!autoFlag && auto && !opt) {
+            autoFlag = true
+            // updatePriorities(id, priority)
+            // retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
+            if (!awaiting) {
+                awaiting = true
+                setTimeout(function() {autoTrade()}, (autoInterval * 60 * 1000))
+            }
+        } else if (!auto) {
+            throw "Insufficient Funds"
+        } else { // if opt, buy as many shares as affordable
+            quant = Math.floor(portfolio["balance"] / price)
         }
     }
 
