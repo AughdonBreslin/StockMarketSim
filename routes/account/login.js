@@ -43,7 +43,6 @@ router.post('/', async (req, res) => {
         return res.redirect('/createPortfolio');
       } else {
         req.session.stockPortId = stockPort._id;
-        await stockPortData.setAutoDeposit(stockPort._id.toString(), status.user._id.toString());
       }
       
     } catch (e) {
