@@ -23,7 +23,7 @@ const constructorMethod = (app) => {
                 userID = await users.getUserIdFromUsername(req.session.username);
                 userID = userID.toString();
                 console.log(`User ${userID} went to home page.`);
-                let dummyVal = await api.pval(req.session.stockPortId)
+                // let dummyVal = await api.pval(req.session.stockPortId)
                 portfolio = await stockPortfolio.getSP(req.session.stockPortId, userID);
             } catch (e) {
                 console.log(e);
