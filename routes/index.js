@@ -31,16 +31,12 @@ const constructorMethod = (app) => {
 
             // get previous days' portfolio value and current portfolio value
             // await api.updateDailyValues(req.session.stockPortId);
-            // let prevPVal = portfolio["value"];
-            // const currPVal = await api.pval(req.session.stockPortId);
-            // if(portfolio["dailyValues"].length) {
-            //     prevPVal = portfolio["dailyValues"][portfolio["dailyValues"].length-1][1];
-            // }
-            // let percent = ((currPVal - prevPVal) / prevPVal) * 100;
-            // percent = percent.toFixed(2);
-            let currVal = portfolio["value"];
-            let prevVal = portfolio["previousValue"];
-            let percent = ((currVal - prevVal) / prevVal) * 100;
+            let prevPVal = portfolio["value"];
+            const currPVal = await api.pval(req.session.stockPortId);
+            if(portfolio["dailyValues"].length) {
+                prevPVal = portfolio["dailyValues"][portfolio["dailyValues"].length-1][1];
+            }
+            let percent = ((currPVal - prevPVal) / prevPVal) * 100;
             percent = percent.toFixed(2);
             
             res.render('homePages/home.handlebars',

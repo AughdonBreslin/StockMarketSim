@@ -285,6 +285,7 @@ async function buy(id, ticker, quant, bypass = false, warn = true, threshold = -
             "pps": price,
             "date": new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
         })
+        await api.pval(id)
     } else { // if autoFlag, update awaitingTrades field only
         if (priority < 1) throw "Priority not set properly"
         priority = await updatePriorities(id, priority)
@@ -396,6 +397,7 @@ async function sell(id, ticker, quant, bypass = false, threshold = -1, auto = fa
             "pps": price,
             "date": new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
         })
+        await api.pval(id)
     } else { // if autoFlag, update awaitingTrades field only
         portfolio["awaitingTrades"].push({
             "_id": new ObjectId(),

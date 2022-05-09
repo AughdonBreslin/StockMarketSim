@@ -56,8 +56,6 @@ const createPortfolio = async function createPortfolio(userID, initialDeposit, a
     const stockPortCollection = await portfolios();
     if (!stockPortCollection) throw `Error: Could not find stock settings collection`;
 
-    console.log("MADE IT HERE");
-
     let stockSet = {
         initial_deposit: tInitialDepo,
         automated_deposit_freq: tAutoDepFreq,
