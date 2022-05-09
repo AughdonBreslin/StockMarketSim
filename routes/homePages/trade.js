@@ -88,7 +88,7 @@ router.post('/', async (req, res) => {
                 console.log("threshold=" + threshold);
 
                 if (threshold < 0) {
-                    throw `Error: The threshold price must be a postive amount`;
+                    throw `Error: The threshold price must be a positive amount`;
                 }
 
                 // if buy parse priority

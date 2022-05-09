@@ -42,7 +42,7 @@
       {{#each transactions}}
           <article>
             <p>
-              On {{this.date}}, you {{action this.type}} {{this.quantity}} {{plural this.quantity "share" "shares"}} of {{this.ticker}} for ${{this.amount}} each, for a total transaction amount of ${{multiply this.amount this.quantity}}.
+              On {{this.date}}, you {{action this.type}} {{this.quantity}} {{plural this.quantity "share" "shares"}} of {{this.ticker}} for ${{this.pps}} each, for a total transaction amount of ${{multiply this.pps this.quantity}}.
             </p>
           </article>
       {{/each}}
