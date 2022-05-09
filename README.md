@@ -11,7 +11,7 @@ Ella Crabtree, Aughdon Breslin, Christian Bautista, Ankit Patel
 ## Setup:
 Our project uses a number of dependencies, listed below. In order to start the project, do `npm i <package>` for every package listed below.
 ```
-"dependencies": {
+  "dependencies": {
     "axios": "^0.26.1",
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
@@ -23,8 +23,12 @@ Our project uses a number of dependencies, listed below. In order to start the p
     "modules": "^0.4.0",
     "mongod": "^2.0.0",
     "mongodb": "^4.5.0",
+    "node-cron": "^3.0.0",
+    "node-schedule": "^2.1.0",
     "xss": "^1.0.11"
-}
+  }
 ```
 
-After this, simply do `npm start` to launch the server, and then navigate to `http://localhost:3000/` on your web browser.
+After this, simply do `npm start` to launch the server, and then navigate to `http://localhost:3000/` on your web browser. 
+
+If you would instead like to run the seed file, do `npm run seed` and you can work with the new user Bebo. His password is 'banana'. He does not have a portfolio yet, so upon login, you will be prompted to configure the settings of your portfolio.
