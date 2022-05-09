@@ -32,3 +32,5 @@ Our project uses a number of dependencies, listed below. In order to start the p
 After this, simply do `npm start` to launch the server, and then navigate to `http://localhost:3000/` on your web browser. 
 
 If you would instead like to run the seed file, do `npm run seed` and you can work with the new user Bebo. His password is 'banana'. He does not have a portfolio yet, so upon login, you will be prompted to configure the settings of your portfolio.
+
+NOTE: When using the website, please refrain from "rapid-clicking" as there have been error occurrences due to unfulfilled promises. I recommend giving about 2 seconds between clicks and waiting for the page to fully load/respond.
