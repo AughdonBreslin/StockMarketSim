@@ -26,7 +26,6 @@ async function price(ticker, interval="1min") {
     const mostRecent = prices[Object.keys(prices)[0]]
     
     // return the price
-    // console.log(`${ticker}: `+Number(mostRecent["4. close"])) // debugging purposes only
     return Number(mostRecent["4. close"])
 }
 
