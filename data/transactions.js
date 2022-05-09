@@ -228,23 +228,8 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
 
     // get the stock price from the api
     const price = await api.price(ticker, interval)
-    // check if user has enough money to buy quant amount of stock
-    // if auto, don't throw an error add to awaitingTrades subCollection, set awaiting to true
-    if ((price * quant) > portfolio["balance"]) {
-        if (!autoFlag && auto) {
-            autoFlag = true
-            // updatePriorities(id, priority)
-            // retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
-            if (!awaiting) {
-                awaiting = true
-                setTimeout(function() {autoTrade()}, (autoInterval * 60 * 1000))
-            }
-        } else {
-            throw "Insufficient Funds"
-        }
-    }
 
-    // check if the price is lte threshold, otherwise, don't buy
+    // check if the price is lte threshold, otherwise, don't buy 
     if (price > threshold && threshold != -1) {
         if (auto && !autoFlag) {
             autoFlag = true
@@ -256,6 +241,26 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
             }
         } else if (!auto) {
             throw "Threshold not met"
+        }
+    }
+
+    // check if user has enough money to buy quant amount of stock
+    // if auto, don't throw an error add to awaitingTrades subCollection, set awaiting to true
+    if ((price * quant) > portfolio["balance"]) {
+        // check insufficient-funds-option setting in portfolio settings
+        const opt = portfolio["settings"]["insufficient-funds-option"]
+        if (!autoFlag && auto && !opt) {
+            autoFlag = true
+            // updatePriorities(id, priority)
+            // retId = await AwaitingTrade(id, "buy", ticker, quant, threshold)
+            if (!awaiting) {
+                awaiting = true
+                setTimeout(function() {autoTrade()}, (autoInterval * 60 * 1000))
+            }
+        } else if (!auto) {
+            throw "Insufficient Funds"
+        } else { // if opt, buy as many shares as affordable
+            quant = Math.floor(portfolio["balance"] / price)
         }
     }
 
@@ -271,6 +276,7 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
             portfolio["stocks"].push([ticker, quant])
         }
         portfolio["transactions"].push({
+            "_id": new ObjectId(),
             "type": "buy",
             "ticker": ticker,
             "quantity": quant,
@@ -282,6 +288,7 @@ async function buy(id, ticker, quant, bypass = false, threshold = -1, priority =
         priority = await updatePriorities(id, priority)
         portfolio = await portfolioCollection.findOne({"_id": ObjectId(id)})
         portfolio["awaitingTrades"].push({
+            "_id": new ObjectId(),
             "type": "buy",
             "ticker": ticker,
             "quantity": quant,
@@ -365,6 +372,7 @@ async function sell(id, ticker, quant, bypass = false, threshold = -1, auto = fa
         portfolio["stocks"][tickers.indexOf(ticker)][1] -= quant
         portfolio["stocks"] = portfolio["stocks"].filter(x => x[1] > 0)
         portfolio["transactions"].push({
+            "_id": new ObjectId(),
             "type": "sell",
             "ticker": ticker,
             "quantity": quant,
@@ -373,6 +381,7 @@ async function sell(id, ticker, quant, bypass = false, threshold = -1, auto = fa
         })
     } else { // if autoFlag, update awaitingTrades field only
         portfolio["awaitingTrades"].push({
+            "_id": new ObjectId(),
             "type": "sell",
             "ticker": ticker,
             "quantity": quant,
@@ -405,16 +414,52 @@ async function autoTrade() {
     let leftover = false
     if (ports.length) {
         // go through each portfolio
-        const buys = []
+        let buys = []
+        let sells = []
         for (let i = 0; i < ports.length; i++) {
-            // go through each awaiting trade
+            // get the portfolio and awaitingTrades
             let portfolio = ports[i]
             let awaitingTrades = portfolio["awaitingTrades"]
+            // split awaitingTrades into buys and sells
+            sells = awaitingTrades.filter(x => x["type"] == "sell")
+            buys = await getAutoBuysSorted(portfolio["_id"].toString())
+            // execute all sells first
+            for (let j = 0; j < sells.length; j++) {
+                try {
+                    await sell(portfolio["_id"].toString(), sells[j]["ticker"], sells[j]["quantity"], false, sells[j]["pps_threshold"], false)
+                } catch(e) { // unable to sell
+                    console.log(e)
+                    leftover = true
+                    continue
+                }
+                // otherwise, if it was able to sell, remove from sells
+                sells = sells.filter(x => x["_id"] !== sells[j]["_id"])
+                j--
+            }
+            // exectue all buys
+            for (let j = 0; j < buys.length; j++) {
+                try {
+                    await buy(portfolio["_id"].toString(), buys[j]["ticker"], buys[j]["quantity"], false, buys[j]["pps_threshold"], buys[j]["priority"], false)
+                } catch(e) { // unable to buy
+                    console.log(e)
+                    leftover = true
+                    continue
+                }
+                // otherwise, if it was able to buy, remove from buys
+                buys = buys.filter(x => x["_id"] !== buys[j]["_id"])
+                j--
+            }
+            // update portfolio
+            awaitingTrades = sells.concat(buys)
+            await portfolioCollection.updateOne({ _id: portfolio["_id"] }, { $set: { "awaitingTrades": awaitingTrades } })
+        }
+    }
+/*
             for (let j = 0; j < awaitingTrades.length; j++) {
                 // check for type
                 if (awaitingTrades[j]["type"] == "sell") { // attempt to execute immediately
                     try {
-                        await sell(portfolio["_id"], awaitingTrades[j]["ticker"], awaitingTrades[j]["quantity"], threshold = awaitingTrades[j]["pps_threshold"], auto = false)
+                        await sell(portfolio["_id"], awaitingTrades[j]["ticker"], awaitingTrades[j]["quantity"], false, threshold = awaitingTrades[j]["pps_threshold"], auto = false)
                     } catch { // unable to sell
                         leftover = true
                         continue
@@ -431,7 +476,7 @@ async function autoTrade() {
             for (let j = 0; j < buys.length; j++) {
                 let buyTrade = buys[j][1]
                 try {
-                    await buy(portfolio["_id"], buyTrade["ticker"], buyTrade["quantity"], threshold = buyTrade["pps_threshold"], auto = false)
+                    await buy(portfolio["_id"], buyTrade["ticker"], buyTrade["quantity"], false, threshold = buyTrade["pps_threshold"], auto = false)
                 } catch { // unable to buy
                     leftover = true
                     continue
@@ -443,6 +488,7 @@ async function autoTrade() {
             await portfolioCollection.updateOne({ _id: portfolio["_id"] }, { $set: { "awaitingTrades": awaitingTrades } })
         }
     }
+*/
 
     // if there are leftover awaiting trades, set timeout
     if (leftover) {
@@ -499,5 +545,6 @@ module.exports = {
     buy,
     sell,
     getAutoBuysSorted,
-    getTransactions
+    getTransactions,
+    autoTrade
 }
