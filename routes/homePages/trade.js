@@ -31,9 +31,6 @@ router.post('/', async (req, res) => {
             // priority: priority                                xx
 
             console.log("/trade route received a request to process!");
-            // Check if user wants to sell or buy stocks.
-            // const trans_opt = xss(req.body.trans_opt) == "buy" ? :  || xss(req.body.sell); /* true = buy and false = sell. */
-            //console.log(req);
 
             const ticker = xss(req.body.ticker);
             validation.checkIsProper(ticker, "string", "Stock ticker");
@@ -73,7 +70,7 @@ router.post('/', async (req, res) => {
                 // make the manual trade call HERE
 
                 if (trans_opt == "buy") {
-                    retval = await transactions.buy(req.session.stockPortId, ticker, quantity, true);
+                    retval = await transactions.buy(req.session.stockPortId, ticker, quantity, true, true);
                 } else {
                     retval = await transactions.sell(req.session.stockPortId, ticker, quantity, true);
                 }
@@ -101,27 +98,33 @@ router.post('/', async (req, res) => {
                 // make the automated trade call HERE
 
                 if (trans_opt == "buy") {
-                    retval = await transactions.buy(req.session.stockPortId, ticker, quantity, false, threshold, priority, true);
+                    retval = await transactions.buy(req.session.stockPortId, ticker, quantity, true, true, threshold, priority, true);
                 } else {
-                    retval = await transactions.sell(req.session.stockPortId, ticker, quantity, false, threshold, true);
+                    retval = await transactions.sell(req.session.stockPortId, ticker, quantity, true, threshold, true);
                 }
             }
 
-            // check if trade was successful. 
+            /* Trade was successful */
+            let str = ``;
+            if (retval) {
+                str += `Successfully `;
 
-            // then, update the activities page? -- this might already be done actually
+                if (retval.mode == 'manual') {
+                    str += `executed trade`;
+                } else {
+                    str += `created trade order`;
 
-            // retval = {
-            //     auth: true,
-            //     ticker: "aapl",
-            //     type: "sell",
-            //     quantity: 100,
-            //     cost: 5000,
-            //     mode: "manual"
-            // };
+                }
+                str += ` to ${retval.type} ${retval.quantity} shares of ${retval.ticker}. Transaction amount: $${retval.total}.`;
 
-            res.render('homePages/trade.handlebars',
-                { title: 'Trade', user: 'TODO', trade_info: retval });
+            } else {
+                str = `Error: Failed to make/create a trade. Please try again!`;
+            }
+
+
+            res.send(str);
+            // return res.render('homePages/trade.handlebars',
+            //     { title: 'Trade', user: 'TODO', trade_info: retval });
 
         } catch (error) {
             console.log(error);
