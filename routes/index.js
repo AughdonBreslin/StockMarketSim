@@ -11,6 +11,7 @@ const databaseRoutes = require('./additional/database');
 const stockPortfolio = require('../data/stockPortfolio');
 const users = require('../data/users');
 const cron = require('node-schedule');
+const api = require('../data/api');
 
 const constructorMethod = (app) => {
     // Home Page
@@ -26,11 +27,19 @@ const constructorMethod = (app) => {
             } catch (e) {
                 console.log(e);
             }
+
+            // get previous days' portfolio value and current portfolio value
+            api.updateDailyValues();
+            const prevPVal = portfolio["dailyValues"][portfolio["dailyValues"].length-1][1];
+            const currPVal = api.pval();
+            let percent = ((currPVal - prevPVal) / prevPVal) * 100;
+            percent = percent.toFixed(2);
+            
             res.render('homePages/home.handlebars',
                 {
                     title: 'My Market Simulator',
                     username: req.session.username,
-                    percentChange: "TODO",
+                    percentChange: `${percent}%`,
                     balance: portfolio.balance,
                     value: portfolio.value
                 });

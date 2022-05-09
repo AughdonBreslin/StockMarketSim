@@ -42,7 +42,7 @@
 
     // "transactions": ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439011"], /* Array of transaction_id"s */
 
-    "dailyValues": [15000, 16000, 15000, 18000, 19000], /* tracks portfolio value over time -- updated daily. | min: 0. max: Number.MAX_SAFE_INTEGER - 1 */ 
+    "dailyValues": [["<YYYY-mm-dd>", 15000], ["<YYYY-mm-dd>", 15000], ["<YYYY-mm-dd>", 15000], ["<YYYY-mm-dd>", 15000], ["<YYYY-mm-dd>", 15000]], /* tracks portfolio value over time -- updated daily. | min: 0. max: Number.MAX_SAFE_INTEGER - 1 */ 
     
     "settings": {
         "_id": "507f1f77bcf86cd799439011",        /* Dont need this either */

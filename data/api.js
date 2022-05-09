@@ -5,6 +5,8 @@ const portfolios = mongoCollections.portfolios
 const validation = require('../validation')
 const key = "FN6CRSE4MHKTRH4X"
 
+let awaiting = false
+
 // price(ticker)
 async function price(ticker, interval="1min") {
     // validate ticker and interval
@@ -82,8 +84,65 @@ async function pval(id) {
     */
 }
 
+// timeToFour
+function timeToFour() {
+    let hours = 0
+    let minutes = 0
+    let seconds = 0
+    const date = new Date()
+
+    // find time to 16
+    // get time to hour first
+    minutes = 60 - date.getMinutes()
+    if (date.getSeconds() != 0) {
+        minutes--
+        seconds = 60 - date.getSeconds()
+    }
+
+    // check if hour is before/after 9
+    if (date.getHours() > 16) {
+        hours = 24 - date.getHours() + 16
+    } else {
+        hours = 16 - date.getHours()
+    }
+
+    // adjust for minutes
+    if (!(minutes == 0 && seconds == 0)) {
+        hours--
+    }
+
+    return ((hours * 60 * 60) + (minutes * 60) + seconds) * 1000
+}
+
+// updateDailyValues
+async function updateDailyValues(id) {
+    // validate id
+    id = validation.checkId(id, "Stock Portfolio ID")    
+
+    // get the portfolio
+    const portfolioCollection = await portfolios()
+    const portfolio = await portfolioCollection.findOne({_id: ObjectId(id)})
+    if(!portfolio) throw "Portfolio not found"
+
+    // get most recent DailyValue
+    const latest = portfolio["dailyValues"][portfolio["dailyValues"].length-1][0]
+    
+    // check if day, month, and year are the same
+    const date = new Date()
+    if(!awaiting && latest.getDate() === date.getDate() && latest.getMonth() === date.getMonth() && latest.getFullYear() === date.getFullYear()) {
+        awaiting = true
+        setTimeout(function() {updateDailyValues(id)}, timeToFour())
+    }
+
+    // update the portfolio
+    portfolio["dailyValues"].push([new Date(), await pval(id)])
+    const updateInfo = await portfolioCollection.updateOne({"_id": ObjectId(id)}, { $set: portfolio })
+    if (!updateInfo["acknowledged"] || !updateInfo["matchedCount"] || !updateInfo["modifiedCount"]) throw "Portfolio was not updated"
+}
+
 module.exports = {
     price,
     dailyHistory,
-    pval
+    pval,
+    updateDailyValues
 }
