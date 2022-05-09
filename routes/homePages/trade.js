@@ -23,12 +23,13 @@ router.post('/', async (req, res) => {
     if (req.session.username) {
 
         try {
-            // ticker: ticker,                                   xx
-            // quantity: quantity,                               xx
-            // trans_opt: trans_opt,   'buy' or 'sell'           xx
-            // trans_mode: trans_mode, 'automated' or 'manual'   xx
-            // threshold: threshold,                             xx
-            // priority: priority                                xx
+            // req.body:
+            // ticker: ticker,                                   
+            // quantity: quantity,                               
+            // trans_opt: trans_opt,   'buy' or 'sell'          
+            // trans_mode: trans_mode, 'automated' or 'manual'   
+            // threshold: threshold,                             
+            // priority: priority                                
 
             console.log("/trade route received a request to process!");
 
