@@ -5,12 +5,56 @@
     let continueButton = document.getElementById('continueButton');
     let cancelButton = document.getElementById('cancelButton');
     const logoutButton = document.getElementById('logoutButton');
+    let myChart;
     logoutButton.addEventListener('click', event => {
         logoutCheck.style.display = "inline-flex";
         continueButton.style.display = "inline-flex";
         cancelButton.style.display = "inline-flex";
     });
 
+    $(document).on('click', '.stockLink', (event) => {
+        event.preventDefault();
+
+        let requestConfig = {
+            method: 'GET',
+            url: event.target.href
+        };
+
+        $.ajax(requestConfig).then(function (response) {
+
+            if (response) {
+                if (myChart !== undefined) {
+                    myChart.destroy();
+                }
+                let labels = Object.keys(response["Time Series (Daily)"]);
+                response = Object.values(response["Time Series (Daily)"]);
+
+                const newArray = response.map(entry => Number(entry['4. close']));
+
+                let canvas = document.getElementById('myChart');
+                let data = {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Stock History',
+                        backgroundColor: 'rgb(255, 99, 132)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        data: newArray,
+                    }]
+                };
+                
+                const config = {
+                    type: 'line',
+                    data: data,
+                    options: {}
+                };
+
+                myChart = new Chart(
+                    canvas,
+                    config
+                  );
+            }
+        })
+    });
 
     /* DEPOSIT / WITHDRAW */
     let portBalance = $('#balance'),
@@ -49,4 +93,5 @@
             });
         }
     });
+
   })(window.jQuery);

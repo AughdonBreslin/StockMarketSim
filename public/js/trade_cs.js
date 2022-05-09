@@ -154,12 +154,11 @@ $(function () {
         $.ajax(requestConfig).then(function (responseMessage) {
             console.log("response received!");
             console.log(responseMessage);
+
+            // Show responseMessage to the user in html:
+            $('#trade_conf_msg').html(responseMessage);
+
         });
-
-
-        // Send the request to the server
-
-
 
     });
 
