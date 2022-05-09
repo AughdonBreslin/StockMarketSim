@@ -29,9 +29,9 @@ const constructorMethod = (app) => {
             }
 
             // get previous days' portfolio value and current portfolio value
-            api.updateDailyValues();
+            api.updateDailyValues(req.session.stockPortId);
             const prevPVal = portfolio["dailyValues"][portfolio["dailyValues"].length-1][1];
-            const currPVal = api.pval();
+            const currPVal = api.pval(req.session.stockPortId);
             let percent = ((currPVal - prevPVal) / prevPVal) * 100;
             percent = percent.toFixed(2);
             
@@ -39,7 +39,7 @@ const constructorMethod = (app) => {
                 {
                     title: 'My Market Simulator',
                     username: req.session.username,
-                    percentChange: `${percent}%`,
+                    percentChange: `${percent}`,
                     balance: portfolio.balance,
                     value: portfolio.value
                 });
